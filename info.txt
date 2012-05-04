@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Gooey"
+	"version"     "1.00"
+	"author_name" "!cake"
+	"author_url"  ""
+	"info"        "When used in conjunction with Visual Basic, IP addresses can be backtraced."
+	"override"    "0"
+}

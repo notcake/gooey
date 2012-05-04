@@ -1,0 +1,16 @@
+local PANEL = {}
+Gooey.ToolbarSeparator = Gooey.MakeConstructor (PANEL, Gooey.ToolbarItem)
+
+function PANEL:ctor (...)
+	self:Init ()
+	
+	self:SetWidth (3)
+end
+
+function PANEL:Init ()
+end
+
+function PANEL:Paint ()
+	surface.SetDrawColor (128, 128, 128, 255)
+	surface.DrawLine (1, 2, 1, self.Height - 2)
+end
