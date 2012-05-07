@@ -1,6 +1,9 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self.ChildNodes = nil
+	self.ChildNodeCount = 0
+
 	self.Populated = false
 	self.ExpandOnPopulate = false
 	
@@ -17,6 +20,7 @@ function PANEL:AddNode (name)
 	node:SetRoot (self:GetRoot ())
 	
 	self.ChildNodes:AddItem (node)
+	self.ChildNodeCount = self.ChildNodeCount + 1
 	self:InvalidateLayout ()
 	
 	if self.ExpandOnPopulate then
@@ -27,6 +31,10 @@ function PANEL:AddNode (name)
 	self:LayoutRecursive ()
 	
 	return node
+end
+
+function PANEL.DefaultComparator (a, b)
+	return a:GetText () < b:GetText ()
 end
 
 function PANEL:FindChild (text)
@@ -42,7 +50,7 @@ function PANEL:FindChild (text)
 end
 
 function PANEL:GetChildCount ()
-	return self.ChildNodes and #self.ChildNodes:GetItems () or 0
+	return self.ChildNodeCount
 end
 
 function PANEL:GetIcon ()
@@ -87,11 +95,11 @@ function PANEL:Remove ()
 end
 
 function PANEL:RemoveNode (node)
-	if not self.ChildNodes then
-		return
-	end
+	if not self.ChildNodes then return end
+	if node:GetParent () ~= self.ChildNodes:GetCanvas () then return end
 	self.ChildNodes:RemoveItem (node)
-	if #self.ChildNodes:GetItems () == 0 then
+	self.ChildNodeCount = self.ChildNodeCount - 1
+	if self.ChildNodeCount == 0 then
 		self:SetExpandable (false)
 	end
 	
@@ -127,13 +135,17 @@ function PANEL:SetIcon (icon)
 	self.Icon:SetImage (icon)
 end
 
-function PANEL:SortChildren (sorter)
-	if not self.ChildNodes then
-		return
-	end
-	table.sort (self.ChildNodes:GetItems (), sorter or function (a, b)
-		return a:GetText ():lower () < b:GetText ():lower ()
-	end)
+function PANEL:SortChildren (comparator)
+	if not self.ChildNodes then return end
+	
+	comparator = comparator or self.Comparator or self.DefaultComparator
+	table.sort (self.ChildNodes:GetItems (),
+		function (a, b)
+			if a == nil then return false end
+			if b == nil then return true end
+			return comparator (a, b)
+		end
+	)
 	self.ChildNodes:InvalidateLayout ()
 end
 

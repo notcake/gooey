@@ -101,14 +101,14 @@ function PANEL:PerformLayout ()
 	end
 	local w, h = self:GetMinimumWidth (), 0
 	
-	for _, item in ipairs (self:GetItems ()) do
+	for _, item in pairs (self:GetItems ()) do
 		item:PerformLayout()
         w = math.max (w, item:GetWide ())
     end
 	
 	self:SetWide (w)
 	
-	for _, item in ipairs (self:GetItems ()) do
+	for _, item in pairs (self:GetItems ()) do
 		item:SetWide (w)
 		item:SetPos (0, h)
 		item:InvalidateLayout (true)

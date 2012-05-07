@@ -35,7 +35,7 @@ if SERVER then
 	end
 	
 	if not Gooey.Debug then
-		-- Gooey.AddLuaFolderRecursive ("gooey")
+		Gooey.AddLuaFolderRecursive ("gooey")
 	end
 end
 

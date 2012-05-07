@@ -66,6 +66,10 @@ function PANEL:AddLine (...)
 	return line
 end
 
+function PANEL.DefaultComparator (a, b)
+	return a:GetText () < b:GetText ()
+end
+
 function PANEL:FindLine (text)
 	for _, line in pairs (self.Lines) do
 		if line:GetColumnText (1) == text then
@@ -123,14 +127,15 @@ function PANEL:SetItemHeight (itemHeight)
 	self:SetDataHeight (itemHeight)
 end
 
-local function defaultComparator (a, b)
-	return a:GetText () < b:GetText ()
-end
-
 function PANEL:Sort (comparator)
-	comparator = comparator or defaultComparator
-
-	table.sort (self.Sorted, comparator)
+	comparator = comparator or self.Comparator or self.DefaultComparator
+	table.sort (self.Sorted,
+		function (a, b)
+			if a == nil then return false end
+			if b == nil then return true end
+			return comparator (a, b)
+		end
+	)
 	
 	self:SetDirty (true)
 	self:InvalidateLayout ()
