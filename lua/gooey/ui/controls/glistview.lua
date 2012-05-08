@@ -141,6 +141,22 @@ function PANEL:Sort (comparator)
 	self:InvalidateLayout ()
 end
 
+function PANEL:SortByColumn (columnId, descending)
+	table.Copy (self.Sorted, self.Lines)
+	table.sort (self.Sorted,
+		function (a, b)
+			if descending then
+				a, b = b, a
+			end
+
+			return (a:GetColumnText (columnId) or "") < (b:GetColumnText (columnId) or "")
+		end
+	)
+	
+	self:SetDirty (true)
+	self:InvalidateLayout ()
+end
+
 -- Events
 function PANEL:DoDoubleClick (_, item)
 	self:DispatchEvent ("DoubleClick", item)
