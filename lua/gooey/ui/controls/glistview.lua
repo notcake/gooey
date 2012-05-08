@@ -1,14 +1,36 @@
 local PANEL = {}
 
+--[[
+	Events:
+		SelectedChanged (item)
+			Fired when the selected item has changed.
+		SelectedCleared ()
+			Fired when the selection has been cleared.
+]]
+
 function PANEL:Init ()
+	Gooey.EventProvider (self)
+	self.SelectionController = Gooey.SelectionController (self)
+	
 	self.Disabled = false
+	self.LastClickTime = 0
 
 	self.Menu = nil
 	self.ShowIcons = true
 	
 	self:SetItemHeight (20)
 	
-	Gooey.EventProvider (self)
+	self.SelectionController:AddEventListener ("SelectionChanged",
+		function (_, item)
+			self:DispatchEvent ("SelectionChanged", item)
+		end
+	)
+	
+	self.SelectionController:AddEventListener ("SelectionCleared",
+		function (_, item)
+			self:DispatchEvent ("SelectionCleared", item)
+		end
+	)
 end
 
 function PANEL:AddColumn (name, material, position)
@@ -66,6 +88,10 @@ function PANEL:AddLine (...)
 	return line
 end
 
+function PANEL:ClearSelection ()
+	self.SelectionController:ClearSelection ()
+end
+
 function PANEL.DefaultComparator (a, b)
 	return a:GetText () < b:GetText ()
 end
@@ -79,8 +105,30 @@ function PANEL:FindLine (text)
 	return nil
 end
 
+function PANEL:GetColumnHeight ()
+	local column = self.Columns [1]
+	if not column then return 0 end
+	return column:GetTall ()
+end
+
 function PANEL:GetColumns ()
 	return self.Columns
+end
+
+function PANEL:GetContentBounds ()
+	local scrollbarWidth = 0
+	if self.VBar and self.VBar:IsVisible () then
+		scrollbarWidth = self.VBar:GetWide ()
+	end
+	return 0, self:GetColumnHeight (), self:GetWide () - scrollbarWidth, self:GetTall ()
+end
+
+function PANEL:GetItemEnumerator ()
+	local next, tbl, key = pairs (self:GetItems ())
+	return function ()
+		key = next (tbl, key)
+		return tbl [key]
+	end
 end
 
 function PANEL:GetItemHeight ()
@@ -92,17 +140,36 @@ function PANEL:GetItems ()
 end
 
 function PANEL:GetSelectedItems ()
-	local items = {}
-	for _, line in pairs (self.Lines) do
-		if line:GetSelected () then
-			items [#items + 1] = line
-		end
-	end
-	return items
+	return self.SelectionController:GetSelectedItems ()
+end
+
+function PANEL:GetSelectedItem ()
+	return self.SelectionController:GetSelectedItem ()
+end
+
+function PANEL:GetSelectionEnumerator ()
+	return self.SelectionController:GetSelectionEnumerator ()
+end
+
+function PANEL:GetSelectionMode ()
+	return self.SelectionController:GetSelectionMode ()
 end
 
 function PANEL:IsDisabled ()
 	return self.Disabled
+end
+
+function PANEL:ItemFromPoint (x, y)
+	x, y = self:LocalToScreen (x, y)
+	for _, item in pairs (self:GetItems ()) do
+		local px, py = item:LocalToScreen (0, 0)
+		local w, h = item:GetSize ()
+		if px <= x and x < px + w and
+			py <= y and y < py + h then
+			return item
+		end
+	end
+	return nil
 end
 
 function PANEL:SetDisabled (disabled)
@@ -113,6 +180,10 @@ function PANEL:SetDisabled (disabled)
 	for _, Line in pairs (self.Lines) do
 		Line:SetDisabled (disabled)
 	end
+end
+
+function PANEL:PaintOver ()
+	self.SelectionController:PaintOver (self)
 end
 
 function PANEL:Remove ()
@@ -157,28 +228,52 @@ function PANEL:SortByColumn (columnId, descending)
 	self:InvalidateLayout ()
 end
 
--- Events
-function PANEL:DoDoubleClick (_, item)
-	self:DispatchEvent ("DoubleClick", item)
+function PANEL:SetSelectionMode (selectionMode)
+	self.SelectionController:SetSelectionMode (selectionMode)
 end
 
-function PANEL:DoRightClick (item)
-	if self.Menu then
-		self.Menu:Open (item)
+-- Events
+function PANEL:DoClick ()
+	if SysTime () - self.LastClickTime < 0.2 then
+		self:DoDoubleClick ()
+		self.LastClickTime = 0
+	else
+		self:DispatchEvent ("Click", self:ItemFromPoint (self:CursorPos ()))
+		self.LastClickTime = SysTime ()
 	end
-	self:DispatchEvent ("RightClick", item)
+end
+
+function PANEL:DoDoubleClick ()
+	self:DispatchEvent ("DoubleClick", self:ItemFromPoint (self:CursorPos ()))
+end
+
+function PANEL:DoRightClick ()
+	self:DispatchEvent ("RightClick", self:ItemFromPoint (self:CursorPos ()))
 end
 
 function PANEL:ItemChecked (line, i, checked)
 	self:DispatchEvent ("ItemChecked", line, i, checked)
 end
 
+function PANEL:OnCursorMoved (x, y)
+	self:DispatchEvent ("MouseMove", 0, x, y)
+end
+
+function PANEL:OnMousePressed (mouseCode)
+	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
+end
+
 function PANEL:OnMouseReleased (mouseCode)
-	self:ClearSelection ()
-	if mouseCode == MOUSE_RIGHT then
-		self:DoRightClick ()
-	end
+	self:DispatchEvent ("MouseUp", mouseCode, self:CursorPos ())
 	if mouseCode == MOUSE_LEFT then
+		self:DoClick ()
+	elseif mouseCode == MOUSE_RIGHT then
+		self:DoRightClick ()
+		if self:GetSelectionMode () == Gooey.SelectionMode.Multiple then
+			if self.Menu then self.Menu:Open (self:GetSelectedItems ()) end
+		else
+			if self.Menu then self.Menu:Open (self:GetSelectedItem ()) end
+		end
 	end
 end
 

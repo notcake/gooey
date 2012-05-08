@@ -1,10 +1,15 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self.ListView = nil
+
 	self.LastClickTime = 0
 	self.Disabled = false
 
 	self.Icon = nil
+	
+	-- Selection
+	self.Selectable = true
 end
 
 function PANEL:DataLayout (listView)
@@ -34,8 +39,16 @@ function PANEL:DataLayout (listView)
 	end
 end
 
+function PANEL:CanSelect ()
+	return self.Selectable
+end
+
 function PANEL:GetIcon ()
 	return self.Icon
+end
+
+function PANEL:GetListView ()
+	return self.ListView
 end
 
 function PANEL:GetText (i)
@@ -44,6 +57,10 @@ end
 
 function PANEL:IsDisabled ()
 	return self.Disabled
+end
+
+function PANEL:IsSelected ()
+	return self.ListView.SelectionController:IsSelected (self)
 end
 
 function PANEL:Paint ()
@@ -63,6 +80,11 @@ function PANEL:Remove ()
 		listView:RemoveLine (self:GetID ())
 	end
 	_R.Panel.Remove (self)
+end
+
+function PANEL:Select ()
+	self.ListView.SelectionController:ClearSelection ()
+	self.ListView.SelectionController:AddToSelection (self)
 end
 
 function PANEL:SetCheckState (i, checked)
@@ -96,13 +118,33 @@ function PANEL:SetIcon (icon)
 	self.Icon = icon
 end
 
+function PANEL:SetCanSelect (canSelect)
+	self.Selectable = canSelect
+end
+
+function PANEL:SetListView (listView)
+	self.ListView = listView
+end
+
 function PANEL:SetText (text)
 	self:SetColumnText (1, text)
 end
 
 -- Events
-function PANEL:OnRightClick ()
-	self:GetListView ():DoRightClick (self)
+function PANEL:DoClick ()
+	self.ListView:DoClick (self)
+end
+
+function PANEL:DoRightClick ()
+	self.ListView:DoRightClick (self)
+end
+
+function PANEL:OnMousePressed (mouseCode)
+	self.ListView:OnMousePressed (mouseCode)
+end
+
+function PANEL:OnMouseReleased (mouseCode)
+	self.ListView:OnMouseReleased (mouseCode)
 end
 
 vgui.Register ("GListViewItem", PANEL, "DListView_Line")
