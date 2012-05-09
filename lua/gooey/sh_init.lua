@@ -1,5 +1,4 @@
 Gooey = Gooey or {}
-Gooey.Debug = SinglePlayer () or (GetConVar ("sensitivity") and true or false)
 Gooey.Resources = {}
 
 if Gooey.DispatchEvent then
@@ -34,9 +33,7 @@ if SERVER then
 		end
 	end
 	
-	if not Gooey.Debug then
-		Gooey.AddLuaFolderRecursive ("gooey")
-	end
+	Gooey.AddLuaFolderRecursive ("gooey")
 end
 
 

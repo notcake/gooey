@@ -77,7 +77,7 @@ function PANEL:Remove ()
 	local listView = self:GetListView ()
 	if listView then
 		self:SetListView (nil)
-		listView:RemoveLine (self:GetID ())
+		listView:RemoveItem (self)
 	end
 	_R.Panel.Remove (self)
 end

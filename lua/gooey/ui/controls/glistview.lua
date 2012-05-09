@@ -187,11 +187,28 @@ function PANEL:PaintOver ()
 end
 
 function PANEL:Remove ()
-	if self.Menu and
-		self.Menu:IsValid () then
-		self.Menu:Remove ()
-	end
+	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
 	_R.Panel.Remove (self)
+end
+
+function PANEL:RemoveItem (listViewItem)
+	if not listViewItem or not listViewItem:IsValid () then return end
+
+	if self.Lines [listViewItem:GetID ()] ~= listViewItem then return end
+	local selectedID = self:GetSortedID (listViewItem:GetID ())
+	self.Lines [listViewItem:GetID ()] = nil
+	table.remove (self.Sorted, selectedID)
+	
+	self.SelectionController:RemoveFromSelection (listViewItem)
+
+	self:SetDirty (true)
+	self:InvalidateLayout ()
+
+	listViewItem:Remove ()
+end
+
+function PANEL:RemoveLine (lineId)
+	Gooey.DeprecatedFunction ()
 end
 
 function PANEL:SetItemHeight (itemHeight)

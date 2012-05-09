@@ -33,17 +33,29 @@ function PANEL:AddNode (name)
 	return node
 end
 
-function PANEL.DefaultComparator (a, b)
-	return a:GetText () < b:GetText ()
+function PANEL:Clear ()
+	if not self.ChildNodes then return end
+	self.ChildNodes:Clear ()
+	self.ChildNodeCount = 0
+	self:SetExpanded (false)
+	self:SetExpandable (false)
+	self:MarkUnpopulated ()
+	
+	self:LayoutRecursive ()
+end
+
+function PANEL:ExpandTo (expanded)
+	self:SetExpanded (expanded)
+	self:GetParentNode():ExpandTo (expanded)
 end
 
 function PANEL:FindChild (text)
 	if not self.ChildNodes then
 		return nil
 	end
-	for _, Item in pairs (self.ChildNodes:GetItems ()) do
-		if Item:GetText () == text then
-			return Item
+	for _, item in pairs (self.ChildNodes:GetItems ()) do
+		if item:GetText () == text then
+			return item
 		end
 	end
 	return nil
@@ -51,6 +63,10 @@ end
 
 function PANEL:GetChildCount ()
 	return self.ChildNodeCount
+end
+
+function PANEL:GetComparator ()
+	return self.Comparator or self.DefaultComparator or self:GetParentNode ():GetComparator ()
 end
 
 function PANEL:GetIcon ()
@@ -63,6 +79,10 @@ end
 
 function PANEL:IsExpandable ()
 	return self:HasChildren () or self:GetForceShowExpander ()
+end
+
+function PANEL:IsExpanded ()
+	return self.m_bExpanded
 end
 
 function PANEL:LayoutRecursive ()
@@ -88,7 +108,7 @@ end
 
 function PANEL:Remove ()
 	if self.Label:GetSelected () then
-		self:GetRoot ():SetSelectedItem (nil)
+		self:GetRoot ():SetSelectedItem (self:GetParentNode ())
 	end
 	self:GetParentNode ():RemoveNode (self)
 	_R.Panel.Remove (self)
@@ -117,12 +137,14 @@ function PANEL:SetExpandable (expandable)
 end
 
 function PANEL:SetExpanded (expanded, suppressAnimation)
+	if self:IsExpanded () == expanded then return end
 	if expanded and
 		not self.Populated and
 		self:IsExpandable () then
 		self:SetExpandOnPopulate (true)
 		self:Populate ()
 	end
+	if self:IsExpanded () == expanded then return end
 	DTree_Node.SetExpanded (self, expanded, suppressAnimation)
 end
 
@@ -138,7 +160,7 @@ end
 function PANEL:SortChildren (comparator)
 	if not self.ChildNodes then return end
 	
-	comparator = comparator or self.Comparator or self.DefaultComparator
+	comparator = comparator or self:GetComparator ()
 	table.sort (self.ChildNodes:GetItems (),
 		function (a, b)
 			if a == nil then return false end
@@ -156,6 +178,16 @@ end
 -- Events
 function PANEL:DoRightClick ()
 	self:GetRoot ():SetSelectedItem (self)
+end
+
+function PANEL:InternalDoClick ()
+	local expanded = self:IsExpanded ()
+	self:GetRoot ():SetSelectedItem (self)
+
+	if self:DoClick () then return end
+	if self:GetRoot ():DoClick (self) then return end
+	
+	self:SetExpanded (not expanded)
 end
 
 vgui.Register ("GTreeViewNode", PANEL, "DTree_Node") 
