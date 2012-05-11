@@ -251,7 +251,7 @@ end
 
 -- Events
 function PANEL:DoClick ()
-	if SysTime () - self.LastClickTime < 0.2 then
+	if SysTime () - self.LastClickTime < 0.3 then
 		self:DoDoubleClick ()
 		self.LastClickTime = 0
 	else

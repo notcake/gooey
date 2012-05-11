@@ -33,10 +33,11 @@ function PANEL:Init ()
 	Gooey.EventProvider (self)
 end
 
-function PANEL:AddOption (text, callback)
+function PANEL:AddOption (id, callback)
 	local item = vgui.Create ("GMenuItem", self)
 	item:SetParentMenu (self)
-	item:SetText (text)
+	item:SetText (id)
+	item.Id = id
 	if callback then
 		item:AddEventListener ("Click",
 			function (_)
@@ -49,11 +50,12 @@ function PANEL:AddOption (text, callback)
 	return item
 end
 
-function PANEL:AddSeparator ()
+function PANEL:AddSeparator (id)
     local item = vgui.Create ("DBevel", self)
     item:SetTall (2)
     item:SetAlpha (100)
-    
+    item.Id = id
+	
     self:AddPanel (item)
 	
 	return item
@@ -65,9 +67,9 @@ function PANEL:CloseMenus ()
 	CloseMenus ()
 end
 
-function PANEL:FindItem (text)
+function PANEL:FindItem (id)
 	for _, item in pairs (self:GetItems ()) do
-		if item:GetText () == text then
+		if item.Id == id then
 			return item
 		end
 	end

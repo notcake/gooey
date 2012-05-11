@@ -1,6 +1,22 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	-- Code copied from DTree_Node
+	self.Label = vgui.Create ("DTree_Node_Button", self)
+	self.Label.DoClick = function () self:InternalDoClick () end
+	self.Label.DoRightClick = function () self:InternalDoRightClick () end
+
+	self.Expander = vgui.Create ("DTinyButton", self)
+	self.Expander:SetText ("+")
+	self.Expander.DoClick = function () self:SetExpanded (not self.m_bExpanded) end
+	self.Expander:SetVisible (false)
+	
+	self.Icon = vgui.Create ("GImage", self)
+	
+	self:SetTextColor( Color( 0, 0, 0, 255 ) )
+	
+	self.animSlide = Derma_Anim( "Anim", self, self.AnimSlide )
+
 	self.ChildNodes = nil
 	self.ChildNodeCount = 0
 
@@ -116,6 +132,7 @@ end
 
 function PANEL:RemoveNode (node)
 	if not self.ChildNodes then return end
+	if not node or not node:IsValid () then return end
 	if node:GetParent () ~= self.ChildNodes:GetCanvas () then return end
 	self.ChildNodes:RemoveItem (node)
 	self.ChildNodeCount = self.ChildNodeCount - 1
@@ -190,4 +207,18 @@ function PANEL:InternalDoClick ()
 	self:SetExpanded (not expanded)
 end
 
-vgui.Register ("GTreeViewNode", PANEL, "DTree_Node") 
+vgui.Register ("GTreeViewNode", PANEL, "Panel") 
+
+-- Import other functions from DTree_Node
+local StartTime = SysTime ()
+local function TryImport ()
+	if not DTree_Node then
+		if SysTime () - StartTime > 60 then return end -- failed
+		timer.Simple (0, TryImport)
+	end
+	
+	for k, v in pairs (DTree_Node) do
+		if not PANEL [k] then PANEL [k] = v end
+	end
+end
+TryImport ()
