@@ -20,6 +20,9 @@ function PANEL:Init ()
 	
 	self:SetItemHeight (20)
 	
+	self.ColumnsById = {}
+	self.ColumnComparators = {}
+	
 	self.SelectionController:AddEventListener ("SelectionChanged",
 		function (_, item)
 			self:DispatchEvent ("SelectionChanged", item)
@@ -33,22 +36,24 @@ function PANEL:Init ()
 	)
 end
 
-function PANEL:AddColumn (name, material, position)
+function PANEL:AddColumn (id, material, position)
 	local column = nil
 	if self.m_bSortable then
 		column = vgui.Create ("GListViewColumn", self)
 	else
 		column = vgui.Create ("DListView_ColumnPlain", self)
 	end
-	column:SetName (name)
+	column:SetName (id)
 	column:SetMaterial (material)
 	column:SetZPos (10)
 	
 	if iPosition then
 	else
-		local ID = table.insert (self.Columns, column)
-		column:SetColumnID(ID)
+		local columnIndex = table.insert (self.Columns, column)
+		column:SetIndex (columnIndex)
 	end
+	column:SetId (id)
+	self.ColumnsById = column
 	
 	self:InvalidateLayout ()
 	
@@ -92,6 +97,10 @@ function PANEL:ClearSelection ()
 	self.SelectionController:ClearSelection ()
 end
 
+function PANEL:ColumnIndexFromId (id)
+	return self.ColumnsById [id] and self.ColumnsById [id]:GetIndex () or nil
+end
+
 function PANEL.DefaultComparator (a, b)
 	return a:GetText () < b:GetText ()
 end
@@ -105,10 +114,17 @@ function PANEL:FindLine (text)
 	return nil
 end
 
+function PANEL:GetColumnComparator (id)
+	return self.ColumnComparators [id] or self.Comparator or self.DefaultComparator
+end
+
+function PANEL:GetColumn (columnIdOrIndex)
+	return self.ColumnsById [columnIdOrIndex] or self.Columns [columnIdOrIndex]
+end
+
 function PANEL:GetColumnHeight ()
 	local column = self.Columns [1]
-	if not column then return 0 end
-	return column:GetTall ()
+	return column and column:GetTall () or 0
 end
 
 function PANEL:GetColumns ()
@@ -211,6 +227,10 @@ function PANEL:RemoveLine (lineId)
 	Gooey.DeprecatedFunction ()
 end
 
+function PANEL:SetColumnComparator (id, comparator)
+	self.ColumnComparators [id] = comparator
+end
+
 function PANEL:SetItemHeight (itemHeight)
 	self:SetDataHeight (itemHeight)
 end
@@ -229,15 +249,17 @@ function PANEL:Sort (comparator)
 	self:InvalidateLayout ()
 end
 
-function PANEL:SortByColumn (columnId, descending)
+function PANEL:SortByColumn (columnIdOrIndex, descending)
+	if type (columnIdOrIndex) == "number" then
+		columnIdOrIndex = self.Columns [columnIdOrIndex] and self.Columns [columnIdOrIndex]:GetId () or 1
+	end
+	local comparator = self:GetColumnComparator (columnIdOrIndex)
+
 	table.Copy (self.Sorted, self.Lines)
 	table.sort (self.Sorted,
 		function (a, b)
-			if descending then
-				a, b = b, a
-			end
-
-			return (a:GetColumnText (columnId) or "") < (b:GetColumnText (columnId) or "")
+			if descending then a, b = b, a end
+			return comparator (a, b, descending)
 		end
 	)
 	

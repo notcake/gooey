@@ -19,20 +19,22 @@ function PANEL:DataLayout (listView)
 	local w = listView:ColumnWidth (1)
 	local Columns = listView:GetColumns ()
 	if self.Icon then
-		local Icon = Gooey.ImageCache:GetImage (self.Icon)
-		local Spacing = (self:GetTall () - Icon:GetHeight ()) * 0.5
-		x = x + Spacing + Icon:GetWidth () + 1
-		w = w - Icon:GetWidth () - Spacing
+		local image = Gooey.ImageCache:GetImage (self.Icon)
+		local spacing = (self:GetTall () - image:GetHeight ()) * 0.5
+		x = x + image:GetWidth () + spacing + 1 - 4
+		w = w - image:GetWidth () - spacing     + 4
+		-- The offset of 4 is to correct for the padding applied to every column text label
 	end
 	for i = 1, #self.Columns do
 		if Columns [i]:GetType () == "Checkbox" then
 			self.Columns [i]:SetPos (x + (listView:ColumnWidth (i) - 14) * 0.5, (height - 14) * 0.5)
 			self.Columns [i]:SetSize (14, 14)
 		else
-			self.Columns [i]:SetPos (x, 0)
+			self.Columns [i]:SetPos (x + 4, 0)
 		end
 		if Columns [i]:GetType () == "Text" then
-			self.Columns [i]:SetSize (w, height)
+			self.Columns [i]:SetSize (w - 8, height)
+			self.Columns [i]:SetContentAlignment (self.ListView:GetColumn (i):GetAlignment ())
 		end
 		x = x + w
 		w = listView:ColumnWidth (i + 1)
@@ -67,9 +69,9 @@ function PANEL:Paint ()
 	DListView_Line.Paint (self)
 	
 	if self.Icon then
-		local Image = Gooey.ImageCache:GetImage (self.Icon)
-		local Spacing = (self:GetTall () - Image:GetHeight ()) * 0.5
-		Image:Draw (Spacing + 1, Spacing)
+		local image = Gooey.ImageCache:GetImage (self.Icon)
+		local spacing = (self:GetTall () - image:GetHeight ()) * 0.5
+		image:Draw (spacing + 1, spacing)
 	end
 end
 
@@ -87,30 +89,27 @@ function PANEL:Select ()
 	self.ListView.SelectionController:AddToSelection (self)
 end
 
-function PANEL:SetCheckState (i, checked)
-	if self.Columns [i] then
-		self.Columns [i]:SetValue (checked)
+function PANEL:SetCheckState (columnIdOrIndex, checked)
+	if type (columnIdOrIndex) == "string" then columnIdOrIndex = self.ListView:ColumnIndexFromId (columnIdOrIndex) end
+	if self.Columns [columnIdOrIndex] then
+		self.Columns [columnIdOrIndex]:SetValue (checked)
 		return
 	end
-	self.Columns [i] = vgui.Create ("GCheckbox", self)
+	self.Columns [columnIdOrIndex] = vgui.Create ("GCheckbox", self)
 	if self.Disabled then
-		self.Columns [i]:SetDisabled (self.Disabled)
+		self.Columns [columnIdOrIndex]:SetDisabled (self.Disabled)
 	end
-	self.Columns [i]:SetValue (checked)
-	self.Columns [i]:AddEventListener ("CheckStateChanged", function (_, checked)
-		self:GetListView ():ItemChecked (self, i, checked)
+	self.Columns [columnIdOrIndex]:SetValue (checked)
+	self.Columns [columnIdOrIndex]:AddEventListener ("CheckStateChanged", function (_, checked)
+		self.ListView:ItemChecked (self, columnIdOrIndex, checked)
 	end)
 end
 
 function PANEL:SetDisabled (disabled)
-	if disabled == nil then
-		disabled = true
-	end
+	if disabled == nil then disabled = true end
 	self.Disabled = disabled
-	for _, Item in pairs (self.Columns) do
-		if Item.SetDisabled then
-			Item:SetDisabled (disabled)
-		end
+	for _, columnItem in pairs (self.Columns) do
+		if columnItem.SetDisabled then columnItem:SetDisabled (disabled) end
 	end
 end
 
@@ -120,6 +119,14 @@ end
 
 function PANEL:SetCanSelect (canSelect)
 	self.Selectable = canSelect
+end
+
+function PANEL:SetColumnText (columnIdOrIndex, text)
+	if type (columnIdOrIndex) == "string" then columnIdOrIndex = self.ListView:ColumnIndexFromId (columnIdOrIndex) end
+	if not self.Columns [columnIdOrIndex] then
+		self.Columns [columnIdOrIndex] = vgui.Create ("DListViewLabel", self)
+	end
+	self.Columns [columnIdOrIndex]:SetText (text)
 end
 
 function PANEL:SetListView (listView)
