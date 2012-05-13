@@ -215,6 +215,7 @@ local function TryImport ()
 	if not DTree_Node then
 		if SysTime () - StartTime > 60 then return end -- failed
 		timer.Simple (0, TryImport)
+		return
 	end
 	
 	for k, v in pairs (DTree_Node) do
