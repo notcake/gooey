@@ -23,7 +23,7 @@ end
 
 function PANEL:OnMousePressed (mouseCode)
 	if mouseCode == MOUSE_LEFT then
-		if self.HoveredItem then
+		if self.HoveredItem and type (self.HoveredItem.Click) == "function" then
 			self.HoveredItem:Click ()
 		end
 	end
