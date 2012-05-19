@@ -1,6 +1,8 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self.Id = "Unknown"
+
 	-- Code copied from DTree_Node
 	self.Label = vgui.Create ("DTree_Node_Button", self)
 	self.Label.DoClick = function () self:InternalDoClick () end
@@ -31,6 +33,7 @@ function PANEL:AddNode (name)
 	self:CreateChildNodes()
 	
 	local node = vgui.Create ("GTreeViewNode", self)
+	node:SetId (name)
 	node:SetText (name)
 	node:SetParentNode (self)
 	node:SetRoot (self:GetRoot ())
@@ -65,12 +68,12 @@ function PANEL:ExpandTo (expanded)
 	self:GetParentNode():ExpandTo (expanded)
 end
 
-function PANEL:FindChild (text)
+function PANEL:FindChild (id)
 	if not self.ChildNodes then
 		return nil
 	end
 	for _, item in pairs (self.ChildNodes:GetItems ()) do
-		if item:GetText () == text then
+		if item:GetId () == id then
 			return item
 		end
 	end
@@ -89,6 +92,10 @@ function PANEL:GetIcon ()
 	return self.Icon and self.Icon.ImageName or nil
 end
 
+function PANEL:GetId ()
+	return self.Id
+end
+
 function PANEL:GetText ()
 	return self.Label:GetValue ()
 end
@@ -99,6 +106,10 @@ end
 
 function PANEL:IsExpanded ()
 	return self.m_bExpanded
+end
+
+function PANEL:IsPopulated ()
+	return self.Populated
 end
 
 function PANEL:LayoutRecursive ()
@@ -172,6 +183,10 @@ end
 function PANEL:SetIcon (icon)
 	Gooey.AddResource ("materials/" .. icon .. ".vmt")
 	self.Icon:SetImage (icon)
+end
+
+function PANEL:SetId (id)
+	self.Id = id
 end
 
 function PANEL:SortChildren (comparator)
