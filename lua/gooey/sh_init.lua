@@ -50,15 +50,23 @@ end
 
 Gooey:DispatchEvent ("Initialize")
 
-concommand.Add ("gooey_reload" .. (CLIENT and "" or "_sv"), function ()
-	include ("autorun/sh_gooey.lua")
-end)
-
 if SERVER then
-	concommand.Add ("gooey_reload_sh", function ()
+	concommand.Add ("gooey_reload_sv", function (ply)
+		if ply and not ply:IsSuperAdmin () then return end
+		
+		include ("autorun/sh_gooey.lua")
+	end)
+
+	concommand.Add ("gooey_reload_sh", function (ply)
+		if ply and not ply:IsSuperAdmin () then return end
+		
 		include ("autorun/sh_gooey.lua")
 		for _, ply in ipairs (player.GetAll ()) do
 			ply:ConCommand ("gooey_reload")
 		end
+	end)
+elseif CLIENT then
+	concommand.Add ("gooey_reload", function ()
+		include ("autorun/sh_gooey.lua")
 	end)
 end
