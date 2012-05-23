@@ -133,7 +133,15 @@ function PANEL:Populate ()
 	end
 end
 
-function PANEL:Remove ()
+function PANEL:Remove ()	
+	-- Remove children first, so selection can bubble up to us.
+	if self.ChildNodes then
+		for _, item in pairs (self.ChildNodes:GetItems ()) do
+			item:Remove ()
+		end
+	end
+	
+	-- Now bubble selection upwards.
 	if self.Label:GetSelected () then
 		self:GetRoot ():SetSelectedItem (self:GetParentNode ())
 	end
