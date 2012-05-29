@@ -22,11 +22,11 @@ if SERVER then
 		end
 	end
 
-	function Gooey.AddLuaFolderRecursive (folder)
-		Gooey.AddLuaFolder (folder)
-		local folders = file.FindDir ("../lua/" .. folder .. "/*")
-		for _, v in pairs (folders) do
-			Gooey.AddLuaFolderRecursive (folder .. "/" .. v)
+	function Gooey.AddCSLuaFolderRecursive (folder)
+		Gooey.AddCSLuaFolder (folder)
+		local folders = file.FindDir ("lua/" .. folder .. "/*", true)
+		for _, childFolder in pairs (folders) do
+			Gooey.AddCSLuaFolderRecursive (folder .. "/" .. childFolder)
 		end
 	end
 	
