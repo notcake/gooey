@@ -1,9 +1,6 @@
-Gooey = Gooey or {}
+if Gooey then return end
+Gooey = {}
 Gooey.Resources = {}
-
-if Gooey.DispatchEvent then
-	Gooey:DispatchEvent ("Unload")
-end
 
 function Gooey.AddResource (path)
 	Gooey.Resources [path] = true
@@ -54,12 +51,16 @@ if SERVER then
 	concommand.Add ("gooey_reload_sv", function (ply)
 		if ply and not ply:IsSuperAdmin () then return end
 		
+		if Gooey and Gooey.DispatchEvent then Gooey:DispatchEvent ("Unload") end
+		Gooey = nil
 		include ("autorun/sh_gooey.lua")
 	end)
 
 	concommand.Add ("gooey_reload_sh", function (ply)
 		if ply and not ply:IsSuperAdmin () then return end
 		
+		if Gooey and Gooey.DispatchEvent then Gooey:DispatchEvent ("Unload") end
+		Gooey = nil
 		include ("autorun/sh_gooey.lua")
 		for _, ply in ipairs (player.GetAll ()) do
 			ply:ConCommand ("gooey_reload")
@@ -67,6 +68,8 @@ if SERVER then
 	end)
 elseif CLIENT then
 	concommand.Add ("gooey_reload", function ()
+		if Gooey and Gooey.DispatchEvent then Gooey:DispatchEvent ("Unload") end
+		Gooey = nil
 		include ("autorun/sh_gooey.lua")
 	end)
 end
