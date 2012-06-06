@@ -13,7 +13,7 @@ end
 if SERVER then
 	AddCSLuaFile ("gooey/sh_init.lua")
 	
-	function Gooey.AddLuaFolder (folder)
+	function Gooey.AddCSLuaFolder (folder)
 		local files = file.FindInLua (folder .. "/*")
 		for _, fileName in pairs (files) do
 			if fileName:sub (-4) == ".lua" then
@@ -30,7 +30,7 @@ if SERVER then
 		end
 	end
 	
-	Gooey.AddLuaFolderRecursive ("gooey")
+	Gooey.AddCSLuaFolderRecursive ("gooey")
 end
 
 
