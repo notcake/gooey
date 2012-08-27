@@ -57,7 +57,7 @@ function PANEL:AddColumn (id, material, position)
 		column:SetIndex (columnIndex)
 	end
 	column:SetId (id)
-	self.ColumnsById = column
+	self.ColumnsById [id] = column
 	
 	self:InvalidateLayout ()
 	

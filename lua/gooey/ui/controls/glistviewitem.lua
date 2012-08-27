@@ -136,11 +136,14 @@ function PANEL:SetCanSelect (canSelect)
 end
 
 function PANEL:SetColumnText (columnIdOrIndex, text)
-	if type (columnIdOrIndex) == "string" then columnIdOrIndex = self.ListView:ColumnIndexFromId (columnIdOrIndex) end
-	if not self.Columns [columnIdOrIndex] then
-		self.Columns [columnIdOrIndex] = vgui.Create ("DListViewLabel", self)
+	local columnIndex = columnIdOrIndex
+	if type (columnIdOrIndex) == "string" then columnIndex = self.ListView:ColumnIndexFromId (columnIdOrIndex) end
+	if not columnIndex then error ("GListViewItem:SetColumnText : " .. tostring (columnIdOrIndex) .. " is not a valid column id.\n") end
+	
+	if not self.Columns [columnIndex] then
+		self.Columns [columnIndex] = vgui.Create ("DListViewLabel", self)
 	end
-	self.Columns [columnIdOrIndex]:SetText (text)
+	self.Columns [columnIndex]:SetText (text)
 end
 
 function PANEL:SetListView (listView)
