@@ -23,6 +23,10 @@ function PANEL:Init ()
 	self.ColumnsById = {}
 	self.ColumnComparators = {}
 	
+	self.LastSortedByColumn = false
+	self.LastSortColumn = 1
+	self.LastSortDescending = false
+	
 	self.SelectionController:AddEventListener ("SelectionChanged",
 		function (_, item)
 			self:DispatchEvent ("SelectionChanged", item)
@@ -236,6 +240,11 @@ function PANEL:SetItemHeight (itemHeight)
 end
 
 function PANEL:Sort (comparator)
+	if not comparator and self.LastSortedByColumn then
+		self:SortByColumn (self.LastSortColumn, self.LastSortDescending)
+		return
+	end
+
 	comparator = comparator or self.Comparator or self.DefaultComparator
 	table.sort (self.Sorted,
 		function (a, b)
@@ -244,6 +253,8 @@ function PANEL:Sort (comparator)
 			return comparator (a, b)
 		end
 	)
+	
+	self.LastSortedByColumn = false
 	
 	self:SetDirty (true)
 	self:InvalidateLayout ()
@@ -262,6 +273,10 @@ function PANEL:SortByColumn (columnIdOrIndex, descending)
 			return comparator (a, b, descending)
 		end
 	)
+	
+	self.LastSortedByColumn = true
+	self.LastSortColumn = columnIdOrIndex
+	self.LastSortDescending = descending
 	
 	self:SetDirty (true)
 	self:InvalidateLayout ()
