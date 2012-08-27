@@ -7,6 +7,7 @@ function PANEL:Init ()
 	self.Disabled = false
 
 	self.Icon = nil
+	self.BackgroundColor = nil
 	
 	-- Selection
 	self.Selectable = true
@@ -41,6 +42,10 @@ function PANEL:DataLayout (listView)
 	end
 end
 
+function PANEL:GetBackgroundColor ()
+	return self.BackgroundColor
+end
+
 function PANEL:CanSelect ()
 	return self.Selectable
 end
@@ -68,6 +73,11 @@ end
 function PANEL:Paint ()
 	DListView_Line.Paint (self)
 	
+	if self.BackgroundColor then
+		surface.SetDrawColor (self.BackgroundColor)
+		self:DrawFilledRect ()
+	end
+	
 	if self.Icon then
 		local image = Gooey.ImageCache:GetImage (self.Icon)
 		local spacing = (self:GetTall () - image:GetHeight ()) * 0.5
@@ -87,6 +97,10 @@ end
 function PANEL:Select ()
 	self.ListView.SelectionController:ClearSelection ()
 	self.ListView.SelectionController:AddToSelection (self)
+end
+
+function PANEL:SetBackgroundColor (color)
+	self.BackgroundColor = color
 end
 
 function PANEL:SetCheckState (columnIdOrIndex, checked)
