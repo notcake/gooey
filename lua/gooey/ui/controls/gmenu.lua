@@ -6,15 +6,20 @@ local openMenus = {}
 		A menu control that does not require recreating every time
 		it needs to be shown (unlike DMenus)
 
-	Events
+	Events:
 		MenuOpening (GMenu menu, Object targetItem)
+			Fired when this menu is opening.
 ]]
 
-local function CloseMenus ()
+function Gooey.CloseMenus ()
 	for _, menu in pairs (openMenus) do
 		menu:Hide ()
 		openMenus [menu] = nil
 	end
+end
+
+function Gooey.IsMenuOpen ()
+	return next (openMenus) and true or false
 end
 
 function PANEL:Init ()
@@ -22,20 +27,21 @@ function PANEL:Init ()
 	self:SetVisible (false)
 	self.TargetItem = nil
 	
+	self:SetMouseInputEnabled (true)
+	self:SetKeyboardInputEnabled (true)
+	
 	-- Remove ourselves from the derma menu list
 	local _, menuList = debug.getupvalue (RegisterDermaMenuForClose, 1)
 	menuList [#menuList] = nil
 	
-	Gooey:AddEventListener ("Unload", tostring (self), function ()
+	Gooey:AddEventListener ("Unloaded", tostring (self), function ()
 		self:Remove ()
 	end)
-	
-	Gooey.EventProvider (self)
 end
 
 function PANEL:AddOption (id, callback)
 	local item = vgui.Create ("GMenuItem", self)
-	item:SetParentMenu (self)
+	item:SetContainingMenu (self)
 	item:SetText (id)
 	item.Id = id
 	if callback then
@@ -64,7 +70,7 @@ end
 PANEL.AddSpacer = PANEL.AddSeparator
 
 function PANEL:CloseMenus ()
-	CloseMenus ()
+	Gooey.CloseMenus ()
 end
 
 function PANEL:FindItem (id)
@@ -93,6 +99,11 @@ function PANEL:Open (targetItem)
 	openMenus [self] = self
 	self:DispatchEvent ("MenuOpening", targetItem)
 	DMenu.Open (self)
+	
+	-- This fixes menu items somehow losing mouse focus as 
+	-- soon as a mouse press occurs when another panel has keyboard focus.
+	self:SetKeyboardInputEnabled (true)
+	self:RequestFocus ()
 end
 
 function PANEL:PerformLayout ()
@@ -124,7 +135,7 @@ function PANEL:PerformLayout ()
 end
 
 function PANEL:Remove ()
-	Gooey:RemoveEventListener ("Unload", tostring (self))
+	Gooey:RemoveEventListener ("Unloaded", tostring (self))
 	_R.Panel.Remove (self)
 end
 
@@ -132,7 +143,7 @@ function PANEL:SetTargetItem (targetItem)
 	self.TargetItem = targetItem
 end
 
-vgui.Register ("GMenu", PANEL, "DMenu")
+Gooey.Register ("GMenu", PANEL, "DMenu")
 
 hook.Add ("VGUIMousePressed", "GMenus", function (panel, mouseCode)
 	while panel ~= nil and panel:IsValid () do
@@ -142,9 +153,9 @@ hook.Add ("VGUIMousePressed", "GMenus", function (panel, mouseCode)
 		panel = panel:GetParent ()
 	end
 	
-	CloseMenus ()
+	Gooey.CloseMenus ()
 end)
 
-Gooey:AddEventListener ("Unload", function ()
-	CloseMenus ()
+Gooey:AddEventListener ("Unloaded", function ()
+	Gooey.CloseMenus ()
 end)

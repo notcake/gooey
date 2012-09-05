@@ -189,7 +189,6 @@ function PANEL:SetExpandOnPopulate (expand)
 end
 
 function PANEL:SetIcon (icon)
-	Gooey.AddResource ("materials/" .. icon .. ".vmt")
 	self.Icon:SetImage (icon)
 end
 
@@ -215,7 +214,7 @@ function PANEL:SuppressLayout (suppress)
 	self.ShouldSuppressLayout = suppress
 end
 
--- Events
+-- Event handlers
 function PANEL:DoRightClick ()
 	self:GetRoot ():SetSelectedItem (self)
 end
@@ -230,7 +229,7 @@ function PANEL:InternalDoClick ()
 	self:SetExpanded (not expanded)
 end
 
-vgui.Register ("GTreeViewNode", PANEL, "Panel") 
+Gooey.Register ("GTreeViewNode", PANEL, "Panel") 
 
 -- Import other functions from DTree_Node
 local StartTime = SysTime ()

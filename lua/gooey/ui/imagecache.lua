@@ -21,10 +21,9 @@ function self:GetImage (image)
 	end
 	self.LastLoadTime = SysTime ()
 	
-	Gooey.AddResource ("materials/" .. image .. ".vmt")
-	local ImageCacheEntry = Gooey.ImageCacheEntry (image)
-	self.Images [image] = ImageCacheEntry
-	return ImageCacheEntry
+	local imageCacheEntry = Gooey.ImageCacheEntry (image)
+	self.Images [image] = imageCacheEntry
+	return imageCacheEntry
 end
 
 self:ctor ()

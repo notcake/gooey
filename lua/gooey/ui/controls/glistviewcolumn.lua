@@ -49,4 +49,4 @@ function PANEL:SetType (type)
 	return self
 end
 
-vgui.Register ("GListViewColumn", PANEL, "DListView_Column")
+Gooey.Register ("GListViewColumn", PANEL, "DListView_Column")

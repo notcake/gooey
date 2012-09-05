@@ -1,15 +1,12 @@
 local PANEL = {}
 
 --[[
-	Events
-	
-	ItemSelected (treeViewNode)
-		Fired when the selected tree view node changes.
+	Events:
+		ItemSelected (treeViewNode)
+			Fired when the selected tree view node changes.
 ]]
 
 function PANEL:Init ()
-	Gooey.EventProvider (self)
-	
 	self.LastClickTime = 0
 	
 	self.Menu = nil
@@ -134,7 +131,7 @@ function PANEL:SuppressLayout (suppress)
 	self.ShouldSuppressLayout = suppress
 end
 
--- Events
+-- Event handlers
 function PANEL:DoClick (node)
 	if SysTime () - self.LastClickTime < 0.3 then
 		self:DoDoubleClick (node)
@@ -163,4 +160,4 @@ function PANEL:OnMouseReleased (mouseCode)
 	end
 end
 
-vgui.Register ("GTreeView", PANEL, "DTree") 
+Gooey.Register ("GTreeView", PANEL, "DTree") 

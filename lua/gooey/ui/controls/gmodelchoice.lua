@@ -64,4 +64,4 @@ function PANEL:SetModel (model)
 	self:DispatchEvent ("ModelChanged", model)
 end
 
-vgui.Register ("GModelChoice", PANEL, "GMultiChoiceX")
+Gooey.Register ("GModelChoice", PANEL, "GMultiChoiceX")

@@ -2,60 +2,53 @@
 
 function PANEL:Init ()
 	self.Items = {}
+	self.ItemsById = {}
 	
 	self.HoveredItem = nil
 	self:SetTall (28)
+	
+	self.MouseCaptured = false
+	
+	self.VPanelContainer = Gooey.VPanelContainer (self)
 end
 
 function PANEL:AddButton (text, callback)
-	local Button = Gooey.ToolbarButton (text, callback)
-	self.Items [#self.Items + 1] = Button
+	local button = Gooey.ToolbarButton (text, callback)
+	self.VPanelContainer:AddControl (button)
+	button:SetId (text)
 	
-	return Button
+	self.Items [#self.Items + 1] = button
+	self.ItemsById [button:GetId ()] = button
+	
+	return button
 end
 
 function PANEL:AddSeparator ()
-	local Separator = Gooey.ToolbarSeparator ()
-	self.Items [#self.Items + 1] = Separator
+	local separator = Gooey.ToolbarSeparator ()
+	self.VPanelContainer:AddControl (separator)
+	self.Items [#self.Items + 1] = separator
 	
-	return Separator
+	return separator
 end
 
-function PANEL:OnMousePressed (mouseCode)
-	if mouseCode == MOUSE_LEFT then
-		if self.HoveredItem and type (self.HoveredItem.Click) == "function" then
-			self.HoveredItem:Click ()
-		end
-	end
+function PANEL:GetItemById (id)
+	return self.ItemsById [id]
 end
 
 function PANEL:Paint ()
-	DPanel.Paint (self)
+	local w, h = self:GetSize ()
+	draw.RoundedBox (4, 0, 0, w, h, GLib.Colors.Silver)
 	
-	local MouseX, MouseY = self:CursorPos ()
-	self.HoveredItem = nil
-	for _, Item in ipairs (self.Items) do
-		local Hovered = false
-		render.SetViewPort (Item:GetLeft (), Item:GetTop (), ScrW (), ScrH ())
-		if self.Hovered then
-			if MouseX >= Item:GetLeft () and MouseX <= Item:GetLeft () + Item:GetWidth () and
-				MouseY >= Item:GetTop () and MouseY <= Item:GetTop () + Item:GetHeight () then
-				self.HoveredItem = Item
-				Hovered = true
-			end
-		end
-		Item:Paint (Hovered)
-	end
-	render.SetViewPort (0, 0, ScrW (), ScrH ())
+	self.VPanelContainer:Paint (Gooey.RenderContext)
 end
 
 function PANEL:PerformLayout ()
-	local X = 2
-	for _, Item in ipairs (self.Items) do
-		Item:SetLeft (X)
-		Item:SetTop ((self:GetTall () - Item:GetHeight ()) * 0.5)
-		X = X + Item:GetWidth ()
+	local x = 2
+	for _, item in ipairs (self.Items) do
+		item:SetLeft (x)
+		item:SetTop ((self:GetTall () - item:GetHeight ()) * 0.5)
+		x = x + item:GetWidth ()
 	end
 end
 
-vgui.Register ("GToolbar", PANEL, "DPanel")
+Gooey.Register ("GToolbar", PANEL, "GPanel")

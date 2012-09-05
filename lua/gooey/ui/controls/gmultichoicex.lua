@@ -29,8 +29,6 @@ function PANEL:Init ()
 	self.LastShowable = false
 	self.AutocompletionCache = {}
 	self.Autocompleter = nil
-	
-	Gooey.EventProvider (self)
 end
 
 function PANEL:HideAutocompletion ()
@@ -162,4 +160,4 @@ function PANEL:UpdateAutocompletion (forceRegeneration)
 	return show
 end
 
-vgui.Register ("GMultiChoiceX", PANEL, "DTextEntry")
+Gooey.Register ("GMultiChoiceX", PANEL, "DTextEntry")

@@ -16,8 +16,6 @@ function PANEL:Init ()
 			end
 		end
 	end
-	
-	Gooey.EventProvider (self)
 end
 
 function PANEL:GetContainer ()
@@ -63,4 +61,4 @@ function PANEL:SetText (text)
 	self.Title:SizeToContents ()
 end
 
-vgui.Register ("GGroupBox", PANEL, "GPanel")
+Gooey.Register ("GGroupBox", PANEL, "GPanel")

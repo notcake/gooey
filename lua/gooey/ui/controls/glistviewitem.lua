@@ -2,15 +2,22 @@ local PANEL = {}
 
 function PANEL:Init ()
 	self.ListView = nil
-
+	
 	self.LastClickTime = 0
-	self.Disabled = false
 
 	self.Icon = nil
-	self.BackgroundColor = nil
 	
 	-- Selection
 	self.Selectable = true
+	
+	self:AddEventListener ("EnabledChanged",
+		function (_, enabled)
+			for _, columnItem in pairs (self.Columns) do
+				if columnItem.SetEnabled == Gooey.BasePanel.SetEnabled then columnItem:SetEnabled (enabled)
+				elseif columnItem.SetDisabled then columnItem:SetDisabled (not enabled) end
+			end
+		end
+	)
 end
 
 function PANEL:DataLayout (listView)
@@ -42,10 +49,6 @@ function PANEL:DataLayout (listView)
 	end
 end
 
-function PANEL:GetBackgroundColor ()
-	return self.BackgroundColor
-end
-
 function PANEL:CanSelect ()
 	return self.Selectable
 end
@@ -60,10 +63,6 @@ end
 
 function PANEL:GetText (i)
 	return self.Columns [i or 1]:GetValue ()
-end
-
-function PANEL:IsDisabled ()
-	return self.Disabled
 end
 
 function PANEL:IsSelected ()
@@ -81,7 +80,7 @@ function PANEL:Paint ()
 	if self.Icon then
 		local image = Gooey.ImageCache:GetImage (self.Icon)
 		local spacing = (self:GetTall () - image:GetHeight ()) * 0.5
-		image:Draw (spacing + 1, spacing)
+		image:Draw (Gooey.RenderContext, spacing + 1, spacing)
 	end
 end
 
@@ -99,10 +98,6 @@ function PANEL:Select ()
 	self.ListView.SelectionController:AddToSelection (self)
 end
 
-function PANEL:SetBackgroundColor (color)
-	self.BackgroundColor = color
-end
-
 function PANEL:SetCheckState (columnIdOrIndex, checked)
 	if type (columnIdOrIndex) == "string" then columnIdOrIndex = self.ListView:ColumnIndexFromId (columnIdOrIndex) end
 	if self.Columns [columnIdOrIndex] then
@@ -110,21 +105,13 @@ function PANEL:SetCheckState (columnIdOrIndex, checked)
 		return
 	end
 	self.Columns [columnIdOrIndex] = vgui.Create ("GCheckbox", self)
-	if self.Disabled then
-		self.Columns [columnIdOrIndex]:SetDisabled (self.Disabled)
-	end
+	self.Columns [columnIdOrIndex]:SetEnabled (self:IsEnabled ())
 	self.Columns [columnIdOrIndex]:SetValue (checked)
-	self.Columns [columnIdOrIndex]:AddEventListener ("CheckStateChanged", function (_, checked)
-		self.ListView:ItemChecked (self, columnIdOrIndex, checked)
-	end)
-end
-
-function PANEL:SetDisabled (disabled)
-	if disabled == nil then disabled = true end
-	self.Disabled = disabled
-	for _, columnItem in pairs (self.Columns) do
-		if columnItem.SetDisabled then columnItem:SetDisabled (disabled) end
-	end
+	self.Columns [columnIdOrIndex]:AddEventListener ("CheckStateChanged",
+		function (_, checked)
+			self.ListView:ItemChecked (self, columnIdOrIndex, checked)
+		end
+	)
 end
 
 function PANEL:SetIcon (icon)
@@ -154,7 +141,7 @@ function PANEL:SetText (text)
 	self:SetColumnText (1, text)
 end
 
--- Events
+-- Event handlers
 function PANEL:DoClick ()
 	self.ListView:DoClick (self)
 end
@@ -171,4 +158,4 @@ function PANEL:OnMouseReleased (mouseCode)
 	self.ListView:OnMouseReleased (mouseCode)
 end
 
-vgui.Register ("GListViewItem", PANEL, "DListView_Line")
+Gooey.Register ("GListViewItem", PANEL, "DListView_Line")

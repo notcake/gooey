@@ -229,7 +229,7 @@ function self:GetBoxSelectionRectangle ()
 	return left, top, width, height
 end
 
--- Events
+-- Event handlers
 function self:MouseDown (_, mouseCode, x, y)
 	if input.IsKeyDown (KEY_LSHIFT) then
 		self.SelectionAction = SelectionAction.Merge

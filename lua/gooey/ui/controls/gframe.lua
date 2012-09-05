@@ -1,27 +1,14 @@
 local PANEL = {}
 
 function PANEL:Init ()
-	self.Text = ""
 end
 
 function PANEL:GetKeyboardMap ()
 	return self.KeyboardMap
 end
 
-function PANEL:GetText ()
-	return self.Text or ""
-end
-
-function PANEL:Paint ()
-	draw.RoundedBox (4, 0, 0, self:GetWide (), self:GetTall (), self:GetBackgroundColor ())
-end
-
 function PANEL:SetKeyboardMap (keyboardMap)
 	self.KeyboardMap = keyboardMap
-end
-
-function PANEL:SetText (text)
-	self.Text = text or ""
 end
 
 -- Event handlers
@@ -42,22 +29,16 @@ function PANEL:OnKeyCodePressed (keyCode)
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
 
-function PANEL:OnCursorEntered ()
-	self:DispatchEvent ("MouseEnter")
-	if self.OnMouseEnter then self:OnMouseEnter () end
-end
-
-function PANEL:OnCursorExited ()
-	self:DispatchEvent ("MouseLeave")
-	if self.OnMouseLeave then self:OnMouseLeave () end
-end
-
 function PANEL:OnMousePressed (mouseCode)
+	DFrame.OnMousePressed (self, mouseCode)
+	
 	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
 	if self.OnMouseDown then self:OnMouseDown (mouseCode, self:CursorPos ()) end
 end
 
 function PANEL:OnMouseReleased (mouseCode)
+	DFrame.OnMouseReleased (self, mouseCode)
+	
 	self:DispatchEvent ("MouseUp", mouseCode, self:CursorPos ())
 	if self.OnMouseUp then self:OnMouseUp (mouseCode, self:CursorPos ()) end
 	
@@ -73,4 +54,4 @@ function PANEL:OnMouseWheeled (delta)
 	if self.OnMouseWheel then self:OnMouseWheel (delta) end
 end
 
-Gooey.Register ("GPanel", PANEL, "DPanel")
+Gooey.Register ("GFrame", PANEL, "DFrame")

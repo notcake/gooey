@@ -9,10 +9,8 @@ local PANEL = {}
 ]]
 
 function PANEL:Init ()
-	Gooey.EventProvider (self)
 	self.SelectionController = Gooey.SelectionController (self)
 	
-	self.Disabled = false
 	self.LastClickTime = 0
 
 	self.Menu = nil
@@ -36,6 +34,14 @@ function PANEL:Init ()
 	self.SelectionController:AddEventListener ("SelectionCleared",
 		function (_, item)
 			self:DispatchEvent ("SelectionCleared", item)
+		end
+	)
+	
+	self:AddEventListener ("EnabledChanged",
+		function (_, enabled)
+			for _, line in pairs (self.Lines) do
+				line:SetEnabled (enabled)
+			end
 		end
 	)
 end
@@ -75,9 +81,7 @@ function PANEL:AddLine (...)
 	line:SetListView (self)
 	line:SetID (id)
 	line:SetTall (self.ItemHeight)
-	if self.Disabled then
-		line:SetDisabled (self.Disabled)
-	end
+	line:SetEnabled (self:IsEnabled ())
 
 	local values = {...}
 	for k, column in pairs (self.Columns) do
@@ -175,10 +179,6 @@ function PANEL:GetSelectionMode ()
 	return self.SelectionController:GetSelectionMode ()
 end
 
-function PANEL:IsDisabled ()
-	return self.Disabled
-end
-
 function PANEL:ItemFromPoint (x, y)
 	x, y = self:LocalToScreen (x, y)
 	for _, item in pairs (self:GetItems ()) do
@@ -190,16 +190,6 @@ function PANEL:ItemFromPoint (x, y)
 		end
 	end
 	return nil
-end
-
-function PANEL:SetDisabled (disabled)
-	if disabled == nil then
-		disabled = true
-	end
-	self.Disabled = disabled
-	for _, Line in pairs (self.Lines) do
-		Line:SetDisabled (disabled)
-	end
 end
 
 function PANEL:PaintOver ()
@@ -286,7 +276,7 @@ function PANEL:SetSelectionMode (selectionMode)
 	self.SelectionController:SetSelectionMode (selectionMode)
 end
 
--- Events
+-- Event handlers
 function PANEL:DoClick ()
 	if SysTime () - self.LastClickTime < 0.3 then
 		self:DoDoubleClick ()
@@ -331,4 +321,4 @@ function PANEL:OnMouseReleased (mouseCode)
 	end
 end
 
-vgui.Register ("GListView", PANEL, "DListView")
+Gooey.Register ("GListView", PANEL, "DListView")

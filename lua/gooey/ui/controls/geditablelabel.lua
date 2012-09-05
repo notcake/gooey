@@ -26,8 +26,6 @@ function PANEL:Init ()
 	end
 	
 	self.PreviousText = nil
-	
-	Gooey.EventProvider (self)
 end
 
 function PANEL:HideTextEntry ()
@@ -97,4 +95,4 @@ function PANEL:Think ()
 	end
 end
 
-vgui.Register ("GEditableLabel", PANEL, "DLabel")
+Gooey.Register ("GEditableLabel", PANEL, "DLabel")
