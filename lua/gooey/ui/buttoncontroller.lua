@@ -1,5 +1,5 @@
 local self = {}
-Gooey.Controller = Gooey.MakeConstructor (self)
+Gooey.ButtonController = Gooey.MakeConstructor (self)
 
 function self:ctor ()
 	self.Actions = {}

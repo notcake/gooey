@@ -1,5 +1,5 @@
 local self = {}
-Gooey.ClipboardController = Gooey.MakeConstructor (self, Gooey.Controller)
+Gooey.ClipboardController = Gooey.MakeConstructor (self, Gooey.ButtonController)
 
 --[[
 	Events:

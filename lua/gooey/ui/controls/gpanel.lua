@@ -25,9 +25,19 @@ function PANEL:SetText (text)
 end
 
 -- Event handlers
+function PANEL:OnCursorEntered ()
+	self:DispatchEvent ("MouseEnter")
+	if self.OnMouseEnter then self:OnMouseEnter () end
+end
+
 function PANEL:OnCursorMoved (x, y)
 	self:DispatchEvent ("MouseMove", 0, x, y)
 	if self.OnMouseMove then self:OnMouseMove (0, self:CursorPos ()) end
+end
+
+function PANEL:OnCursorExited ()
+	self:DispatchEvent ("MouseLeave")
+	if self.OnMouseLeave then self:OnMouseLeave () end
 end
 
 function PANEL:OnKeyCodePressed (keyCode)
@@ -41,16 +51,6 @@ function PANEL:OnKeyCodePressed (keyCode)
 	end
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
-
-function PANEL:OnCursorEntered ()
-	self:DispatchEvent ("MouseEnter")
-	if self.OnMouseEnter then self:OnMouseEnter () end
-end
-
-function PANEL:OnCursorExited ()
-	self:DispatchEvent ("MouseLeave")
-	if self.OnMouseLeave then self:OnMouseLeave () end
-end
 
 function PANEL:OnMousePressed (mouseCode)
 	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())

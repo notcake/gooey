@@ -2,16 +2,20 @@ local PANEL = {}
 
 --[[
 	Events:
+		SelectedContentsChanged (Tab oldSelectedTab, Panel oldSelectedContents, Tab selectedTab, Panel selectedContents)
+			Fired when the selected contents has changed.
 		SelectedTabChanged (Tab oldSelectedTab, Tab selectedTab)
-			Fired when the selected tab has been changed.
+			Fired when the selected tab has changed.
 		TabAdded (Tab tab)
 			Fired when a tab has been added to this TabControl.
 		TabCloseRequested (Tab tab)
 			Fired when a tab's close button has been clicked.
-		TabContentsChanged (Tab tab, Panel contents)
-			Fired when a tab's contents have been changed.
+		TabContentsChanged (Tab tab, Panel oldContents, Panel contents)
+			Fired when a tab's contents has changed.
 		TabRemoved (Tab tab)
 			Fired when a tab has been removed from this TabControl.
+		TabTextChanged (Tab tab, text)
+			Fired when a tab's header text has changed.
 ]]
 
 function PANEL:Init ()
@@ -24,8 +28,16 @@ function PANEL:Init ()
 	self.CloseRequested = function (tab)
 		self:DispatchEvent ("TabCloseRequested", tab)
 	end
-	self.ContentsChanged = function (tab, contents)
-		self:DispatchEvent ("TabContentsChanged", tab, contents)
+	self.ContentsChanged = function (tab, oldContents, contents)
+		self:DispatchEvent ("TabContentsChanged", tab, oldContents, contents)
+		
+		if tab:IsSelected () then
+			self:DispatchEvent ("SelectedContentsChanged", tab, oldContents, tab, contents)
+		end
+	end
+	self.TextChanged = function (tab, text)
+		self:DispatchEvent ("TabTextChanged", tab, text)
+		self:InvalidateLayout ()
 	end
 end
 
@@ -56,6 +68,7 @@ function PANEL:AddTab (...)
 	
 	tab:AddEventListener ("CloseRequested",  tostring (self:GetTable ()), self.CloseRequested)
 	tab:AddEventListener ("ContentsChanged", tostring (self:GetTable ()), self.ContentsChanged)
+	tab:AddEventListener ("TextChanged",     tostring (self:GetTable ()), self.TextChanged)
 	
 	if not self:GetSelectedTab () then
 		self:SetSelectedTab (tab)
@@ -70,6 +83,14 @@ end
 
 function PANEL:ContainsTab (tab)
 	return self.TabSet [tab] or false
+end
+
+function PANEL:GetEnumerator ()
+	local i = 0
+	return function ()
+		i = i + 1
+		return self.Tabs [i]
+	end
 end
 
 function PANEL:GetHeaderHeight ()
@@ -127,6 +148,7 @@ function PANEL:RemoveTab (tab, delete)
 	
 	tab:RemoveEventListener ("CloseRequested",  tostring (self:GetTable ()))
 	tab:RemoveEventListener ("ContentsChanged", tostring (self:GetTable ()))
+	tab:RemoveEventListener ("TextChanged",     tostring (self:GetTable ()))
 	
 	if self:GetSelectedTab () == tab then
 		self:SetSelectedTab (self.Tabs [index] or self.Tabs [index - 1])
@@ -148,17 +170,26 @@ function PANEL:SetSelectedTab (tab)
 	if self.SelectedTab == tab then return end
 	
 	local oldSelectedTab = self.SelectedTab
+	local oldSelectedContents = nil
 	if self.SelectedTab then
-		if self.SelectedTab:GetContents () then
-			self.SelectedTab:GetContents ():SetVisible (false)
+		oldSelectedContents = self.SelectedTab:GetContents ()
+		if oldSelectedContents then
+			oldSelectedContents:SetVisible (false)
 		end
 	end
+	
 	self.SelectedTab = tab
+	
+	local selectedContents = nil
 	if self.SelectedTab then
+		selectedContents = self.SelectedTab:GetContents ()
 		self.SelectedTab:LayoutContents ()
 	end
 	
 	self:DispatchEvent ("SelectedTabChanged", oldSelectedTab, tab)
+	if oldSelectedContents ~= selectedContents then
+		self:DispatchEvent ("SelectedContentsChanged", oldSelectedTab, oldSelectedContents, tab, selectedContents)
+	end
 end
 
 -- Event handlers

@@ -5,8 +5,10 @@ Gooey.Tab = Gooey.MakeConstructor (self)
 	Events:
 		CloseRequested ()
 			Fired when the close button of this tab has been clicked.
-		ContentsChanged (Panel contents)
+		ContentsChanged (Panel oldContents, Panel contents)
 			Fired when the content panel of this tab has changed.
+		TextChanged (text)
+			Fired when this tab's header text has changed.
 ]]
 
 function self:ctor ()
@@ -105,11 +107,12 @@ end
 function self:SetContents (contents)
 	if self.Contents == contents then return end
 	
+	local oldContents = self.Contents
 	self.Contents = contents
 	
 	self:LayoutContents ()
 	
-	self:DispatchEvent ("ContentsChanged", contents)
+	self:DispatchEvent ("ContentsChanged", oldContents, self.Contents)
 end
 
 function self:SetContextMenu (contextMenu, giveOwnership)

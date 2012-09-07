@@ -75,7 +75,10 @@ function PANEL:SetTab (tab)
 end
 
 function PANEL:SetText (text)
+	if self.Text == text then return end
+	
 	self.Text = text
+	self.Tab:DispatchEvent ("TextChanged", text)
 	
 	self:InvalidateLayout ()
 end

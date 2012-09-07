@@ -73,7 +73,7 @@ function PANEL:CloseMenus ()
 	Gooey.CloseMenus ()
 end
 
-function PANEL:FindItem (id)
+function PANEL:GetItemById (id)
 	for _, item in pairs (self:GetItems ()) do
 		if item.Id == id then
 			return item

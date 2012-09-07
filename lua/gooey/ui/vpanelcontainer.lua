@@ -101,14 +101,37 @@ end
 function self:Paint (renderContext)
 	renderContext = renderContext or Gooey.RenderContext
 	
+	-- Calculate scissor rect
+	local left, top = 0, 0
+	local right, bottom = ScrW (), ScrH ()
+	local panel = self.Control
+	while panel and panel:IsValid () do
+		local panelLeft, panelTop = panel:LocalToScreen (0, 0)
+		local panelRight = panelLeft + panel:GetWide ()
+		local panelBottom = panelTop + panel:GetTall ()
+		
+		if panelLeft > left		then left	= panelLeft		end
+		if panelRight < right	then right	= panelRight	end
+		if panelTop > top		then top	= panelTop		end
+		if panelBottom < bottom	then bottom	= panelBottom	end
+		
+		panel = panel:GetParent ()
+	end
+	
+	render.SetScissorRect (left, top, right, bottom, true)
 	renderContext:PushScreenViewPort ()
-	for _, control in ipairs (self.Controls) do
+	
+	local control = nil
+	for i = 1, #self.Controls do
+		control = self.Controls [i]
 		if control:IsVisible () then
 			renderContext:SetRelativeViewPort (control:GetLeft (), control:GetTop ())
 			control:Paint (renderContext)
 		end
 	end
+	
 	renderContext:PopViewPort ()
+	render.SetScissorRect (0, 0, ScrW (), ScrH (), false)
 end
 
 function self:SetHoveredControl (control)

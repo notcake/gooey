@@ -1,5 +1,5 @@
 local self = {}
-Gooey.UndoRedoController = Gooey.MakeConstructor (self, Gooey.Controller)
+Gooey.UndoRedoController = Gooey.MakeConstructor (self, Gooey.ButtonController)
 
 --[[
 	Events:
