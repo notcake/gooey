@@ -81,6 +81,16 @@ function PANEL:AddTab (...)
 	return tab
 end
 
+function PANEL:Clear ()
+	local tabs = {}
+	for tab in self:GetEnumerator () do
+		tabs [#tabs + 1] = tab
+	end
+	for _, tab in ipairs (tabs) do
+		tab:Remove ()
+	end
+end
+
 function PANEL:ContainsTab (tab)
 	return self.TabSet [tab] or false
 end
