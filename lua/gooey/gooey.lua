@@ -17,10 +17,9 @@ if CLIENT then
 		local init = classTable.Init
 		
 		for k, v in pairs (Gooey.BasePanel) do
-			if rawget (classTable, k) then
-				ErrorNoHalt ("Warning: Gooey.Register (\"" .. className .. "\"): " .. k .. " is being overridden.\n")
+			if not rawget (classTable, k) then
+				classTable [k] = v
 			end
-			classTable [k] = v
 		end
 		
 		classTable.Init = function (...)

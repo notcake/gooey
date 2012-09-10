@@ -55,6 +55,11 @@ PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
 function PANEL:OnMousePressed (mouseCode)
 	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
 	if self.OnMouseDown then self:OnMouseDown (mouseCode, self:CursorPos ()) end
+	
+	if mouseCode == MOUSE_LEFT then
+		self.Depressed = true
+		self.Pressed = true
+	end
 end
 
 function PANEL:OnMouseReleased (mouseCode)
@@ -63,6 +68,8 @@ function PANEL:OnMouseReleased (mouseCode)
 	
 	if mouseCode == MOUSE_LEFT then
 		self:DispatchEvent ("Click")
+		self.Depressed = false
+		self.Pressed = false
 	elseif mouseCode == MOUSE_RIGHT then
 		self:DispatchEvent ("RightClick")
 	end

@@ -15,6 +15,12 @@ function PANEL:GetContents ()
 	return self.Contents
 end
 
+function PANEL:GetProgress ()
+	if not self.Contents then return 0 end
+	if type (self.Contents.GetProgress) ~= "function" then return 0 end
+	return self.Contents:GetProgress ()
+end
+
 function PANEL:GetSizingMethod ()
 	return self.SizingMethod
 end
@@ -44,8 +50,8 @@ function PANEL:Paint ()
 end
 
 function PANEL:PerformLayout ()
-	self.Contents:SetPos (0, 0)
-	self.Contents:SetSize (self:GetWide (), self:GetTall ())
+	self.Contents:SetPos (2, 2)
+	self.Contents:SetSize (self:GetWide () - 4, self:GetTall () - 4)
 end
 
 function PANEL:SetContents (contents, ownsContents)
@@ -91,6 +97,14 @@ function PANEL:SetSizingMethod (sizingMethod)
 	
 	self.SizingMethod = sizingMethod
 	self:GetParent ():InvalidateLayout ()
+end
+
+function PANEL:SetProgress (progress)
+	if not self.Contents then return end
+	if type (self.Contents.SetProgress) ~= "function" then return end
+	if not progress then return end
+	
+	self.Contents:SetProgress (progress)
 end
 
 function PANEL:SetText (text)

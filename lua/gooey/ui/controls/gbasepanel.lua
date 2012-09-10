@@ -5,6 +5,8 @@ Gooey.BasePanel = self
 	Events:
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
+		VisibleChanged (visible)
+			Fired when this panel's visibility has changed.
 ]]
 
 function self:_ctor ()
@@ -12,11 +14,21 @@ function self:_ctor ()
 	self.BasePanelInitialized = true
 
 	self.Enabled = true
+	self.Pressed = false
 	
 	self.BackgroundColor = nil
 	self.TextColor = nil
 	
+	-- Fade effects
+	self.FadingOut = false
+	self.FadeEndTime = SysTime ()
+	self.FadeDuration = 1
+	
 	Gooey.EventProvider (self)
+end
+
+function self:CancelFade ()
+	self.FadingOut = false
 end
 
 function self:Create (class)
@@ -27,6 +39,14 @@ function self:CreateLabel (text)
 	local label = vgui.Create ("DLabel", self)
 	label:SetText (text)
 	return label
+end
+
+function self:FadeOut ()
+	if not self:IsVisible () then return end
+	
+	self.FadingOut = true
+	self.FadeEndTime = SysTime () + self:GetAlpha () / 255 * self.FadeDuration
+	self:FadeThink ()
 end
 
 function self:GetBackgroundColor ()
@@ -42,6 +62,14 @@ end
 
 function self:IsEnabled ()
 	return self.Enabled
+end
+
+function self:IsHovered ()
+	return self.Hovered
+end
+
+function self:IsPressed ()
+	return self.Pressed
 end
 
 function self:SetBackgroundColor (color)
@@ -72,6 +100,42 @@ function self:SetTextColor (color)
 	DLabel.ApplySchemeSettings (self)
 	
 	return self
+end
+
+function self:SetVisible (visible)
+	if self:IsVisible () == visible then return end
+	
+	_R.Panel.SetVisible (self, visible)
+	self:DispatchEvent ("VisibleChanged", visible)
+end
+
+-- Internal
+function self:FadeThink ()
+	if not self.FadingOut then return end
+	
+	local alpha = self:GetFadeAlpha ()
+	self:SetAlpha (alpha)
+	if alpha == 0 then
+		self.FadingOut = false
+		self:SetVisible (false)
+		self:SetAlpha (255)
+		return
+	end
+	
+	timer.Simple (0.001,
+		function ()
+			if not self or not self:IsValid () then return end
+			self:FadeThink ()
+		end
+	)
+end
+
+function self:GetFadeAlpha ()
+	local t = (self.FadeEndTime - SysTime ()) / self.FadeDuration
+	local alpha = t * 255
+	if alpha < 0 then alpha = 0 end
+	if alpha > 255 then alpha = 255 end
+	return alpha
 end
 
 -- Deprecated functions

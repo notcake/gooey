@@ -15,21 +15,34 @@ function PANEL:AddPanel (text)
 	return self:AddTextPanel (text)
 end
 
-function PANEL:AddTextPanel (text)
+function PANEL:AddCustomPanel (contents)
 	local panel = vgui.Create ("GStatusBarPanel", self)
 	self.Panels [#self.Panels + 1] = panel
 	panel:SetSizingMethod (Gooey.SizingMethod.ExpandToFit)
+	panel:SetContents (contents)
 	
+	panel:AddEventListener ("VisibleChanged", tostring (self:GetTable ()),
+		function ()
+			self:InvalidateLayout ()
+		end
+	)
+	
+	self:InvalidateLayout ()
+	return panel
+end
+
+function PANEL:AddProgressPanel ()
+	local progress = vgui.Create ("GProgressBar")
+	return self:AddCustomPanel (progress)
+end
+
+function PANEL:AddTextPanel (text)
 	local label = vgui.Create ("DLabel")
+	label:SetText (text or "")
 	label:SetTextColor (GLib.Colors.Black)
 	label:SetTextInset (4)
 	label:SetContentAlignment (4)
-	panel:SetContents (label)
-	panel:SetText (text)
-	
-	self:InvalidateLayout ()
-	
-	return panel
+	return self:AddCustomPanel (label)
 end
 
 function PANEL:GetPanel (index)
@@ -57,8 +70,10 @@ function PANEL:Paint ()
 	else
 		surface.SetDrawColor (GLib.Colors.Gray)
 		for i = 2, self:GetPanelCount () do
-			local x = self:GetPanel (i):GetPos ()
-			surface.DrawLine (x - 2, 2, x - 2, self:GetTall () - 1)
+			if self:GetPanel (i):IsVisible () then
+				local x = self:GetPanel (i):GetPos ()
+				surface.DrawLine (x - 2, 2, x - 2, self:GetTall () - 1)
+			end
 		end
 	end
 	
@@ -80,7 +95,7 @@ function PANEL:PerformLayout ()
 		local remainingWidth = w
 		local index = 1
 		
-		local dividerWidth = 4
+		local dividerWidth = 3
 		
 		local expandToFitPanelCount = 0
 		for i = 1, self:GetPanelCount () do

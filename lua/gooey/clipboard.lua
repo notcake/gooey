@@ -9,6 +9,7 @@ function self:ctor ()
 	
 	self.ClipboardControllers = Gooey.WeakKeyTable ()
 	
+	--[[
 	timer.Create ("Gooey.Clipboard", 0.5, 0,
 		function ()
 			if not self or not self.TextEntry or not self.TextEntry:IsValid () then return end
@@ -31,6 +32,7 @@ function self:ctor ()
 			)
 		end
 	)
+	]]
 	
 	self:CreateTextEntry ()
 	
@@ -87,7 +89,8 @@ function self:IsClipboardControllerRegistered (clipboardController)
 end
 
 function self:IsEmpty ()
-	return self.ClipboardText == ""
+	return false
+	-- return self.ClipboardText == ""
 end
 
 function self:RegisterClipboardController (clipboardController)
