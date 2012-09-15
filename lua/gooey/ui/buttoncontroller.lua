@@ -38,7 +38,9 @@ function self:UpdateActionState (actionName, canPerformAction)
 	self.Actions [actionName].Enabled = canPerformAction
 	
 	for button, _ in pairs (self.Actions [actionName].Buttons) do
-		button:SetEnabled (canPerformAction)
+		if button:IsValid () then
+			button:SetEnabled (canPerformAction)
+		end
 	end
 	
 	self:DispatchEvent (self.Actions [actionName].EventName, canPeformAction)

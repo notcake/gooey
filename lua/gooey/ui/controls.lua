@@ -1,5 +1,6 @@
 Gooey.UI = {}
 
+include ("orientation.lua")
 include ("sizingmethod.lua")
 
 include ("imagecacheentry.lua")
@@ -37,6 +38,8 @@ include ("controls/gprogressbar.lua")
 include ("controls/gscrollbarbutton.lua")
 include ("controls/gscrollbarcorner.lua")
 include ("controls/gscrollbargrip.lua")
+include ("controls/gsplitcontainer.lua")
+include ("controls/gsplitcontainersplitter.lua")
 include ("controls/gstatusbar.lua")
 include ("controls/gstatusbargrip.lua")
 include ("controls/gstatusbarpanel.lua")

@@ -18,31 +18,33 @@ function PANEL:Init ()
 	self.Gray707070 = Color (0x70, 0x70, 0x70, 0xFF)
 end
 
+local crossPoly1 =
+{
+	{ x = 0, y = 0 },
+	{ x = 2, y = 0 },
+	{ x = 8, y = 7 },
+	{ x = 8, y = 8 },
+	{ x = 7, y = 8 },
+	{ x = 0, y = 2 }
+}
+
+local crossPoly2 =
+{
+	{ x = 8, y = 0 },
+	{ x = 7, y = 0 },
+	{ x = 0, y = 7 },
+	{ x = 0, y = 8 },
+	{ x = 2, y = 8 },
+	{ x = 8, y = 2 }
+}
+
 function PANEL:DrawCross (renderContext, x, y, color)
 	renderContext:PushRelativeViewPort (x, y)
 	
 	surface.SetDrawColor (color)
 	surface.SetTexture ()
-	surface.DrawPoly (
-		{
-			{ x = 0, y = 0 },
-			{ x = 2, y = 0 },
-			{ x = 8, y = 7 },
-			{ x = 8, y = 8 },
-			{ x = 7, y = 8 },
-			{ x = 0, y = 2 }
-		}
-	)
-	surface.DrawPoly (
-		{
-			{ x = 8, y = 0 },
-			{ x = 7, y = 0 },
-			{ x = 0, y = 7 },
-			{ x = 0, y = 8 },
-			{ x = 2, y = 8 },
-			{ x = 8, y = 2 }
-		}
-	)
+	surface.DrawPoly (crossPoly1)
+	surface.DrawPoly (crossPoly2)
 	
 	renderContext:PopViewPort ()
 end

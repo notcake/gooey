@@ -147,6 +147,10 @@ function PANEL:IsPressed ()
 	return self.Pressed
 end
 
+function PANEL:IsValid ()
+	return true
+end
+
 function PANEL:IsVisible ()
 	return self.Visible
 end

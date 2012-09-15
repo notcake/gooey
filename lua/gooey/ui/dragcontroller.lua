@@ -19,6 +19,8 @@ function self:ctor (control)
 	
 	self.MouseDown = function (_, mouseCode, x, y)
 		if mouseCode == MOUSE_LEFT then
+			self.Control:MouseCapture (true)
+			
 			self.ExpectingDrag = true
 			self.MouseDownX = x
 			self.MouseDownY = y
@@ -33,6 +35,8 @@ function self:ctor (control)
 	end
 	self.MouseUp = function (_, mouseCode, x, y)
 		if mouseCode == MOUSE_LEFT then
+			self.Control:MouseCapture (false)
+			
 			self.ExpectingDrag = false
 			self:EndDrag ()
 		end
@@ -49,7 +53,6 @@ function self:BeginDrag ()
 		self.MouseDownX, self.MouseDownY = self.Control:CursorPos ()
 	end
 	
-	self.Control:MouseCapture (true)
 	self.ExpectingDrag = false
 	self.Dragging = true
 end
@@ -59,8 +62,6 @@ function self:EndDrag ()
 	
 	self.Dragging = false
 	self.ExpectingDrag = false
-	
-	self.Control:MouseCapture (false)
 end
 
 function self:SetControl (control)
