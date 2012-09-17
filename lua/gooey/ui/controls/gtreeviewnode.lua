@@ -133,22 +133,6 @@ function PANEL:Populate ()
 	end
 end
 
-function PANEL:Remove ()	
-	-- Remove children first, so selection can bubble up to us.
-	if self.ChildNodes then
-		for _, item in pairs (self.ChildNodes:GetItems ()) do
-			item:Remove ()
-		end
-	end
-	
-	-- Now bubble selection upwards.
-	if self.Label:GetSelected () then
-		self:GetRoot ():SetSelectedItem (self:GetParentNode ())
-	end
-	self:GetParentNode ():RemoveNode (self)
-	_R.Panel.Remove (self)
-end
-
 function PANEL:RemoveNode (node)
 	if not self.ChildNodes then return end
 	if not node or not node:IsValid () then return end
@@ -227,6 +211,21 @@ function PANEL:InternalDoClick ()
 	if self:GetRoot ():DoClick (self) then return end
 	
 	self:SetExpanded (not expanded)
+end
+
+function PANEL:OnRemoved ()	
+	-- Remove children first, so selection can bubble up to us.
+	if self.ChildNodes then
+		for _, item in pairs (self.ChildNodes:GetItems ()) do
+			item:Remove ()
+		end
+	end
+	
+	-- Now bubble selection upwards.
+	if self.Label:GetSelected () then
+		self:GetRoot ():SetSelectedItem (self:GetParentNode ())
+	end
+	self:GetParentNode ():RemoveNode (self)
 end
 
 Gooey.Register ("GTreeViewNode", PANEL, "Panel") 

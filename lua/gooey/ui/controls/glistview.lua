@@ -196,11 +196,6 @@ function PANEL:PaintOver ()
 	self.SelectionController:PaintOver (self)
 end
 
-function PANEL:Remove ()
-	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
-	_R.Panel.Remove (self)
-end
-
 function PANEL:RemoveItem (listViewItem)
 	if not listViewItem or not listViewItem:IsValid () then return end
 
@@ -319,6 +314,10 @@ function PANEL:OnMouseReleased (mouseCode)
 			if self.Menu then self.Menu:Open (self:GetSelectedItem ()) end
 		end
 	end
+end
+
+function PANEL:OnRemoved ()
+	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
 end
 
 Gooey.Register ("GListView", PANEL, "DListView")

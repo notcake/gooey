@@ -7,6 +7,8 @@ Gooey.Tab = Gooey.MakeConstructor (self)
 			Fired when the close button of this tab has been clicked.
 		ContentsChanged (Panel oldContents, Panel contents)
 			Fired when the content panel of this tab has changed.
+		Removed ()
+			Fired when this tab has been removed and destroyed.
 		TextChanged (text)
 			Fired when this tab's header text has changed.
 ]]
@@ -93,6 +95,8 @@ function self:Remove ()
 		end
 		self.ContextMenu = nil
 	end
+	
+	self:DispatchEvent ("Removed")
 end
 
 function self:Select ()

@@ -84,15 +84,6 @@ function PANEL:Paint ()
 	end
 end
 
-function PANEL:Remove ()
-	local listView = self:GetListView ()
-	if listView then
-		self:SetListView (nil)
-		listView:RemoveItem (self)
-	end
-	_R.Panel.Remove (self)
-end
-
 function PANEL:Select ()
 	self.ListView.SelectionController:ClearSelection ()
 	self.ListView.SelectionController:AddToSelection (self)
@@ -156,6 +147,14 @@ end
 
 function PANEL:OnMouseReleased (mouseCode)
 	self.ListView:OnMouseReleased (mouseCode)
+end
+
+function PANEL:OnRemoved ()
+	local listView = self:GetListView ()
+	if listView then
+		self:SetListView (nil)
+		listView:RemoveItem (self)
+	end
 end
 
 Gooey.Register ("GListViewItem", PANEL, "DListView_Line")

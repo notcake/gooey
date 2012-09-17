@@ -5,6 +5,8 @@ Gooey.BasePanel = self
 	Events:
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
+		Removed ()
+			Fired when this panel has been removed.
 		VisibleChanged (visible)
 			Fired when this panel's visibility has changed.
 ]]
@@ -70,6 +72,13 @@ end
 
 function self:IsPressed ()
 	return self.Pressed
+end
+
+function self:Remove ()
+	if self.OnRemoved then self:OnRemoved () end
+	self:DispatchEvent ("Removed")
+	
+	_R.Panel.Remove (self)
 end
 
 function self:SetBackgroundColor (color)

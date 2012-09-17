@@ -58,5 +58,6 @@ include ("controls/gtabheader.lua")
 include ("controls/gtoolbaritem.lua")
 include ("controls/gtoolbarbutton.lua")
 include ("controls/gtoolbarseparator.lua")
+include ("controls/gtoolbarsplitbutton.lua")
 
 include ("dialogs/simplebuttondialog.lua")

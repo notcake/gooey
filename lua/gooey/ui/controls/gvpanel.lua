@@ -31,7 +31,7 @@ function PANEL:Init ()
 	
 	Gooey.EventProvider (self)
 	
-	self:AddEventListener ("MouseLeave",
+	self:AddEventListener ("MouseLeave", tostring (self),
 		function (_)
 			if self:IsPressed () and not self:HasMouseCapture () then
 				self:SetPressed (false)
@@ -39,7 +39,7 @@ function PANEL:Init ()
 		end
 	)
 	
-	self:AddEventListener ("MouseDown",
+	self:AddEventListener ("MouseDown", tostring (self),
 		function (_, mouseCode, x, y)
 			if mouseCode == MOUSE_LEFT then
 				self:SetPressed (true)
@@ -50,12 +50,14 @@ function PANEL:Init ()
 		end
 	)
 	
-	self:AddEventListener ("MouseUp",
+	self:AddEventListener ("MouseUp", tostring (self),
 		function (_, mouseCode, x, y)
 			if mouseCode == MOUSE_LEFT then
-				self:SetPressed (false)
-				if self:ContainsPoint (x, y) and self:IsEnabled () then
-					self:DispatchEvent ("Click")
+				if self:IsPressed () then
+					self:SetPressed (false)
+					if self:ContainsPoint (x, y) and self:IsEnabled () then
+						self:DispatchEvent ("Click")
+					end
 				end
 				if self:HasMouseCapture () then
 					self:CaptureMouse (false)
@@ -155,11 +157,24 @@ function PANEL:IsVisible ()
 	return self.Visible
 end
 
+function PANEL:LocalToParent (x, y)
+	return x + self.X, y + self.Y
+end
+
+function PANEL:LocalToScreen (x, y)
+	local parentX, parentY = self:LocalToParent (x, y)
+	return self:GetParent ():LocalToScreen (parentX, parentY)
+end
+
 function PANEL:ParentToLocal (x, y)
 	return x - self.X, y - self.Y
 end
 
 function PANEL:PerformLayout ()
+end
+
+function PANEL:Remove ()
+	if self.OnRemoved then self:OnRemoved () end
 end
 
 function PANEL:SetEnabled (enabled)

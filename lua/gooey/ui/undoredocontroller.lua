@@ -71,6 +71,10 @@ function self:CanUndo ()
 	return self:CanPerformAction ("Undo")
 end
 
+function self:GetUndoRedoStack ()
+	return self.UndoRedoStack
+end
+
 function self:SetUndoRedoStack (undoRedoStack)
 	if self.UndoRedoStack then
 		self.UndoRedoStack:RemoveEventListener ("CanSaveChanged", tostring (self))

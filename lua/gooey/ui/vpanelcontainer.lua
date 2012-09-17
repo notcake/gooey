@@ -76,6 +76,14 @@ function self:CaptureMouse (capture, control)
 	end
 end
 
+function self:Clear ()
+	for _, control in ipairs (self.Controls) do
+		control:Remove ()
+	end
+	self.Controls = {}
+	self.HoveredControl = nil
+end
+
 function self:GetHoveredControl ()
 	return self.HoveredControl
 end
@@ -96,6 +104,10 @@ end
 
 function self:IsSelected ()
 	return self.Control and self.Control.IsSelected and self.Control:IsSelected () or false
+end
+
+function self:LocalToScreen (x, y)
+	return self.Control:LocalToScreen (x, y)
 end
 
 function self:Paint (renderContext)

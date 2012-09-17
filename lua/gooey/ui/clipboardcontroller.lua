@@ -62,6 +62,10 @@ function self:CanPaste ()
 	return self:CanPerformAction ("Paste")
 end
 
+function self:GetControl ()
+	return self.Control
+end
+
 function self:SetControl (control)
 	if self.Control then
 		self.Control:RemoveEventListener ("SelectionChanged", tostring (self))

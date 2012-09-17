@@ -76,11 +76,6 @@ function PANEL:PerformLayout ()
 	if not self.ShouldSuppressLayout then DPanelList.PerformLayout (self) end
 end
 
-function PANEL:Remove ()
-	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
-	_R.Panel.Remove (self)
-end
-
 function PANEL:RemoveNode (node)
 	if not node or not node:IsValid () then return end
 	if node:GetParent () ~= self:GetCanvas () then return end
@@ -158,6 +153,10 @@ function PANEL:OnMouseReleased (mouseCode)
 	if mouseCode == MOUSE_RIGHT then
 		self:DoRightClick ()
 	end
+end
+
+function PANEL:OnRemoved ()
+	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
 end
 
 Gooey.Register ("GTreeView", PANEL, "DTree") 

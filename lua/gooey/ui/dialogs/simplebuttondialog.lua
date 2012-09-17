@@ -55,13 +55,6 @@ function PANEL:PerformLayout ()
 	end
 end
 
-function PANEL:Remove ()
-	self.Callback (nil)
-
-	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
-	_R.Panel.Remove (self)
-end
-
 function PANEL:SetCallback (callback)
 	self.Callback = callback or Gooey.NullCallback
 	return self
@@ -75,6 +68,12 @@ end
 function PANEL:SetTitle (title)
 	DFrame.SetTitle (self, title)
 	return self
+end
+
+function PANEL:OnRemoved ()
+	self.Callback (nil)
+
+	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 
 Gooey.Register ("GSimpleButtonDialog", PANEL, "GFrame")

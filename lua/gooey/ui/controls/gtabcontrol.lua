@@ -134,14 +134,6 @@ function PANEL:PerformLayout ()
 	end
 end
 
-function PANEL:Remove ()
-	for _, tab in ipairs (self.Tabs) do
-		tab:Remove ()
-	end
-	
-	_R.Panel.Remove (self)
-end
-
 function PANEL:RemoveTab (tab, delete)
 	if delete == nil then delete = true end
 	if not self.TabSet [tab] then return end
@@ -199,6 +191,12 @@ function PANEL:SetSelectedTab (tab)
 	self:DispatchEvent ("SelectedTabChanged", oldSelectedTab, tab)
 	if oldSelectedContents ~= selectedContents then
 		self:DispatchEvent ("SelectedContentsChanged", oldSelectedTab, oldSelectedContents, tab, selectedContents)
+	end
+end
+
+function PANEL:OnRemoved ()
+	for _, tab in ipairs (self.Tabs) do
+		tab:Remove ()
 	end
 end
 

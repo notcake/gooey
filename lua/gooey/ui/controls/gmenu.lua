@@ -7,7 +7,9 @@ local openMenus = {}
 		it needs to be shown (unlike DMenus)
 
 	Events:
-		MenuOpening (GMenu menu, Object targetItem)
+		MenuClosed ()
+			Fired when this menu has been closed.
+		MenuOpening (Object targetItem)
 			Fired when this menu is opening.
 ]]
 
@@ -34,7 +36,7 @@ function PANEL:Init ()
 	local _, menuList = debug.getupvalue (RegisterDermaMenuForClose, 1)
 	menuList [#menuList] = nil
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self), function ()
+	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
 		self:Remove ()
 	end)
 end
@@ -91,6 +93,8 @@ function PANEL:Hide ()
 	
 	openMenus [self] = nil
 	DMenu.Hide (self)
+	
+	self:DispatchEvent ("MenuClosed")
 end
 
 function PANEL:Open (targetItem)
@@ -134,13 +138,12 @@ function PANEL:PerformLayout ()
 	self:SetTall (h)
 end
 
-function PANEL:Remove ()
-	Gooey:RemoveEventListener ("Unloaded", tostring (self))
-	_R.Panel.Remove (self)
-end
-
 function PANEL:SetTargetItem (targetItem)
 	self.TargetItem = targetItem
+end
+
+function PANEL:OnRemoved ()
+	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 
 Gooey.Register ("GMenu", PANEL, "DMenu")
