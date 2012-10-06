@@ -107,6 +107,13 @@ function PANEL:GetHeaderHeight ()
 	return self.TabHeaderHeight
 end
 
+function PANEL:GetSelectedContents ()
+	if not self.SelectedTab then return nil end
+	if not self.SelectedTab:GetContents () then return nil end
+	if not self.SelectedTab:GetContents ():IsValid () then return nil end
+	return self.SelectedTab:GetContents ()
+end
+
 function PANEL:GetSelectedTab ()
 	return self.SelectedTab
 end
