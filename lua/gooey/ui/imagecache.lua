@@ -25,7 +25,7 @@ function self:GetImage (image)
 	image = image:lower ()
 	if self.Images [image] then
 		return self.Images [image]
-	end	
+	end
 	if SysTime () - self.LastLoadTime < self.LoadInterval then
 		return self:GetPlaceholderImage ()
 	end

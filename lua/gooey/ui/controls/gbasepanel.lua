@@ -100,7 +100,7 @@ function self:SetTextColor (color)
 	self.TextColor = color
 	
 	if type (color) == "number" then
-		GCompute.PrintStackTrace ()
+		Gooey.PrintStackTrace ()
 	end
 	_R.Panel.SetFGColor (self, color)
 	self.m_cTextColor = color -- for DTree_Node compatibility

@@ -1,5 +1,5 @@
 local self = {}
-Gooey.Clipboard = GCompute.MakeConstructor (self)
+Gooey.Clipboard = Gooey.MakeConstructor (self)
 
 function self:ctor ()
 	self.ClipboardText = ""
