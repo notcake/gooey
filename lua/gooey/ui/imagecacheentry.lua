@@ -22,8 +22,14 @@ function self:ctor (image)
 		end
 	end
 	
-	self.Width = self.Material:GetMaterialTexture ("$basetexture"):GetActualWidth ()
-	self.Height = self.Material:GetMaterialTexture ("$basetexture"):GetActualHeight ()
+	local texture = self.Material:GetMaterialTexture ("$basetexture")
+	if texture then
+		self.Width  = texture:GetActualWidth ()
+		self.Height = texture:GetActualHeight ()
+	else
+		self.Width  = 16
+		self.Height = 16
+	end
 end
 
 function self:Draw (renderContext, x, y, r, g, b, a)
