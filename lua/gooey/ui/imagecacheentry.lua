@@ -1,11 +1,12 @@
 local self = {}
 Gooey.ImageCacheEntry = Gooey.MakeConstructor (self)
 
-local colorModMaterial = Material ("pp/colour")
-
 function self:ctor (image)
 	self.Image = image
 	self.Material = Material (image)
+	if self.Material:IsError () then
+		self.Material = Gooey.ImageCache:GetFallbackImage ():GetMaterial ()
+	end
 	
 	if string.find (self.Material:GetShader (), "VertexLitGeneric") or
 		string.find (self.Material:GetShader (), "Cable") then
@@ -33,6 +34,10 @@ end
 
 function self:GetHeight ()
 	return self.Height
+end
+
+function self:GetMaterial ()
+	return self.Material
 end
 
 function self:GetSize ()

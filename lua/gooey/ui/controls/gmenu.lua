@@ -110,6 +110,23 @@ function PANEL:Open (targetItem)
 	self:RequestFocus ()
 end
 
+function PANEL:OpenSubMenu (item, menu)
+	local openSubMenu = self:GetOpenSubMenu ()
+	if openSubMenu then
+		if menu and openSubMenu == menu then return end
+		
+		self:CloseSubMenu (openSubMenu)
+	end
+	
+	if not menu then return end
+
+	local x, y = item:LocalToScreen (self:GetWide (), 0)
+	menu:Open ()
+	menu:SetPos (x - 3, y)
+	
+	self:SetOpenSubMenu (menu)
+end
+
 function PANEL:PerformLayout ()
 	DMenu.PerformLayout (self)
 	
