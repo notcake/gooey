@@ -1,5 +1,11 @@
 local PANEL = {}
 
+--[[
+	Events:
+		ContentsChanged (Panel oldContents, Panel contents)
+			Fired when this panel's contents have changed.
+]]
+
 function PANEL:Init ()
 	self.StatusBar = nil
 	
@@ -9,6 +15,14 @@ function PANEL:Init ()
 	self.SizingMethod = Gooey.SizingMethod.ExpandToFit
 	self.FixedWidth = 300
 	self.PercentageWidth = 100
+	
+	self:AddEventListener ("BackgroundColorChanged",
+		function (_, backgroundColor)
+			if self.Contents and type (self.Contents.SetBackgroundColor) == "function" then
+				self.Contents:SetBackgroundColor (backgroundColor)
+			end
+		end
+	)
 end
 
 function PANEL:GetContents ()
@@ -50,13 +64,18 @@ function PANEL:Paint ()
 end
 
 function PANEL:PerformLayout ()
-	self.Contents:SetPos (2, 2)
-	self.Contents:SetSize (self:GetWide () - 4, self:GetTall () - 4)
+	if self.Contents then
+		self.Contents:SetPos (2, 2)
+		self.Contents:SetSize (self:GetWide () - 4, self:GetTall () - 4)
+		self.Contents:InvalidateLayout ()
+	end
 end
 
 function PANEL:SetContents (contents, ownsContents)
 	if self.Contents == contents then return end
 	if ownsContents == nil then ownsContents = true end
+	
+	local oldContents = self.Contents
 	
 	if self.Contents then
 		if self.OwnsContents then
@@ -72,6 +91,8 @@ function PANEL:SetContents (contents, ownsContents)
 		self.Contents:SetParent (self)
 		self.Contents:SetVisible (true)
 	end
+	
+	self:DispatchEvent ("ContentsChanged", oldContents, self.Contents)
 	
 	self:InvalidateLayout ()
 end

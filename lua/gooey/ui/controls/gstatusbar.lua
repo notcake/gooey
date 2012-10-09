@@ -9,17 +9,26 @@ function PANEL:Init ()
 	self.Text = ""
 	
 	self:SetBackgroundColor (GLib.Colors.Silver)
+	
+	self:AddEventListener ("BackgroundColorChanged",
+		function (_, backgroundColor)
+			for _, panel in ipairs (self.Panels) do
+				panel:SetBackgroundColor (backgroundColor)
+			end
+		end
+	)
 end
 
 function PANEL:AddPanel (text)
 	return self:AddTextPanel (text)
 end
 
-function PANEL:AddCustomPanel (contents)
-	local panel = vgui.Create ("GStatusBarPanel", self)
+function PANEL:AddCustomPanel (contents, class)
+	local panel = vgui.Create (class or "GStatusBarPanel", self)
 	self.Panels [#self.Panels + 1] = panel
+	panel:SetContents (contents) -- has to be done before SetBackgroundColor so that the background color is applied recursively
 	panel:SetSizingMethod (Gooey.SizingMethod.ExpandToFit)
-	panel:SetContents (contents)
+	panel:SetBackgroundColor (self:GetBackgroundColor ())
 	
 	panel:AddEventListener ("VisibleChanged", tostring (self:GetTable ()),
 		function ()
@@ -29,6 +38,11 @@ function PANEL:AddCustomPanel (contents)
 	
 	self:InvalidateLayout ()
 	return panel
+end
+
+function PANEL:AddComboBoxPanel ()
+	local comboBox = vgui.Create ("GStatusBarComboBox")
+	return self:AddCustomPanel (comboBox, "GStatusBarComboBoxPanel")
 end
 
 function PANEL:AddProgressPanel ()
@@ -43,6 +57,13 @@ function PANEL:AddTextPanel (text)
 	label:SetTextInset (4)
 	label:SetContentAlignment (4)
 	return self:AddCustomPanel (label)
+end
+
+function PANEL:Clear ()
+	for _, panel in ipairs (self.Panels) do
+		panel:Remove ()
+	end
+	self.Panels = {}
 end
 
 function PANEL:GetPanel (index)
@@ -147,6 +168,11 @@ end
 function PANEL:SetText (text)
 	if self:GetPanelCount () == 0 then self.Text = text or "" return end
 	self:GetPanel (1):SetText (text)
+end
+
+-- Event handlers
+function PANEL:OnRemoved ()
+	self:Clear ()
 end
 
 Gooey.Register ("GStatusBar", PANEL, "GPanel")

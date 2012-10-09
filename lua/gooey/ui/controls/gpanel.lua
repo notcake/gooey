@@ -26,6 +26,9 @@ end
 
 -- Event handlers
 function PANEL:OnCursorEntered ()
+	self.Depressed = input.IsMouseDown (MOUSE_LEFT)
+	self.Pressed = input.IsMouseDown (MOUSE_LEFT)
+	
 	self:DispatchEvent ("MouseEnter")
 	if self.OnMouseEnter then self:OnMouseEnter () end
 end

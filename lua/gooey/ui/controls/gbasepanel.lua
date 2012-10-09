@@ -3,6 +3,8 @@ Gooey.BasePanel = self
 
 --[[
 	Events:
+		BackgroundColorChanged (backgroundColor)
+			Fired when this panel's background color has changed.
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
 		Removed ()
@@ -83,6 +85,7 @@ end
 
 function self:SetBackgroundColor (color)
 	self.BackgroundColor = color
+	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
 	return self
 end
 

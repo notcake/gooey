@@ -101,8 +101,12 @@ function PANEL:Open (targetItem)
 	self.TargetItem = targetItem
 	
 	openMenus [self] = self
+	self:SetPos (gui.MouseX (), gui.MouseY ())
 	self:DispatchEvent ("MenuOpening", targetItem)
-	DMenu.Open (self)
+	
+	-- The MenuOpening hook may override our display position
+	local x, y = self:GetPos ()
+	DMenu.Open (self, x, y)
 	
 	-- This fixes menu items somehow losing mouse focus as 
 	-- soon as a mouse press occurs when another panel has keyboard focus.
