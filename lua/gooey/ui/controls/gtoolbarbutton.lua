@@ -4,9 +4,17 @@ Gooey.ToolbarButton = Gooey.MakeConstructor (PANEL, Gooey.ToolbarItem)
 function PANEL:ctor (text)
 	self:Init ()
 	
-	self.Text = text
+	self.Text = ""
 	self.Width = 24
 	self.Height = 24
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self:SetToolTipText (text)
+		end
+	)
+	
+	self:SetText (text)
 end
 
 function PANEL:Init ()

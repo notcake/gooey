@@ -28,6 +28,10 @@ function self:_ctor ()
 	self.FadeEndTime = SysTime ()
 	self.FadeDuration = 1
 	
+	-- ToolTip
+	self.ToolTipText = nil
+	self.ToolTipController = nil
+	
 	Gooey.EventProvider (self)
 end
 
@@ -62,6 +66,18 @@ end
 
 function self:GetTextColor ()
 	return self.TextColor or GLib.Colors.Black
+end
+
+function self:GetToolTipController ()
+	if not self.ToolTipController then
+		self.ToolTipController = Gooey.ToolTipController (self)
+		self.ToolTipController:SetEnabled (false)
+	end
+	return self.ToolTipController
+end
+
+function self:GetToolTipText ()
+	return self.ToolTipText or ""
 end
 
 function self:IsEnabled ()
@@ -112,6 +128,16 @@ function self:SetTextColor (color)
 	DLabel.ApplySchemeSettings (self)
 	
 	return self
+end
+
+function self:SetToolTipText (text)
+	if self.ToolTipText == text then return end
+	
+	self.ToolTipText = text
+	if not self.ToolTipController then
+		self.ToolTipController = Gooey.ToolTipController (self)
+	end
+	self.ToolTipController:SetEnabled (self.ToolTipText ~= nil)
 end
 
 function self:SetVisible (visible)

@@ -36,9 +36,11 @@ function PANEL:Init ()
 	local _, menuList = debug.getupvalue (RegisterDermaMenuForClose, 1)
 	menuList [#menuList] = nil
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
-		self:Remove ()
-	end)
+	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()),
+		function ()
+			self:Remove ()
+		end
+	)
 end
 
 function PANEL:AddOption (id, callback)
@@ -163,6 +165,7 @@ function PANEL:SetTargetItem (targetItem)
 	self.TargetItem = targetItem
 end
 
+-- Event handlers
 function PANEL:OnRemoved ()
 	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end

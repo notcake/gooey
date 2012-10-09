@@ -1,5 +1,6 @@
-Gooey.Orientation =
-{
-	Vertical    = 0,
-	Horizontal  = 1
-}
+Gooey.Orientation = Gooey.Enum (
+	{
+		Vertical    = 0,
+		Horizontal  = 1
+	}
+)

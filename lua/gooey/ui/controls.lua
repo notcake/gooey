@@ -2,15 +2,21 @@ Gooey.UI = {}
 
 include ("orientation.lua")
 include ("sizingmethod.lua")
+include ("tooltippositioningmode.lua")
 
 include ("imagecacheentry.lua")
 include ("imagecache.lua")
+
 include ("keyboardmap.lua")
 include ("dragcontroller.lua")
 include ("selectioncontroller.lua")
+include ("tooltipcontroller.lua")
+include ("tooltipmanager.lua")
+
 include ("buttoncontroller.lua")
 include ("clipboardcontroller.lua")
 include ("undoredocontroller.lua")
+
 include ("vpanelcontainer.lua")
 
 include ("controls/gbasepanel.lua")
@@ -47,6 +53,7 @@ include ("controls/gstatusbarpanel.lua")
 include ("controls/gstatusbarcomboboxpanel.lua")
 include ("controls/gtabcontrol.lua")
 include ("controls/gtoolbar.lua")
+include ("controls/gtooltip.lua")
 include ("controls/gtreeviewnode.lua")
 include ("controls/gtreeview.lua")
 include ("controls/gvscrollbar.lua")

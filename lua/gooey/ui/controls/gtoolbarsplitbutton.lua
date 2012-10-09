@@ -4,7 +4,7 @@ Gooey.ToolbarSplitButton = Gooey.MakeConstructor (PANEL, Gooey.ToolbarItem)
 function PANEL:ctor (text)
 	self:Init ()
 	
-	self.Text = text
+	self.Text = ""
 	self.Width = 36
 	self.Height = 24
 	
@@ -35,6 +35,14 @@ function PANEL:ctor (text)
 			end
 		end
 	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self:SetToolTipText (text)
+		end
+	)
+	
+	self:SetText (text)
 end
 
 function PANEL:Init ()

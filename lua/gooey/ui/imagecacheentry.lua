@@ -5,7 +5,10 @@ function self:ctor (image)
 	self.Image = image
 	self.Material = Material (image)
 	if self.Material:IsError () then
-		self.Material = Gooey.ImageCache:GetFallbackImage ():GetMaterial ()
+		local fallbackImage = Gooey.ImageCache:GetFallbackImage ()
+		if fallbackImage then
+			self.Material = Gooey.ImageCache:GetFallbackImage ():GetMaterial ()
+		end
 	end
 	
 	if string.find (self.Material:GetShader (), "VertexLitGeneric") or

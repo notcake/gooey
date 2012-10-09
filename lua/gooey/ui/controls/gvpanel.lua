@@ -1,6 +1,21 @@
 local PANEL = {}
 Gooey.VPanel = Gooey.MakeConstructor (PANEL)
 
+--[[
+	Events:
+		BackgroundColorChanged (backgroundColor)
+			Fired when this panel's background color has changed.
+		EnabledChanged (enabled)
+			Fired when this panel has been enabled or disabled.
+		Removed ()
+			Fired when this panel has been removed.
+		TextChanged (text)
+			Fired when this panel's text has changed.
+		VisibleChanged (visible)
+			Fired when this panel's visibility has changed.
+]]
+
+
 function PANEL:ctor ()
 	PANEL.Init (self)
 end
@@ -19,6 +34,9 @@ function PANEL:Init ()
 	self.ShouldCaptureMouse = false
 	self.MouseCaptured = false
 	
+	self.BackgroundColor = nil
+	self.TextColor = nil
+	
 	-- Positioning
 	self.X = 0
 	self.Y = 0
@@ -26,6 +44,10 @@ function PANEL:Init ()
 	self.Height = 24
 	
 	self.Text = ""
+	
+	-- ToolTip
+	self.ToolTipText = nil
+	self.ToolTipController = nil
 	
 	self.LayoutValid = false
 	
@@ -85,6 +107,13 @@ function PANEL:ContainsPoint (x, y)
 	       y >= 0 and y < self:GetHeight ()
 end
 
+function PANEL:GetBackgroundColor ()
+	if not self.BackgroundColor then
+		self.BackgroundColor = GLib.Colors.DarkGray
+	end
+	return self.BackgroundColor
+end
+
 function PANEL:GetBottom ()
 	return self.Y + self.Height
 end
@@ -115,6 +144,22 @@ end
 
 function PANEL:GetText ()
 	return self.Text
+end
+
+function PANEL:GetTextColor ()
+	return self.TextColor or GLib.Colors.Black
+end
+
+function PANEL:GetToolTipController ()
+	if not self.ToolTipController then
+		self.ToolTipController = Gooey.ToolTipController (self)
+		self.ToolTipController:SetEnabled (false)
+	end
+	return self.ToolTipController
+end
+
+function PANEL:GetToolTipText ()
+	return self.ToolTipText or ""
 end
 
 function PANEL:GetTop ()
@@ -175,10 +220,21 @@ end
 
 function PANEL:Remove ()
 	if self.OnRemoved then self:OnRemoved () end
+	self:DispatchEvent ("Removed")
+end
+
+function PANEL:SetBackgroundColor (color)
+	self.BackgroundColor = color
+	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
+	return self
 end
 
 function PANEL:SetEnabled (enabled)
+	if self.Enabled == enabled then return self end
+	
 	self.Enabled = enabled
+	
+	self:DispatchEvent ("EnabledChanged", enabled)
 	return self
 end
 
@@ -235,8 +291,32 @@ function PANEL:SetSize (width, height)
 end
 
 function PANEL:SetText (text)
+	text = text or ""
+	if self.Text == text then return end
+	
 	self.Text = text
+	self:DispatchEvent ("TextChanged", text)
 	return self
+end
+
+function PANEL:SetTextColor (color)
+	self.TextColor = color
+	
+	if type (color) == "number" then
+		Gooey.PrintStackTrace ()
+	end
+	
+	return self
+end
+
+function PANEL:SetToolTipText (text)
+	if self.ToolTipText == text then return end
+	
+	self.ToolTipText = text
+	if not self.ToolTipController then
+		self.ToolTipController = Gooey.ToolTipController (self)
+	end
+	self.ToolTipController:SetEnabled (self.ToolTipText ~= nil)
 end
 
 function PANEL:SetTop (y)
@@ -245,7 +325,10 @@ function PANEL:SetTop (y)
 end
 
 function PANEL:SetVisible (visible)
+	if self.Visible == visible then return end
+	
 	self.Visible = visible
+	self:DispatchEvent ("VisibleChanged", visible)
 end
 
 function PANEL:SetWidth (width)

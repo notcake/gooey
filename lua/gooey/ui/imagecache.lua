@@ -1,7 +1,5 @@
-Gooey.ImageCache = Gooey.ImageCache or {}
-
-local self = Gooey.ImageCache
-Gooey.MakeConstructor (self)
+local self = {}
+Gooey.ImageCache = Gooey.MakeConstructor (self)
 
 function self:ctor ()
 	self.Images = {}
@@ -9,8 +7,8 @@ function self:ctor ()
 	self.LoadInterval = 0.1
 	self.LastLoadTime = 0
 	
+	self.FallbackImage    = self:LoadImage ("gui/silkicons/cross")
 	self.PlaceholderImage = self:LoadImage ("gui/g_silkicons/hourglass")
-	self.FallbackImage    = self:LoadImage ("gui/silkicons/arrow_refresh")
 end
 
 function self:GetFallbackImage ()
@@ -47,4 +45,4 @@ function self:LoadImage (image)
 	return imageCacheEntry
 end
 
-self:ctor ()
+Gooey.ImageCache = Gooey.ImageCache ()
