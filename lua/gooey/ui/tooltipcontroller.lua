@@ -118,9 +118,9 @@ function self:SetPositioningMode (positioningMode)
 	self.PositioningMode = positioningMode
 end
 
-function self:ShowToolTip ()
+function self:ShowToolTip (text)
 	self.ToolTip = Gooey.ToolTipManager:GetToolTip ()
-	self.ToolTip:SetText (self:GetToolTipText () or "")
+	self.ToolTip:SetText (text or self:GetToolTipText () or "")
 	self.ToolTip:SetVisible (true)
 	self.ToolTip:AddEventListener ("VisibleChanged", "Gooey.ToolTipController",
 		function (_, visible)
