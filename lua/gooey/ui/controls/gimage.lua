@@ -13,7 +13,7 @@ function PANEL:Init ()
 		self:SetMouseInputEnabled (false)
 	end
 	
-	self.GetWidth = self.GetWidth or self.GetWide
+	self.GetWidth  = self.GetWidth  or self.GetWide
 	self.GetHeight = self.GetHeight or self.GetTall
 end
 

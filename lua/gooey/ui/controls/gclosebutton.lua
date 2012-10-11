@@ -1,8 +1,6 @@
 local PANEL = {}
 Gooey.CloseButton = Gooey.MakeConstructor (PANEL, Gooey.VPanel)
 
-surface.CreateFont ("Marlett", 13, 700, true, false, "GooeySymbolFont")
-
 function PANEL:ctor (text)
 	self:Init ()
 end
@@ -60,7 +58,7 @@ function PANEL:Paint (renderContext)
 			draw.RoundedBox (4, 1, 1, self.Width - 2, self.Height - 2, GLib.Colors.LightGray)
 		end
 	end
-	surface.SetFont ("GooeySymbolFont")
+	
 	if self:IsEnabled () then
 		-- Enabled
 		if self:IsPressed () then

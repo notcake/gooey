@@ -15,14 +15,21 @@ function Gooey.NullCallback () end
 if CLIENT then
 	function Gooey.Register (className, classTable, baseClassName)
 		local init = classTable.Init
+		local classTableCopy = {}
+		for k, v in pairs (classTable) do
+			classTableCopy [k] = v
+		end
+		if getmetatable (classTable) then
+			setmetatable (classTableCopy, getmetatable (classTable))
+		end
 		
 		for k, v in pairs (Gooey.BasePanel) do
-			if not rawget (classTable, k) then
-				classTable [k] = v
+			if not rawget (classTableCopy, k) then
+				classTableCopy [k] = v
 			end
 		end
 		
-		classTable.Init = function (...)
+		classTableCopy.Init = function (...)
 			-- BasePanel._ctor will check for and avoid multiple initialization
 			Gooey.BasePanel._ctor (...)
 			if init then
@@ -30,7 +37,7 @@ if CLIENT then
 			end
 		end
 		
-		vgui.Register (className, classTable, baseClassName)
+		vgui.Register (className, classTableCopy, baseClassName)
 	end
 	
 	include ("clipboard.lua")
