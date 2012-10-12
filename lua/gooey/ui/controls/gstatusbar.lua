@@ -4,7 +4,7 @@ function PANEL:Init ()
 	self:SetTall (24)
 	
 	self.Panels = {}
-	self.Grip = vgui.Create ("GStatusBarGrip", self)
+	self.ResizeGrip = vgui.Create ("GResizeGrip", self)
 	
 	self.Text = ""
 	
@@ -98,7 +98,7 @@ function PANEL:Paint ()
 		end
 	end
 	
-	local x = self.Grip:GetPos ()
+	local x = self.ResizeGrip:GetPos ()
 	surface.SetDrawColor (GLib.Colors.Gray)
 	surface.DrawLine (x - 2, 2, x - 2, self:GetTall () - 1)
 end
@@ -107,12 +107,13 @@ function PANEL:PerformLayout ()
 	self:SetWide (self:GetParent ():GetWide () - 4)
 	self:SetPos (2, self:GetParent ():GetTall () - self:GetTall () - 2)
 	
-	if self.Grip then
-		self.Grip:PerformLayout ()
+	if self.ResizeGrip then
+		self.ResizeGrip:SetSize (self:GetTall (), self:GetTall ())
+		self.ResizeGrip:PerformLayout ()
 		
 		-- Calculate panel widths
 		local x = 0
-		local w = self:GetWide () - self.Grip:GetWide ()
+		local w = self:GetWide () - self.ResizeGrip:GetWide ()
 		local remainingWidth = w
 		local index = 1
 		

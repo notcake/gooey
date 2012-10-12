@@ -7,8 +7,12 @@ Gooey.BasePanel = self
 			Fired when this panel's background color has changed.
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
+		ParentChanged (oldParent, parent)
+			Fired when this panel's parent has changed.
 		Removed ()
 			Fired when this panel has been removed.
+		SizeChanged (width, height)
+			Fired when this panel's size has changed.
 		VisibleChanged (visible)
 			Fired when this panel's visibility has changed.
 ]]
@@ -115,6 +119,31 @@ function self:SetEnabled (enabled)
 	return self
 end
 
+function self:SetHeight (height)
+	if self:GetTall () == height then return end
+	
+	_R.Panel.SetTall (self, height)
+	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+end
+
+function self:SetParent (parent)
+	if self:GetParent () == parent then return end
+	
+	local oldParent = self:GetParent ()
+	
+	_R.Panel.SetParent (self, parent)
+	self:DispatchEvent ("ParentChanged", oldParent, self:GetParent ())
+end
+
+function self:SetSize (width, height, ...)
+	if self:GetWide () == width and self:GetTall () == height then return end
+	
+	_R.Panel.SetSize (self, width, height)
+	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+end
+
+self.SetTall = self.SetHeight
+
 function self:SetTextColor (color)
 	self.TextColor = color
 	
@@ -146,6 +175,15 @@ function self:SetVisible (visible)
 	_R.Panel.SetVisible (self, visible)
 	self:DispatchEvent ("VisibleChanged", visible)
 end
+
+function self:SetWide (width)
+	if self:GetWide () == width then return end
+	
+	_R.Panel.SetWide (self, width)
+	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+end
+
+self.SetWidth = self.SetWide
 
 -- Internal
 function self:FadeThink ()

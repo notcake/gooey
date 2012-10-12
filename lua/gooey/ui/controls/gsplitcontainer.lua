@@ -190,4 +190,6 @@ function PANEL:SetSplitterThickness (thickness)
 	self:InvalidateLayout ()
 end
 
+PANEL.SetSplitterWidth = PANEL.SetSplitterThickness
+
 Gooey.Register ("GSplitContainer", PANEL, "GPanel")

@@ -1,6 +1,8 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self.ResizeGrip = vgui.Create ("GResizeGrip", self)
+	self.ResizeGrip:SetSize (16, 16)
 end
 
 function PANEL:GetKeyboardMap ()

@@ -49,4 +49,15 @@ function PANEL:SetType (type)
 	return self
 end
 
+function PANEL:SetWidth (width)
+	width = math.Clamp (width, self.m_iMinWidth, self.m_iMaxWidth)
+	
+	if width ~= self:GetWide () then
+		self:GetParent ():SetDirty (true)
+	end
+	
+	self:SetWide (width)
+	return width
+end
+
 Gooey.Register ("GListViewColumn", PANEL, "DListView_Column")

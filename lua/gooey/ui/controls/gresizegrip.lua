@@ -8,8 +8,10 @@ function PANEL:Init ()
 	self.DragController = Gooey.DragController (self)
 	self.DragController:AddEventListener ("PositionCorrectionChanged",
 		function (_, deltaX, deltaY)
-			local statusBar = self:GetParent ()
-			local frame = statusBar:GetParent ()
+			local frame = self:GetParent ()
+			if frame.ClassName == "GStatusBar" then
+				frame = frame:GetParent ()
+			end
 			
 			local x, y   = frame:GetPos ()
 			local width  = frame:GetWide () + deltaX
@@ -26,6 +28,22 @@ function PANEL:Init ()
 			frame:SetSize (width, height)
 		end
 	)
+	
+	self:AddEventListener ("ParentChanged",
+		function (_, oldParent, parent)
+			if oldParent and oldParent:IsValid () then
+				oldParent:RemoveEventListener ("SizeChanged", tostring (self:GetTable ()))
+			end
+			if parent and parent:IsValid () then
+				parent:AddEventListener ("SizeChanged", tostring (self:GetTable ()),
+					function ()
+						self:PerformLayout ()
+					end
+				)
+			end
+		end
+	)
+	self:DispatchEvent ("ParentChanged", nil, self:GetParent ())
 end
 
 function PANEL:Paint ()
@@ -46,9 +64,14 @@ function PANEL:Paint ()
 end
 
 function PANEL:PerformLayout ()
-	self:SetTall (self:GetParent ():GetTall ())
-	self:SetWide (self:GetTall ())
-	self:SetPos (self:GetParent ():GetWide () - self:GetWide (), 0)
+	self:SetPos (self:GetParent ():GetWide () - self:GetWide (), self:GetParent ():GetTall () - self:GetTall ())
 end
 
-Gooey.Register ("GStatusBarGrip", PANEL, "GPanel")
+-- Event handlers
+function PANEL:OnRemoved ()
+	if self:GetParent () and self:GetParent ():IsValid () then
+		self:GetParent ():RemoveEventListener ("SizeChanged", tostring (self:GetTable ()))
+	end
+end
+
+Gooey.Register ("GResizeGrip", PANEL, "GPanel")
