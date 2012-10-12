@@ -56,6 +56,10 @@ function self:GetText ()
 	return self.Header:GetText ()
 end
 
+function self:GetToolTipText ()
+	return self.Header:GetToolTipText ()
+end
+
 function self:IsCloseButtonVisible ()
 	return self.Header:IsCloseButtonVisible ()
 end
@@ -155,4 +159,8 @@ end
 
 function self:SetText (text)
 	self.Header:SetText (text)
+end
+
+function self:SetToolTipText (text)
+	self.Header:SetToolTipText (text)
 end

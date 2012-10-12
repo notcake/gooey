@@ -42,6 +42,7 @@ function PANEL:Init ()
 				self.Label:SetPos (1, 1)
 				
 				if self.MenuCloseTime ~= CurTime () then
+					if not self.Menu or not self.Menu:IsValid () then return end
 					self.MenuOpen = true
 					self.Menu:Open ()
 				end
@@ -92,13 +93,6 @@ function PANEL:Paint ()
 		else
 			draw.RoundedBoxEx (4, 1, 1, boxWidth - 2, h - 2, self:GetBackgroundColor (), self.MenuDownwards or not self.MenuOpen, self.MenuDownwards or not self.MenuOpen, not self.MenuDownwards or not self.MenuOpen, not self.MenuDownwards or not self.MenuOpen)
 		end
-		
-		draw.RoundedBoxEx (4, 4 + textWidth + textArrowSpacing,     0, arrowWidth,     h,     GLib.Colors.Gray, false, self.MenuDownwards or not self.MenuOpen, false, not self.MenuDownwards or not self.MenuOpen)
-		if self:IsPressed () or self.MenuOpen then
-			draw.RoundedBoxEx (4, 4 + textWidth + textArrowSpacing + 1, 1, arrowWidth - 2, h - 2, GLib.Colors.DarkGray,       false, self.MenuDownwards or not self.MenuOpen, false, not self.MenuDownwards or not self.MenuOpen)
-		else
-			draw.RoundedBoxEx (4, 4 + textWidth + textArrowSpacing + 1, 1, arrowWidth - 2, h - 2, self:GetBackgroundColor (), false, self.MenuDownwards or not self.MenuOpen, false, not self.MenuDownwards or not self.MenuOpen)
-		end
 	else
 		draw.RoundedBoxEx (4, 4 + textWidth + textArrowSpacing,     0, arrowWidth,     h,     GLib.Colors.Gray,           true, self.MenuDownwards or not self.MenuOpen, true, not self.MenuDownwards or not self.MenuOpen)
 		draw.RoundedBoxEx (4, 4 + textWidth + textArrowSpacing + 1, 1, arrowWidth - 2, h - 2, self:GetBackgroundColor (), true, self.MenuDownwards or not self.MenuOpen, true, not self.MenuDownwards or not self.MenuOpen)
@@ -113,11 +107,17 @@ function PANEL:Paint ()
 end
 
 function PANEL:PerformLayout ()
-	self.Label:SetPos (0, 0)
+	if self:IsPressed () or self.MenuOpen then
+		self.Label:SetPos (1, 1)
+	else
+		self.Label:SetPos (0, 0)
+	end
 	self.Label:SetSize (self:GetWide () - textArrowSpacing - arrowWidth, self:GetTall ())
 end
 
 function PANEL:PositionMenu ()
+	if not self.Menu or not self.Menu:IsValid () then return end
+	
 	local menuHeight = self.Menu:GetTall ()
 	local x, y = self:LocalToScreen (0, self:GetTall () - 1)
 	

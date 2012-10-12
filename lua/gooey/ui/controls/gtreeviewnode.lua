@@ -1,6 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self.TreeView = nil
 	self.Id = "Unknown"
 
 	-- Code copied from DTree_Node
@@ -33,6 +34,7 @@ function PANEL:AddNode (name)
 	self:CreateChildNodes()
 	
 	local node = vgui.Create ("GTreeViewNode", self)
+	node:SetTreeView (self:GetTreeView ())
 	node:SetId (name)
 	node:SetText (name)
 	node:SetParentNode (self)
@@ -98,6 +100,10 @@ end
 
 function PANEL:GetText ()
 	return self.Label:GetValue ()
+end
+
+function PANEL:GetTreeView ()
+	return self.TreeView
 end
 
 function PANEL:IsExpandable ()
@@ -180,6 +186,11 @@ function PANEL:SetId (id)
 	self.Id = id
 end
 
+
+function PANEL:SetTreeView (treeView)
+	self.TreeView = treeView
+end
+
 function PANEL:SortChildren (comparator)
 	if not self.ChildNodes then return end
 	
@@ -205,12 +216,16 @@ end
 
 function PANEL:InternalDoClick ()
 	local expanded = self:IsExpanded ()
+	local wasSelected = self:IsSelected ()
 	self:GetRoot ():SetSelectedItem (self)
 
 	if self:DoClick () then return end
 	if self:GetRoot ():DoClick (self) then return end
 	
-	self:SetExpanded (not expanded)
+	if not expanded or wasSelected then
+		self:SetExpanded (not expanded)
+	end
+end
 end
 
 function PANEL:OnRemoved ()	

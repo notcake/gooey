@@ -26,6 +26,7 @@ function PANEL:ctor (text)
 			if x < buttonWidth then
 				self:SetPressed (true)
 			elseif self:IsEnabled () then
+				if not self.DropDownMenu or not self.DropDownMenu:IsValid () then return end
 				if self.DropDownCloseTime ~= CurTime () then
 					self.DropDownMenuOpen = true
 					self:DispatchEvent ("DropDownOpening", self.DropDownMenu)

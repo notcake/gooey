@@ -21,6 +21,7 @@ end
 function PANEL:AddNode (name)
 	local node = vgui.Create ("GTreeViewNode", self)
 	
+	node:SetTreeView (self)
 	node:SetId (name)
 	node:SetText (name)
 	node:SetParentNode (self)

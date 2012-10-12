@@ -29,7 +29,7 @@ function PANEL:Init ()
 	self.RightButton:SetScrollIncrement (1)
 	self.RightButton:SetDirection ("Right")
 	
-	self:SetSize (256, 16)
+	self:SetWide (256)
 	
 	self:AddEventListener ("EnabledChanged",
 		function (_, enabled)

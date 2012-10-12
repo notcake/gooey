@@ -29,7 +29,7 @@ function PANEL:Init ()
 	self.DownButton:SetScrollIncrement (1)
 	self.DownButton:SetDirection ("Down")
 	
-	self:SetSize (16, 256)
+	self:SetTall (256)
 	
 	self:AddEventListener ("EnabledChanged",
 		function (_, enabled)
