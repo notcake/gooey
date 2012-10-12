@@ -56,33 +56,6 @@ function PANEL:IsSelected ()
 	return self.Tab:IsSelected ()
 end
 
-function PANEL:SetCloseButtonVisible (closeButtonVisible)
-	self.CloseButton:SetVisible (closeButtonVisible)
-	
-	self:InvalidateLayout ()
-end
-
-function PANEL:SetIcon (icon)
-	if self.Image:GetImage () == icon then return end
-	
-	self.Image:SetImage (icon)
-	
-	self:InvalidateLayout ()
-end
-
-function PANEL:SetTab (tab)
-	self.Tab = tab
-end
-
-function PANEL:SetText (text)
-	if self.Text == text then return end
-	
-	self.Text = text
-	self.Tab:DispatchEvent ("TextChanged", text)
-	
-	self:InvalidateLayout ()
-end
-
 function PANEL:Paint ()
 	local w, h = self:GetSize ()
 	
@@ -129,6 +102,33 @@ function PANEL:PerformLayout ()
 	
 	if x < 64 then x = 64 end
 	self:SetWidth (x)
+end
+
+function PANEL:SetCloseButtonVisible (closeButtonVisible)
+	self.CloseButton:SetVisible (closeButtonVisible)
+	
+	self:InvalidateLayout ()
+end
+
+function PANEL:SetIcon (icon)
+	if self.Image:GetImage () == icon then return end
+	
+	self.Image:SetImage (icon)
+	
+	self:InvalidateLayout ()
+end
+
+function PANEL:SetTab (tab)
+	self.Tab = tab
+end
+
+function PANEL:SetText (text)
+	if self.Text == text then return end
+	
+	self.Text = text
+	self.Tab:DispatchEvent ("TextChanged", text)
+	
+	self:InvalidateLayout ()
 end
 
 Gooey.Register ("GTabHeader", PANEL, "GPanel")

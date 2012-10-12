@@ -228,19 +228,21 @@ function PANEL:OnRemoved ()
 	self:GetParentNode ():RemoveNode (self)
 end
 
-Gooey.Register ("GTreeViewNode", PANEL, "Panel") 
-
 -- Import other functions from DTree_Node
-local StartTime = SysTime ()
+local startTime = SysTime ()
 local function TryImport ()
 	if not DTree_Node then
-		if SysTime () - StartTime > 60 then return end -- failed
-		timer.Simple (0, TryImport)
+		if SysTime () - startTime > 60 then
+			Gooey.Register ("GTreeViewNode", PANEL, "GPanel")
+			return
+		end
+		timer.Simple (0.001, TryImport)
 		return
 	end
 	
 	for k, v in pairs (DTree_Node) do
 		if not PANEL [k] then PANEL [k] = v end
 	end
+	Gooey.Register ("GTreeViewNode", PANEL, "GPanel")
 end
 TryImport ()

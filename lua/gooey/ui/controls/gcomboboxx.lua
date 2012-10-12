@@ -1,7 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init ()	
-	self.Autocompletion = vgui.Create ("GComboBox", self)
+	self.Autocompletion = vgui.Create ("GListBox", self)
 	self.Autocompletion:SetMouseInputEnabled (true)
 	self.Autocompletion:SetMultiple (false)
 	self.Autocompletion:SetVisible (false)
@@ -160,4 +160,4 @@ function PANEL:UpdateAutocompletion (forceRegeneration)
 	return show
 end
 
-Gooey.Register ("GMultiChoiceX", PANEL, "DTextEntry")
+Gooey.Register ("GComboBoxX", PANEL, "DTextEntry")

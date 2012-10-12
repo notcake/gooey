@@ -2,10 +2,6 @@ local PANEL = {}
 local openMenus = {}
 
 --[[
-	GMenu
-		A menu control that does not require recreating every time
-		it needs to be shown (unlike DMenus)
-
 	Events:
 		MenuClosed ()
 			Fired when this menu has been closed.
@@ -61,9 +57,8 @@ function PANEL:AddOption (id, callback)
 end
 
 function PANEL:AddSeparator (id)
-    local item = vgui.Create ("DBevel", self)
-    item:SetTall (2)
-    item:SetAlpha (100)
+    local item = vgui.Create ("GMenuSeparator", self)
+    item:SetTall (1)
     item.Id = id
 	
     self:AddPanel (item)

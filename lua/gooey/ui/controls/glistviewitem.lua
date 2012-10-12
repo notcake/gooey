@@ -70,10 +70,18 @@ function PANEL:IsSelected ()
 end
 
 function PANEL:Paint ()
-	DListView_Line.Paint (self)
-	
 	if self.BackgroundColor then
 		surface.SetDrawColor (self.BackgroundColor)
+		self:DrawFilledRect ()
+	end
+	
+	if self:IsSelected () then
+		local col = self:GetSkin ().combobox_selected
+		surface.SetDrawColor (col.r, col.g, col.b, col.a)
+		self:DrawFilledRect ()
+	elseif self:IsHovered () then
+		local col = self:GetSkin ().combobox_selected
+		surface.SetDrawColor (col.r, col.g, col.b, col.a * 0.25)
 		self:DrawFilledRect ()
 	end
 	

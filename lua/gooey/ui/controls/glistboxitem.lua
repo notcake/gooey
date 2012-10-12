@@ -3,7 +3,7 @@ PANEL.GetSelected	= Gooey.DeprecatedFunction
 PANEL.SetSelected	= Gooey.DeprecatedFunction
 
 function PANEL:Init ()
-	self.ComboBox = nil
+	self.ListBox = nil
 	self.ID = nil
 	
 	-- Layout
@@ -33,7 +33,7 @@ end
 PANEL.GetText = _R.Panel.GetValue
 
 function PANEL:IsSelected ()
-	return self.ComboBox.SelectionController:IsSelected (self)
+	return self.ListBox.SelectionController:IsSelected (self)
 end
 
 --[[
@@ -52,17 +52,17 @@ function PANEL:Paint ()
 end
 
 function PANEL:Select ()
-	self.ComboBox.SelectionController:ClearSelection ()
-	self.ComboBox.SelectionController:AddToSelection (self)
+	self.ListBox.SelectionController:ClearSelection ()
+	self.ListBox.SelectionController:AddToSelection (self)
 end
 
 function PANEL:SetCanSelect (canSelect)
 	self.Selectable = canSelect
 end
 
-function PANEL:SetComboBox (comboBox)
-	self.ComboBox = comboBox
-	self:SetMother (comboBox)
+function PANEL:SetListBox (listBox)
+	self.ListBox = listBox
+	self:SetMother (listBox)
 end
 
 function PANEL:SetIcon (icon)
@@ -96,27 +96,27 @@ function PANEL:SetID (id)
 	if self.ID == id then
 		return
 	end
-	if self.ComboBox then
-		self.ComboBox:SetItemID (self, id)
+	if self.ListBox then
+		self.ListBox:SetItemID (self, id)
 	end
 	self.ID = id
 end
 
 -- Event handlers
 function PANEL:DoClick ()
-	self.ComboBox:DoClick (self)
+	self.ListBox:DoClick (self)
 end
 
 function PANEL:DoRightClick ()
-	self.ComboBox:DoRightClick (self)
+	self.ListBox:DoRightClick (self)
 end
 
 function PANEL:OnMousePressed (mouseCode)
-	self.ComboBox:OnMousePressed (mouseCode)
+	self.ListBox:OnMousePressed (mouseCode)
 end
 
 function PANEL:OnMouseReleased (mouseCode)
-	self.ComboBox:OnMouseReleased (mouseCode)
+	self.ListBox:OnMouseReleased (mouseCode)
 	if mouseCode == MOUSE_LEFT then
 		self:DoClick ()
 	elseif mouseCode == MOUSE_RIGHT then
@@ -124,4 +124,4 @@ function PANEL:OnMouseReleased (mouseCode)
 	end
 end
 
-Gooey.Register ("GComboBoxItem", PANEL, "DComboBoxItem")
+Gooey.Register ("GListBoxItem", PANEL, "DComboBoxItem")

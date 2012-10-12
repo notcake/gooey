@@ -53,7 +53,9 @@ function self:dtor ()
 end
 
 function self:CreateTextEntry ()
-	self.TextEntry = vgui.Create ("DTextEntry")
+	if DTextEntry then
+		self.TextEntry = vgui.Create ("DTextEntry")
+	end
 	
 	if not self.TextEntry then
 		return timer.Create ("Gooey.Clipboard.CreateTextEntry", 0.5, 1,

@@ -40,4 +40,4 @@ function PANEL:SetImage (image)
 	return self
 end
 
-Gooey.Register ("GImage", PANEL, "GPanel")
+Gooey.Register ("GImage", table.Copy (PANEL), "GPanel")
