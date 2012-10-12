@@ -216,7 +216,7 @@ end
 
 function PANEL:InternalDoClick ()
 	local expanded = self:IsExpanded ()
-	local wasSelected = self:IsSelected ()
+	local wasSelected = self.Label:GetSelected ()
 	self:GetRoot ():SetSelectedItem (self)
 
 	if self:DoClick () then return end
@@ -225,7 +225,6 @@ function PANEL:InternalDoClick ()
 	if not expanded or wasSelected then
 		self:SetExpanded (not expanded)
 	end
-end
 end
 
 function PANEL:OnRemoved ()	
