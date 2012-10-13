@@ -48,16 +48,16 @@ end
 
 function PANEL:Paint ()
 	local w, h = self:GetSize ()
-	local padding = 4
-	local dotSize = (w - padding * 2) / 5
+	local padding = 3
+	local dotSize = math.min ((math.min (w, h) - padding * 2) / 5, 3)
 	dotSize = math.floor (dotSize + 0.5) -- round dotSize
 	
-	local x = padding
+	local x = w - padding - dotSize * 5
 	draw.RoundedBox (2, x, h - padding - dotSize, dotSize, dotSize, GLib.Colors.Gray)
-	x = x + dotSize * 2
+	x = w - padding - dotSize * 3
 	draw.RoundedBox (2, x, h - padding - dotSize * 3, dotSize, dotSize, GLib.Colors.Gray)
 	draw.RoundedBox (2, x, h - padding - dotSize, dotSize, dotSize, GLib.Colors.Gray)
-	x = x + dotSize * 2
+	x = w - padding - dotSize
 	draw.RoundedBox (2, x, h - padding - dotSize * 5, dotSize, dotSize, GLib.Colors.Gray)
 	draw.RoundedBox (2, x, h - padding - dotSize * 3, dotSize, dotSize, GLib.Colors.Gray)
 	draw.RoundedBox (2, x, h - padding - dotSize, dotSize, dotSize, GLib.Colors.Gray)

@@ -55,6 +55,9 @@ function PANEL:GetSplitterThickness ()
 	return self.SplitterThickness
 end
 
+function PANEL:Paint (w, h)
+end
+
 function PANEL:PerformLayout ()
 	local splitterSize = self:GetSplitterThickness ()
 	local size = self.Orientation == Gooey.Orientation.Vertical and self:GetWide () or self:GetTall ()
@@ -87,6 +90,8 @@ function PANEL:PerformLayout ()
 	local panel2X, panel2Y = 0, 0
 	local panel1Width, panel1Height = self:GetSize ()
 	local panel2Width, panel2Height = self:GetSize ()
+	
+	panel2Size = panel2Offset + panel2Size - math.floor (panel2Offset)
 	
 	if self.Orientation == Gooey.Orientation.Vertical then
 		panel1X = panel1Offset
