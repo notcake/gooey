@@ -29,8 +29,11 @@ function PANEL:Paint (w, h)
 	derma.SkinHook ("Paint", "MenuOption", self, w, h)
 	if not self:IsEnabled () then
 		surface.SetFont ("Default")
+		surface.SetTextColor (GLib.Colors.White)
+		surface.SetTextPos (21, 3)
+		surface.DrawText (self:GetText ())
 		surface.SetTextColor (GLib.Colors.Gray)
-		surface.SetTextPos (20, 3)
+		surface.SetTextPos (20, 2)
 		surface.DrawText (self:GetText ())
 		return true
 	end

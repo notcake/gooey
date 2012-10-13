@@ -33,7 +33,7 @@ if CLIENT then
 		if classTable.Paint then
 			classTable._Paint = classTable.Paint
 			classTable.Paint = function (self)
-				self:_Paint (self:GetSize ())
+				return self:_Paint (self:GetSize ())
 			end
 		end
 		
