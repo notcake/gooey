@@ -25,11 +25,11 @@ function PANEL:GetContainingMenu ()
 	return self.ContainingMenu
 end
 
-function PANEL:Paint ()
-	derma.SkinHook ("Paint", "MenuOption", self)
+function PANEL:Paint (w, h)
+	derma.SkinHook ("Paint", "MenuOption", self, w, h)
 	if not self:IsEnabled () then
 		surface.SetFont ("Default")
-		surface.SetTextColor (128, 128, 128, 255)
+		surface.SetTextColor (GLib.Colors.Gray)
 		surface.SetTextPos (20, 3)
 		surface.DrawText (self:GetText ())
 		return true

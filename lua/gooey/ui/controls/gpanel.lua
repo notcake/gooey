@@ -12,8 +12,8 @@ function PANEL:GetText ()
 	return self.Text or ""
 end
 
-function PANEL:Paint ()
-	draw.RoundedBox (4, 0, 0, self:GetWide (), self:GetTall (), self:GetBackgroundColor ())
+function PANEL:Paint (w, h)
+	draw.RoundedBox (4, 0, 0, w, h, self:GetBackgroundColor ())
 end
 
 function PANEL:SetKeyboardMap (keyboardMap)

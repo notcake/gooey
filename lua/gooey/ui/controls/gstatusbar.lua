@@ -79,8 +79,8 @@ function PANEL:GetText ()
 	return self:GetPanel (1):GetText ()
 end
 
-function PANEL:Paint ()
-	draw.RoundedBoxEx (4, 0, 0, self:GetWide (), self:GetTall (), self:GetBackgroundColor (), false, false, true, true)
+function PANEL:Paint (w, h)
+	draw.RoundedBoxEx (4, 0, 0, w, h, self:GetBackgroundColor (), false, false, true, true)
 	
 	if self:GetPanelCount () == 0 then
 		surface.SetFont ("Default")

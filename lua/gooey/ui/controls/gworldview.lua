@@ -31,11 +31,11 @@ function PANEL:DisableScissorRect ()
 end
 
 function PANEL:DrawEntities ()
-	PCallError (ents.GetByIndex (0).DrawModel, ents.GetByIndex (0))
+	pcall (ents.GetByIndex (0).DrawModel, ents.GetByIndex (0))
 	
 	for _, ent in ipairs (ents.GetAll ()) do
 		if ent:EntIndex () ~= 0 then
-			PCallError (ent.Draw or ent.DrawModel, ent)
+			pcall (ent.Draw or ent.DrawModel, ent)
 		end
 	end
 	
@@ -112,8 +112,8 @@ function PANEL:OnMouseReleased (mouseCode)
 	self:MouseCapture (false)
 end
 
-function PANEL:Paint ()
-	draw.RoundedBox (4, 0, 0, self:GetWide (), self:GetTall (), Vector (128, 128, 128, 255))
+function PANEL:Paint (w, h)
+	draw.RoundedBox (4, 0, 0, w, h, Vector (128, 128, 128, 255))
 
 	local x, y = self:LocalToScreen (0, 0)
 	local w, h = self:GetSize ()
@@ -145,7 +145,7 @@ function PANEL:Paint ()
 	end
 	
 	self:EnableScissorRect ()
-	PCallError (self.DrawEntities, self)
+	pcall (self.DrawEntities, self)
 	self:DisableScissorRect ()
 	
 	render.SuppressEngineLighting (false)

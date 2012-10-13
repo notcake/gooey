@@ -126,8 +126,7 @@ function PANEL:GetTabCount ()
 	return #self.Tabs
 end
 
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
+function PANEL:Paint (w, h)
 	draw.RoundedBoxEx (4, 0, self.TabHeaderHeight, w, h - self.TabHeaderHeight, GLib.Colors.Silver, self:GetTabCount () == 0, true, true, true)
 end
 

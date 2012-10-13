@@ -56,9 +56,7 @@ function PANEL:IsSelected ()
 	return self.Tab:IsSelected ()
 end
 
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
-	
+function PANEL:Paint (w, h)
 	if self.Tab:IsSelected () then
 		draw.RoundedBoxEx (4, 0, 0, w, h, GLib.Colors.Silver, true, true, false, false)
 	elseif self:IsHovered () then

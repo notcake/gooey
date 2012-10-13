@@ -30,10 +30,10 @@ function PANEL:GetOutlineColor ()
 	return self.OutlineColor
 end
 
-function PANEL:Paint ()
+function PANEL:Paint (w, h)
 	local textHeight = draw.GetFontHeight (self:GetFont ()) * 0.5
-	draw.RoundedBox (4, 0, textHeight, self:GetWide (), self:GetTall () - textHeight, self:GetOutlineColor ())
-	draw.RoundedBox (4, 1, 1 + textHeight, self:GetWide () - 2, self:GetTall () - 2 - textHeight, self:GetBackgroundColor ())
+	draw.RoundedBox (4, 0, textHeight, w, h - textHeight, self:GetOutlineColor ())
+	draw.RoundedBox (4, 1, 1 + textHeight, w - 2, h - 2 - textHeight, self:GetBackgroundColor ())
 	surface.SetDrawColor (self:GetBackgroundColor ())
 	surface.DrawRect (self.Title:GetPos () - 4, 0, self.Title:GetWide () + 8, self.Title:GetTall ())
 end

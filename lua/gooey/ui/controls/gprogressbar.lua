@@ -8,7 +8,7 @@ function PANEL:GetProgress ()
 	return self.Progress * 100
 end
 
-function PANEL:Paint ()
+function PANEL:Paint (w, h)
 	local w, h = self:GetSize ()
 	local barWidth = w * self.Progress
 	local roundRadius = math.min (4, math.floor (barWidth * 0.5))

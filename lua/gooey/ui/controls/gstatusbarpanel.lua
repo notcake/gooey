@@ -60,7 +60,7 @@ function PANEL:IsPercentageWidth ()
 	return self.SizingMethod == Gooey.SizingMethod.PercentageWidth
 end
 
-function PANEL:Paint ()
+function PANEL:Paint (w, h)
 end
 
 function PANEL:PerformLayout ()

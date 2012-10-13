@@ -50,8 +50,7 @@ function PANEL:GetItemById (id)
 	return self.ItemsById [id]
 end
 
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
+function PANEL:Paint (w, h)
 	draw.RoundedBox (4, 0, 0, w, h, GLib.Colors.Silver)
 	
 	self.VPanelContainer:Paint (Gooey.RenderContext)

@@ -79,8 +79,7 @@ function PANEL:GetText ()
 	return self.Label:GetText ()
 end
 
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
+function PANEL:Paint (w, h)
 	surface.SetFont ("Default")
 	local textWidth = surface.GetTextSize (self:GetText ())
 	local boxWidth = math.min (w, 4 + textWidth + textArrowSpacing + arrowWidth)

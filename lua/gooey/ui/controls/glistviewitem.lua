@@ -69,7 +69,7 @@ function PANEL:IsSelected ()
 	return self.ListView.SelectionController:IsSelected (self)
 end
 
-function PANEL:Paint ()
+function PANEL:Paint (w, h)
 	if self.BackgroundColor then
 		surface.SetDrawColor (self.BackgroundColor)
 		self:DrawFilledRect ()

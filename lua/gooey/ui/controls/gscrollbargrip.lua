@@ -17,7 +17,7 @@ function PANEL:Init ()
 end
 
 function PANEL:Paint (w, h)
-	derma.SkinHook ("Paint", "ScrollBarGrip", self)
+	derma.SkinHook ("Paint", "ScrollBarGrip", self, w, h)
 end
 
 Gooey.Register ("GScrollBarGrip", PANEL, "GPanel")

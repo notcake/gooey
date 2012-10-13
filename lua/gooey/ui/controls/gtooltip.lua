@@ -46,8 +46,7 @@ function PANEL:Lock ()
 end
 
 local borderColor = Color (32, 32, 32, 255)
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
+function PANEL:Paint (w, h)
 	draw.RoundedBox (4, 0, 0, w,     h,     borderColor)
 	draw.RoundedBox (4, 1, 1, w - 2, h - 2, self:GetBackgroundColor ())
 end

@@ -12,6 +12,8 @@ function PANEL:Init ()
 	
 	-- Selection
 	self.Selectable = true
+	
+	self:SetTextColor (GLib.Colors.Black)
 end
 
 function PANEL:CanSelect ()
@@ -39,7 +41,7 @@ end
 --[[
 	Taken from skins/default.lua
 ]]
-function PANEL:Paint ()
+function PANEL:Paint (w, h)
 	if self:IsSelected () then
 		local col = self:GetSkin ().combobox_selected
 		surface.SetDrawColor (col.r, col.g, col.b, col.a)

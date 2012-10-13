@@ -11,7 +11,7 @@ function PANEL:Init ()
 	self.SplitterPosition = 0
 	self.InverseSplitterPosition = 0
 	
-	self.SplitterThickness = 4
+	self.SplitterThickness = 5
 	self.FixedPanel = nil
 	
 	self.Splitter.DragController:AddEventListener ("PositionCorrectionChanged",

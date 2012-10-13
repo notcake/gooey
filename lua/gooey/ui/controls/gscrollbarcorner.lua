@@ -3,8 +3,7 @@ local PANEL = {}
 function PANEL:Init ()
 end
 
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
+function PANEL:Paint (w, h)
 	surface.SetDrawColor (GLib.Colors.Gray)
 	surface.DrawRect (0, 0, w, h)
 end
