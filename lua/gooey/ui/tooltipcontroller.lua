@@ -5,6 +5,7 @@ function self:ctor (control)
 	self.Control = nil
 	
 	self.Enabled = true
+	self.Manual = false
 	
 	-- Positioning
 	self.AnchorPoint = 3
@@ -20,6 +21,7 @@ function self:ctor (control)
 		
 		hook.Add ("Think", "Gooey.ToolTipController",
 			function ()
+				if self.Manual then return end
 				if not self.Control:IsEnabled () then return end
 				if not self:GetToolTipText () then return end
 				if self:IsToolTipVisible () then return end
@@ -35,6 +37,10 @@ function self:ctor (control)
 		
 		self.MouseOver = false
 		hook.Remove ("Think", "Gooey.ToolTipController")
+	end
+	
+	self.Removed = function (_)
+		self:SetControl (nil)
 	end
 	
 	self:SetControl (control)
@@ -62,8 +68,16 @@ function self:GetToolTipText ()
 end
 
 function self:HideToolTip ()
-	if not self.ToolTip or not self.ToolTip:IsValid () then return false end
-	self.ToolTip:SetVisible (false)
+	if self.ToolTip and self.ToolTip:IsValid () then
+		self.ToolTip:RemoveEventListener ("VisibleChanged", "Gooey.ToolTipController")
+		self.ToolTip:SetVisible (false)
+		self.ToolTip = nil
+	end
+	
+	if self.Control then
+		self.Control:RemoveEventListener ("Removed",        "Gooey.ToolTipController")
+		self.Control:RemoveEventListener ("VisibleChanged", "Gooey.ToolTipController")
+	end
 end
 
 function self:IsEnabled ()
@@ -86,6 +100,7 @@ function self:SetControl (control)
 	if self.Control then
 		self.Control:RemoveEventListener ("MouseEnter", tostring (self))
 		self.Control:RemoveEventListener ("MouseLeave", tostring (self))
+		self.Control:RemoveEventListener ("Removed",    tostring (self))
 		hook.Remove ("Think", "Gooey.ToolTipController")
 	end
 	
@@ -94,6 +109,7 @@ function self:SetControl (control)
 	if self.Control and self.Enabled then
 		self.Control:AddEventListener ("MouseEnter", tostring (self), self.MouseEnter)
 		self.Control:AddEventListener ("MouseLeave", tostring (self), self.MouseLeave)
+		self.Control:AddEventListener ("Removed",    tostring (self), self.Removed)
 	end
 end
 
@@ -107,11 +123,16 @@ function self:SetEnabled (enabled)
 			self.Control:AddEventListener ("MouseEnter", tostring (self), self.MouseEnter)
 			self.Control:AddEventListener ("MouseLeave", tostring (self), self.MouseLeave)
 		else
+			self:HideToolTip ()
 			self.Control:RemoveEventListener ("MouseEnter", tostring (self))
 			self.Control:RemoveEventListener ("MouseLeave", tostring (self))
 			hook.Remove ("Think", "Gooey.ToolTipController")
 		end
 	end
+end
+
+function self:SetManual (manual)
+	self.Manual = manual
 end
 
 function self:SetPositioningMode (positioningMode)
@@ -125,11 +146,25 @@ function self:ShowToolTip (text)
 	self.ToolTip:AddEventListener ("VisibleChanged", "Gooey.ToolTipController",
 		function (_, visible)
 			if not visible then
-				self.ToolTip:RemoveEventListener ("VisibleChanged", "Gooey.ToolTipController")
-				self.ToolTip = nil
+				self:HideToolTip ()
 			end
 		end
 	)
+	
+	if self.Control then
+		self.Control:AddEventListener ("Removed", "Gooey.ToolTipController",
+			function (_)
+				self:HideToolTip ()
+			end
+		)
+		self.Control:AddEventListener ("VisibleChanged", "Gooey.ToolTipController",
+			function (_, visible)
+				if not visible then
+					self:HideToolTip ()
+				end
+			end
+		)
+	end
 	
 	if self.PositioningMode ~= Gooey.ToolTipPositioningMode.Custom then
 		local x, y, w, h = 0, 0, 0, 0
