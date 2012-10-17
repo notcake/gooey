@@ -29,7 +29,7 @@ function self:GetImage (image)
 	end
 	self.LastLoadTime = SysTime ()
 	
-	local imageCacheEntry = Gooey.ImageCacheEntry (image)
+	local imageCacheEntry = Gooey.ImageCacheEntry (self, image)
 	self.Images [image] = imageCacheEntry
 	return imageCacheEntry
 end
@@ -40,7 +40,7 @@ function self:LoadImage (image)
 		return self.Images [image]
 	end
 	
-	local imageCacheEntry = Gooey.ImageCacheEntry (image)
+	local imageCacheEntry = Gooey.ImageCacheEntry (self, image)
 	self.Images [image] = imageCacheEntry
 	return imageCacheEntry
 end

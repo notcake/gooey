@@ -1,13 +1,13 @@
 local self = {}
 Gooey.ImageCacheEntry = Gooey.MakeConstructor (self)
 
-function self:ctor (image)
+function self:ctor (imageCache, image)
 	self.Image = image
 	self.Material = Material (image)
 	if self.Material:IsError () then
-		local fallbackImage = Gooey.ImageCache:GetFallbackImage ()
+		local fallbackImage = imageCache:GetFallbackImage ()
 		if fallbackImage then
-			self.Material = Gooey.ImageCache:GetFallbackImage ():GetMaterial ()
+			self.Material = imageCache:GetFallbackImage ():GetMaterial ()
 		end
 	end
 	
