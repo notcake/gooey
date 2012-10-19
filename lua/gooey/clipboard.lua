@@ -100,7 +100,7 @@ function self:RegisterClipboardController (clipboardController)
 end
 
 function self:SetText (newClipboardText)
-	SetClipboardText (newClipboardText)
+	SetClipboardText (GLib.UTF8.ToLatin1 (newClipboardText))
 	
 	if self.ClipboardText == newClipboardText then return end
 	

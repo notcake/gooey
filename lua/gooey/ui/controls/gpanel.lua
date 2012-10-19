@@ -2,6 +2,7 @@ local PANEL = {}
 
 function PANEL:Init ()
 	self.Text = ""
+	self.LastLeftMouseButtonReleaseTime = 0
 end
 
 function PANEL:GetKeyboardMap ()
@@ -70,9 +71,17 @@ function PANEL:OnMouseReleased (mouseCode)
 	if self.OnMouseUp then self:OnMouseUp (mouseCode, self:CursorPos ()) end
 	
 	if mouseCode == MOUSE_LEFT then
-		self:DispatchEvent ("Click")
+		if SysTime () - self.LastLeftMouseButtonReleaseTime < 0.4 then
+			if self.OnDoubleClick then self:OnDoubleClick (mouseCode, self:CursorPos ()) end
+			self:DispatchEvent ("DoubleClick")
+		else
+			if self.OnClick then self:OnClick (mouseCode, self:CursorPos ()) end
+			self:DispatchEvent ("Click")
+		end
 		self.Depressed = false
 		self.Pressed = false
+		
+		self.LastLeftMouseButtonReleaseTime = SysTime ()
 	elseif mouseCode == MOUSE_RIGHT then
 		self:DispatchEvent ("RightClick")
 	end
