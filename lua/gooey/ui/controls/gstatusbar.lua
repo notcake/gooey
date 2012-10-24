@@ -54,7 +54,7 @@ function PANEL:AddTextPanel (text)
 	local label = vgui.Create ("DLabel")
 	label:SetText (text or "")
 	label:SetTextColor (GLib.Colors.Black)
-	label:SetTextInset (4)
+	label:SetTextInset (4, 0)
 	label:SetContentAlignment (4)
 	return self:AddCustomPanel (label)
 end
@@ -83,7 +83,7 @@ function PANEL:Paint (w, h)
 	draw.RoundedBoxEx (4, 0, 0, w, h, self:GetBackgroundColor (), false, false, true, true)
 	
 	if self:GetPanelCount () == 0 then
-		surface.SetFont ("Default")
+		surface.SetFont ("DermaDefault")
 		local w, h = surface.GetTextSize (self:GetText ())
 		surface.SetTextColor (self:GetTextColor ())
 		surface.SetTextPos (4, (self:GetTall () - h) * 0.5)

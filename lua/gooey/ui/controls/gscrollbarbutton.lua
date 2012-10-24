@@ -37,23 +37,7 @@ function PANEL:GetScrollIncrement ()
 end
 
 function PANEL:Paint (w, h)
-	if VERSION < 150 then
-		local w, h = self:GetSize ()
-		derma.SkinHook ("Paint", "Button", self, w, h)
-		
-		local character = ""
-		local color = GLib.Colors.White
-		if not self:IsEnabled () then
-			color = GLib.Colors.Gray
-		end
-		if self.Direction == "Up" then character = "5"
-		elseif self.Direction == "Down" then character = "6"
-		elseif self.Direction == "Left" then character = "3"
-		elseif self.Direction == "Right" then character = "4" end
-		draw.SimpleText (character, "Marlett", self:GetWide () * 0.5, self:GetTall () * 0.5, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	else
-		derma.SkinHook ("Paint", "Button" .. self:GetDirection (), self, w, h)
-	end
+	derma.SkinHook ("Paint", "Button" .. self:GetDirection (), self, w, h)
 end
 
 function PANEL:SetDirection (direction)

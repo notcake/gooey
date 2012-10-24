@@ -100,7 +100,7 @@ function self:Remove ()
 	if self.OnRemoved then self:OnRemoved () end
 	self:DispatchEvent ("Removed")
 	
-	_R.Panel.Remove (self)
+	debug.getregistry ().Panel.Remove (self)
 end
 
 function self:SetBackgroundColor (color)
@@ -122,7 +122,7 @@ end
 function self:SetHeight (height)
 	if self:GetTall () == height then return end
 	
-	_R.Panel.SetTall (self, height)
+	debug.getregistry ().Panel.SetTall (self, height)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 end
 
@@ -131,14 +131,14 @@ function self:SetParent (parent)
 	
 	local oldParent = self:GetParent ()
 	
-	_R.Panel.SetParent (self, parent)
+	debug.getregistry ().Panel.SetParent (self, parent)
 	self:DispatchEvent ("ParentChanged", oldParent, self:GetParent ())
 end
 
 function self:SetSize (width, height, ...)
 	if self:GetWide () == width and self:GetTall () == height then return end
 	
-	_R.Panel.SetSize (self, width, height)
+	debug.getregistry ().Panel.SetSize (self, width, height)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 end
 
@@ -150,7 +150,7 @@ function self:SetTextColor (color)
 	if type (color) == "number" then
 		Gooey.PrintStackTrace ()
 	end
-	_R.Panel.SetFGColor (self, color)
+	debug.getregistry ().Panel.SetFGColor (self, color)
 	self.m_cTextColor = color -- for DTree_Node compatibility
 	self.m_colText    = color -- for DLabel compatibility
 	
@@ -172,14 +172,14 @@ end
 function self:SetVisible (visible)
 	if self:IsVisible () == visible then return end
 	
-	_R.Panel.SetVisible (self, visible)
+	debug.getregistry ().Panel.SetVisible (self, visible)
 	self:DispatchEvent ("VisibleChanged", visible)
 end
 
 function self:SetWide (width)
 	if self:GetWide () == width then return end
 	
-	_R.Panel.SetWide (self, width)
+	debug.getregistry ().Panel.SetWide (self, width)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 end
 

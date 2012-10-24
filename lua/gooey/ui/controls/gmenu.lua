@@ -32,6 +32,8 @@ function PANEL:Init ()
 	local _, menuList = debug.getupvalue (RegisterDermaMenuForClose, 1)
 	menuList [#menuList] = nil
 	
+	self:SetDeleteSelf (false)
+	
 	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()),
 		function ()
 			self:Remove ()
@@ -73,8 +75,8 @@ function PANEL:CloseMenus ()
 end
 
 function PANEL:GetItemById (id)
-	for _, item in pairs (self:GetItems ()) do
-		if item.Id == id then
+	for _, item in pairs (self:GetCanvas ():GetChildren ()) do
+		if not item:IsMarkedForDeletion () and item.Id == id then
 			return item
 		end
 	end
@@ -131,24 +133,23 @@ end
 function PANEL:PerformLayout ()
 	DMenu.PerformLayout (self)
 	
-	if self.animOpen.Running then
-		return
-	end
 	local w, h = self:GetMinimumWidth (), 0
 	
-	for _, item in pairs (self:GetItems ()) do
-		item:PerformLayout()
-        w = math.max (w, item:GetWide ())
+	for k, item in pairs (self:GetCanvas ():GetChildren ()) do
+		if not item:IsMarkedForDeletion () then
+			item:PerformLayout()
+			w = math.max (w, item:GetWide ())
+		end
     end
 	
 	self:SetWide (w)
 	
-	for _, item in pairs (self:GetItems ()) do
+	for _, item in pairs (self:GetCanvas ():GetChildren ()) do
 		item:SetWide (w)
 		item:SetPos (0, h)
 		item:InvalidateLayout (true)
 		
-		if item:IsVisible () then
+		if item:IsVisible () and not item:IsMarkedForDeletion () then
 			h = h + item:GetTall ()
 		end
 	end

@@ -3,7 +3,7 @@ local PANEL = {}
 function PANEL:Init ()
 	self:SetMouseInputEnabled (true)
 	self:SetKeyboardInputEnabled (true)
-	self:SetTextInset (3)
+	self:SetTextInset (3, 0)
 
 	self.TextEntry = vgui.Create ("DTextEntry", self)
 	self.TextEntry:SetText (self:GetText ())
@@ -60,7 +60,7 @@ end
 
 function PANEL:SetFont (font)
 	self.TextEntry:SetFont (font)
-	_R.Panel.SetFont (self, font)
+	debug.getregistry ().Panel.SetFont (self, font)
 end
 
 function PANEL:SetText (text)
@@ -71,7 +71,7 @@ function PANEL:SetText (text)
 		self.TextEntry:SetText (text)
 	end
 	
-	_R.Panel.SetText (self, text)
+	debug.getregistry ().Panel.SetText (self, text)
 end
 
 function PANEL:ShouldHideTextEntry ()

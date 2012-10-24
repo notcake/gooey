@@ -64,7 +64,7 @@ end
 function PANEL:Clear ()
 	self.Sorted = {}
 
-	DComboBox.Clear (self)
+	DListBox.Clear (self)
 	
 	self:ClearSelection ()
 end
@@ -119,7 +119,7 @@ function PANEL:GetSelectionMode ()
 end
 
 function PANEL:HasFocus ()
-	if _R.Panel.HasFocus (self) then
+	if debug.getregistry ().Panel.HasFocus (self) then
 		return true
 	end
 	return self.VBar:HasFocus () or self.VBar.btnUp:HasFocus () or self.VBar.btnDown:HasFocus () or self.VBar.btnGrip:HasFocus ()
@@ -274,4 +274,4 @@ function PANEL:OnMouseReleased (mouseCode)
 	end
 end
 
-Gooey.Register ("GListBox", PANEL, "DComboBox")
+Gooey.Register ("GListBox", PANEL, "DListBox")

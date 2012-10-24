@@ -40,7 +40,7 @@ function PANEL:SetIndex (index)
 end
 
 function PANEL:SetText (text)
-	_R.Panel.SetText (self, text)
+	debug.getregistry ().Panel.SetText (self, text)
 	return self
 end
 

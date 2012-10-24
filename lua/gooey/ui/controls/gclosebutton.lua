@@ -40,7 +40,7 @@ function PANEL:DrawCross (renderContext, x, y, color)
 	renderContext:PushRelativeViewPort (x, y)
 	
 	surface.SetDrawColor (color)
-	surface.SetTexture ()
+	surface.SetTexture (-1)
 	surface.DrawPoly (crossPoly1)
 	surface.DrawPoly (crossPoly2)
 	

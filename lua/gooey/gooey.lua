@@ -30,13 +30,6 @@ if CLIENT then
 			end
 		end
 		
-		if classTable.Paint then
-			classTable._Paint = classTable.Paint
-			classTable.Paint = function (self)
-				return self:_Paint (self:GetSize ())
-			end
-		end
-		
 		vgui.Register (className, classTable, baseClassName)
 	end
 	

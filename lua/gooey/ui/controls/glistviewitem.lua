@@ -35,8 +35,8 @@ function PANEL:DataLayout (listView)
 	end
 	for i = 1, #self.Columns do
 		if Columns [i]:GetType () == "Checkbox" then
-			self.Columns [i]:SetPos (x + (listView:ColumnWidth (i) - 14) * 0.5, (height - 14) * 0.5)
-			self.Columns [i]:SetSize (14, 14)
+			self.Columns [i]:SetPos (x + (listView:ColumnWidth (i) - 15) * 0.5, (height - 15) * 0.5)
+			self.Columns [i]:SetSize (15, 15)
 		else
 			self.Columns [i]:SetPos (x + 4, 0)
 		end
@@ -63,6 +63,14 @@ end
 
 function PANEL:GetText (i)
 	return self.Columns [i or 1]:GetValue ()
+end
+
+function PANEL:IsHovered ()
+	if not self.Hovered then return false end
+	
+	local mouseX, mouseY = self:CursorPos ()
+	return mouseX >= 0 and mouseX < self:GetWide () and
+	       mouseY >= 0 and mouseY < self:GetTall ()
 end
 
 function PANEL:IsSelected ()

@@ -5,7 +5,7 @@ function PANEL:Init ()
 	self.Icon = nil
 	
 	self:SetContentAlignment (4)
-	self:SetTextInset (20)
+	self:SetTextInset (20, 0)
 end
 
 function PANEL:ContainsPoint (x, y)
@@ -27,17 +27,19 @@ end
 
 function PANEL:Paint (w, h)
 	derma.SkinHook ("Paint", "MenuOption", self, w, h)
-	if not self:IsEnabled () then
-		surface.SetFont ("Default")
+	surface.SetFont ("DermaDefault")
+	if self:IsEnabled () then
+		surface.SetTextColor (GLib.Colors.Black)
+		surface.SetTextPos (22, 4)
+	else
 		surface.SetTextColor (GLib.Colors.White)
-		surface.SetTextPos (21, 3)
+		surface.SetTextPos (23, 5)
 		surface.DrawText (self:GetText ())
 		surface.SetTextColor (GLib.Colors.Gray)
-		surface.SetTextPos (20, 2)
-		surface.DrawText (self:GetText ())
-		return true
+		surface.SetTextPos (22, 4)
 	end
-	return false
+	surface.DrawText (self:GetText ())
+	return true
 end
 
 function PANEL:SetIcon (icon)
@@ -48,7 +50,7 @@ function PANEL:SetIcon (icon)
 	end
 	if not self.Icon then
 		self.Icon = vgui.Create ("GImage", self)
-		self.Icon:SetPos (2, 1)
+		self.Icon:SetPos (3, 3)
 		self.Icon:SetSize (16, 16)
 	end
 	

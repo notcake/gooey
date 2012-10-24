@@ -1,8 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture"		"gui/g_silkicons/arrow_turn_right"
-	"$ignorez"			1
-	"$vertexcolor" 		1
-	"$vertexalpha" 		1
-	"$nolod" 			1
-}

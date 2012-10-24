@@ -7,19 +7,28 @@ function PANEL:Init ()
 	-- Code copied from DTree_Node
 	self.Label = vgui.Create ("DTree_Node_Button", self)
 	self.Label.DoClick = function () self:InternalDoClick () end
+	self.Label.DoDoubleClick = function () self:InternalDoClick () end
 	self.Label.DoRightClick = function () self:InternalDoRightClick () end
+	self.Label.DragHover = function (s, t) self:DragHover (t) end
 
-	self.Expander = vgui.Create ("DTinyButton", self)
-	self.Expander:SetText ("+")
+	self.Expander = vgui.Create ("DExpandButton", self)
 	self.Expander.DoClick = function () self:SetExpanded (not self.m_bExpanded) end
 	self.Expander:SetVisible (false)
 	
 	self.Icon = vgui.Create ("GImage", self)
 	
-	self:SetTextColor( Color( 0, 0, 0, 255 ) )
+	self:SetTextColor (Color (0, 0, 0, 255))
 	
-	self.animSlide = Derma_Anim( "Anim", self, self.AnimSlide )
+	self.animSlide = Derma_Anim ("Anim", self, self.AnimSlide)
+	
+	self.fLastClick = SysTime ()
+	
+	self:SetDrawLines (false)
+	self:SetLastChild (false)
 
+	self.Children = {}       -- set of children
+	self.SortedChildren = {} -- sorted array of children
+	
 	self.ChildNodes = nil
 	self.ChildNodeCount = 0
 
@@ -27,7 +36,7 @@ function PANEL:Init ()
 	self.ExpandOnPopulate = false
 	
 	self.ShouldSuppressLayout = false
-	self:SetIcon ("gui/g_silkicons/folder")
+	self:SetIcon ("icon16/folder.png")
 end
 
 function PANEL:AddNode (name)
@@ -40,7 +49,10 @@ function PANEL:AddNode (name)
 	node:SetParentNode (self)
 	node:SetRoot (self:GetRoot ())
 	
-	self.ChildNodes:AddItem (node)
+	self.ChildNodes:Add (node)
+	
+	self.Children [node] = true
+	self.SortedChildren [#self.SortedChildren + 1] = node
 	self.ChildNodeCount = self.ChildNodeCount + 1
 	self:InvalidateLayout ()
 	
@@ -65,6 +77,23 @@ function PANEL:Clear ()
 	self:LayoutRecursive ()
 end
 
+function PANEL:CreateChildNodes ()
+	DTree_Node.CreateChildNodes (self)
+	
+	self.ChildNodes.OnChildRemoved = function (listLayout, ...)
+		self:OnChildRemoved (...)
+	end
+	
+	self.ChildNodes.PerformLayout = function (listLayout)
+		listLayout:SizeToChildren (false, true)
+		local y = 0
+		for k, v in ipairs (self.SortedChildren) do
+			v:SetPos (0, y)
+			y = y + v:GetTall ()
+		end
+	end
+end
+
 function PANEL:ExpandTo (expanded)
 	self:SetExpanded (expanded)
 	self:GetParentNode():ExpandTo (expanded)
@@ -74,7 +103,7 @@ function PANEL:FindChild (id)
 	if not self.ChildNodes then
 		return nil
 	end
-	for _, item in pairs (self.ChildNodes:GetItems ()) do
+	for _, item in pairs (self.ChildNodes:GetChildren ()) do
 		if item:GetId () == id then
 			return item
 		end
@@ -118,6 +147,10 @@ function PANEL:IsPopulated ()
 	return self.Populated
 end
 
+function PANEL:IsSelected ()
+	return self:GetRoot ().m_pSelectedItem == self or self.Label:IsSelected ()
+end
+
 function PANEL:LayoutRecursive ()
 	if not self.ShouldSuppressLayout then
 		if self.ChildNodes then
@@ -142,24 +175,21 @@ end
 function PANEL:RemoveNode (node)
 	if not self.ChildNodes then return end
 	if not node or not node:IsValid () then return end
-	if node:GetParent () ~= self.ChildNodes:GetCanvas () then return end
-	self.ChildNodes:RemoveItem (node)
-	self.ChildNodeCount = self.ChildNodeCount - 1
-	if self.ChildNodeCount == 0 then
-		self:SetExpandable (false)
-	end
-	
-	self:LayoutRecursive ()
+	if node:GetParent () ~= self.ChildNodes then return end
+	node:Remove ()
 end
 
 function PANEL:Select ()
 	self:GetRoot ():SetSelectedItem (self)
-	self:SetSelected (true)
 end
 
 function PANEL:SetExpandable (expandable)
 	self:SetForceShowExpander (expandable)
 	self.Expander:SetVisible (self:HasChildren () or expandable)
+	
+	if not expandable then
+		self:SetExpanded (false, true)
+	end
 end
 
 function PANEL:SetExpanded (expanded, suppressAnimation)
@@ -186,23 +216,31 @@ function PANEL:SetId (id)
 	self.Id = id
 end
 
+function PANEL:SetTextColor (color)
+	self.Label:SetColor (color)
+end
 
 function PANEL:SetTreeView (treeView)
 	self.TreeView = treeView
 end
 
 function PANEL:SortChildren (comparator)
-	if not self.ChildNodes then return end
-	
 	comparator = comparator or self:GetComparator ()
-	table.sort (self.ChildNodes:GetItems (),
+	table.sort (self.SortedChildren,
 		function (a, b)
 			if a == nil then return false end
 			if b == nil then return true end
 			return comparator (a, b)
 		end
 	)
-	self.ChildNodes:InvalidateLayout ()
+	
+	for _, v in ipairs (self.SortedChildren) do
+		v:MoveToFront ()
+	end
+	
+	if self.ChildNodes then
+		self.ChildNodes:InvalidateLayout ()
+	end
 end
 
 function PANEL:SuppressLayout (suppress)
@@ -216,7 +254,7 @@ end
 
 function PANEL:InternalDoClick ()
 	local expanded = self:IsExpanded ()
-	local wasSelected = self.Label:GetSelected ()
+	local wasSelected = self:IsSelected ()
 	self:GetRoot ():SetSelectedItem (self)
 
 	if self:DoClick () then return end
@@ -225,6 +263,28 @@ function PANEL:InternalDoClick ()
 	if not expanded or wasSelected then
 		self:SetExpanded (not expanded)
 	end
+end
+
+function PANEL:OnChildRemoved (childNode)
+	if not self.Children [childNode] then return end
+	
+	self.Children [childNode] = nil
+	for k, v in ipairs (self.SortedChildren) do
+		if v == childNode then
+			table.remove (self.SortedChildren, k)
+			break
+		end
+	end
+	self.ChildNodeCount = self.ChildNodeCount - 1
+	if self.ChildNodeCount == 0 then
+		self:SetExpandable (false)
+	end
+	
+	self:GetRoot ():LayoutRecursive ()
+end
+
+function PANEL:OnMouseWheel (delta)
+	self:GetTreeView ():OnMouseWheeled (delta)
 end
 
 function PANEL:OnRemoved ()	
@@ -239,7 +299,6 @@ function PANEL:OnRemoved ()
 	if self.Label:GetSelected () then
 		self:GetRoot ():SetSelectedItem (self:GetParentNode ())
 	end
-	self:GetParentNode ():RemoveNode (self)
 end
 
 -- Import other functions from DTree_Node

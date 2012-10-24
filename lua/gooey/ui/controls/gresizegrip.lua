@@ -46,8 +46,7 @@ function PANEL:Init ()
 	self:DispatchEvent ("ParentChanged", nil, self:GetParent ())
 end
 
-function PANEL:Paint ()
-	local w, h = self:GetSize ()
+function PANEL:Paint (w, h)
 	local padding = 3
 	local dotSize = math.min ((math.min (w, h) - padding * 2) / 5, 3)
 	dotSize = math.floor (dotSize + 0.5) -- round dotSize

@@ -20,24 +20,24 @@ function PANEL:Init ()
 		local subresults
 		
 		-- files
-		subresults = file.Find ("models/" .. text .. "*.mdl", true)
+		subresults = file.Find ("models/" .. text .. "*.mdl", "GAME")
 		for _, v in ipairs (subresults) do
 			results [#results + 1] = basedir .. v
 		end
 		
 		-- folders
-		subresults = file.FindDir ("models/" .. text .. "*", true)
+		subresults = file.FindDir ("models/" .. text .. "*", "GAME")
 		for _, v in ipairs (subresults) do
 			results [#results + 1] = basedir .. v
 		end
 		
-		if text ~= "" and text:sub (-1) ~= "/" and text:sub (-1) ~= "\\" and file.IsDir ("models/" .. text, true) then			
-			subresults = file.Find ("models/" .. text .. "/*.mdl", true)
+		if text ~= "" and text:sub (-1) ~= "/" and text:sub (-1) ~= "\\" and file.IsDir ("models/" .. text, "GAME") then			
+			subresults = file.Find ("models/" .. text .. "/*.mdl", "GAME")
 			for _, v in ipairs (subresults) do
 				results [#results + 1] = text .. "/" .. v
 			end
 			
-			subresults = file.FindDir ("models/" .. text .. "/*", true)
+			subresults = file.FindDir ("models/" .. text .. "/*", "GAME")
 			for _, v in ipairs (subresults) do
 				results [#results + 1] = text .. "/" .. v
 			end
@@ -46,7 +46,7 @@ function PANEL:Init ()
 		return results
 	end)
 	self:AddEventListener ("TextChanged", function (multiChoice, text)
-		if file.Exists ("models/" .. text, true) and text:lower ():sub (-4) == ".mdl" then
+		if file.Exists ("models/" .. text, "GAME") and text:lower ():sub (-4) == ".mdl" then
 			self:SetModel (text)
 		end
 	end)

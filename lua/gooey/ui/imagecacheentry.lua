@@ -13,7 +13,7 @@ function self:ctor (imageCache, image)
 	
 	if string.find (self.Material:GetShader (), "VertexLitGeneric") or
 		string.find (self.Material:GetShader (), "Cable") then
-		local baseTexture = self.Material:GetMaterialString ("$basetexture")
+		local baseTexture = self.Material:GetString ("$basetexture")
 		if baseTexture then
 			self.Material = CreateMaterial (image .. "_DImage", "UnlitGeneric",
 				{
@@ -25,10 +25,10 @@ function self:ctor (imageCache, image)
 		end
 	end
 	
-	local texture = self.Material:GetMaterialTexture ("$basetexture")
+	local texture = self.Material:GetTexture ("$basetexture")
 	if texture then
-		self.Width  = texture:GetActualWidth ()
-		self.Height = texture:GetActualHeight ()
+		self.Width  = texture:Width ()
+		self.Height = texture:Height ()
 	else
 		self.Width  = 16
 		self.Height = 16

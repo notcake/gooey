@@ -7,10 +7,19 @@ local PANEL = {}
 ]]
 
 function PANEL:Init ()
+	-- Remove the original root node and replace it with our own
+	self.RootNode:Remove ()
+	self.RootNode = self:GetCanvas ():Add ("GTreeViewNode")
+	self.RootNode:SetTreeView (self)
+	self.RootNode:SetRoot (self)
+	self.RootNode:SetParentNode (self)
+	self.RootNode:Dock (TOP)
+	self.RootNode:SetText ("")
+	self.RootNode:SetExpanded (true, true)
+	
 	self.LastClickTime = 0
 	
 	self.Menu = nil
-	self.ChildNodeCount = 0
 
 	self.PopulationMode = "Static"
 	self.Populator = nil
@@ -19,17 +28,7 @@ function PANEL:Init ()
 end
 
 function PANEL:AddNode (name)
-	local node = vgui.Create ("GTreeViewNode", self)
-	
-	node:SetTreeView (self)
-	node:SetId (name)
-	node:SetText (name)
-	node:SetParentNode (self)
-	node:SetRoot (self)
-	
-	self:AddItem (node)
-	self.ChildNodeCount = self.ChildNodeCount + 1
-	return node
+	return self.RootNode:AddNode (name)
 end
 
 function PANEL.DefaultComparator (a, b)
@@ -37,7 +36,9 @@ function PANEL.DefaultComparator (a, b)
 end
 
 function PANEL:FindChild (id)
-	for _, item in pairs (self:GetItems ()) do
+	if not self.RootNode.ChildNodes then return nil end
+	
+	for _, item in pairs (self.RootNode.ChildNodes:GetChildren ()) do
 		if item:GetId () == id then
 			return item
 		end
@@ -46,7 +47,7 @@ function PANEL:FindChild (id)
 end
 
 function PANEL:GetChildCount ()
-	return self.ChildNodeCount
+	return self.RootNode:GetChildCount ()
 end
 
 function PANEL:GetComparator ()
@@ -66,7 +67,7 @@ function PANEL:GetPopulator ()
 end
 
 function PANEL:InvalidateLayout ()
-	if not self.ShouldSuppressLayout then _R.Panel.InvalidateLayout (self) end
+	if not self.ShouldSuppressLayout then debug.getregistry ().Panel.InvalidateLayout (self) end
 end
 
 function PANEL:LayoutRecursive ()
@@ -74,7 +75,7 @@ function PANEL:LayoutRecursive ()
 end
 
 function PANEL:PerformLayout ()
-	if not self.ShouldSuppressLayout then DPanelList.PerformLayout (self) end
+	if not self.ShouldSuppressLayout then DScrollPanel.PerformLayout (self) end
 end
 
 function PANEL:RemoveNode (node)
@@ -84,6 +85,10 @@ function PANEL:RemoveNode (node)
 	self:RemoveItem (node)
 	self.ChildNodeCount = self.ChildNodeCount - 1
 	self:InvalidateLayout ()
+end
+
+function PANEL:SetExpandable (expandable)
+	self.RootNode:SetExpandable (expandable)
 end
 
 function PANEL:SetMenu (menu)
@@ -112,14 +117,7 @@ function PANEL:SetSelectedItem (node)
 end
 
 function PANEL:SortChildren (comparator)
-	comparator = comparator or self.Comparator or self.DefaultComparator
-	table.sort (self:GetItems (),
-		function (a, b)
-			if a == nil then return false end
-			if b == nil then return true end
-			return comparator (a, b)
-		end
-	)
+	self.RootNode:SortChildren (comparator or self.Comparator or self.DefaultComparator)
 	self:InvalidateLayout ()
 end
 

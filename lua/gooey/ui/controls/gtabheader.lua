@@ -70,7 +70,7 @@ function PANEL:Paint (w, h)
 		x = x + self.Image:GetWidth () + 4
 	end
 	
-	surface.SetFont ("Default")
+	surface.SetFont ("DermaDefault")
 	local _, textHeight = surface.GetTextSize (self:GetText ())
 	surface.SetTextColor (GLib.Colors.Black)
 	surface.SetTextPos (x, (self:GetTall () - textHeight) * 0.5)
@@ -87,7 +87,7 @@ function PANEL:PerformLayout ()
 		x = x + self.Image:GetWidth () + 4
 	end
 	
-	surface.SetFont ("Default")
+	surface.SetFont ("DermaDefault")
 	local w, h = surface.GetTextSize (self:GetText ())
 	x = x + w + 4
 	

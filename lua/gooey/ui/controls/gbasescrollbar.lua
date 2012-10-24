@@ -22,7 +22,7 @@ function PANEL:Init ()
 	self.FirstMouseScrollInterval = 0.5
 	self.MouseScrollInterval = 0.050
 	
-	self:SetSize (16, 16)
+	self:SetSize (15, 15)
 	
 	self:AddEventListener ("EnabledChanged",
 		function (_, enabled)

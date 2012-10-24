@@ -11,43 +11,35 @@ function PANEL:Init ()
 	
 	self:SetContentAlignment (4)
 	self:SetText ("")
+	self:SetTextColor (self:GetSkin ().Colours.Label.Default)
 end
 
-function PANEL:Paint ()
-	local h = 14
-	local w = 14
+function PANEL:IsChecked ()
+	return self.Checked
+end
+
+function PANEL:Paint (w, h)
+	local w = 15
+	local h = 15
 	
-	-- Outline and background
-	if not self:IsEnabled () then
-		draw.RoundedBox (4, 0, 0, w, h, Color (64, 64, 64, 255))
-		draw.RoundedBox (4, 1, 1, w - 2, h - 2, Color (172, 172, 172, 255))
-		self:SetTextColor (GLib.Colors.Gray)
+	if self:IsChecked () then
+		if self:IsEnabled () then
+			self:GetSkin ().tex.Checkbox_Checked (0, 0, w, h)
+		else
+			self:GetSkin ().tex.CheckboxD_Checked (0, 0, w, h)
+		end
 	else
-		if self.Hovered then
-			draw.RoundedBox (4, 0, 0, w, h, GLib.Colors.Gray)
-			self:SetTextColor (GLib.Colors.White)
+		if self:IsEnabled () then
+			self:GetSkin ().tex.Checkbox (0, 0, w, h)
 		else
-			draw.RoundedBox (4, 0, 0, w, h, Color (30, 30, 30, 255))
-			self:SetTextColor (Color (200, 200, 200, 255))
+			self:GetSkin ().tex.CheckboxD (0, 0, w, h)
 		end
-		draw.RoundedBox (4, 1, 1, w - 2, h - 2, GLib.Colors.White)
-	end
-	
-	if self.Checked then
-		surface.SetFont ("marlett")
-		surface.SetTextPos (0, 0)
-		if not self:IsEnabled () then
-			surface.SetTextColor (Color (64, 64, 64, 255))
-		else
-			surface.SetTextColor (GLib.Colors.Black)
-		end
-		surface.DrawText ("a")
 	end
 	return false
 end
 
 function PANEL:PerformLayout ()
-	self:SetTextInset (self:GetTall () + 4)
+	self:SetTextInset (self:GetTall () + 4, 0)
 end
 
 function PANEL:SetChecked (checked)

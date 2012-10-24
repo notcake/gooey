@@ -116,7 +116,6 @@ function PANEL:Paint (w, h)
 	draw.RoundedBox (4, 0, 0, w, h, Vector (128, 128, 128, 255))
 
 	local x, y = self:LocalToScreen (0, 0)
-	local w, h = self:GetSize ()
 
 	local rw, rh = w, h
 	if w < h then

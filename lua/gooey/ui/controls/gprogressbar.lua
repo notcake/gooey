@@ -9,7 +9,6 @@ function PANEL:GetProgress ()
 end
 
 function PANEL:Paint (w, h)
-	local w, h = self:GetSize ()
 	local barWidth = w * self.Progress
 	local roundRadius = math.min (4, math.floor (barWidth * 0.5))
 	draw.RoundedBox (roundRadius, 0, 0, barWidth, h, GLib.Colors.CornflowerBlue)

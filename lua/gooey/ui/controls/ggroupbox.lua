@@ -56,7 +56,7 @@ function PANEL:SetOutlineColor (color)
 end
 
 function PANEL:SetText (text)
-	_R.Panel.SetText (self, text)
+	debug.getregistry ().Panel.SetText (self, text)
 	self.Title:SetText (text)
 	self.Title:SizeToContents ()
 end

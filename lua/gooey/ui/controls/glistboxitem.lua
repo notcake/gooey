@@ -32,7 +32,7 @@ function PANEL:GetIndent ()
 	return self.Indent
 end
 
-PANEL.GetText = _R.Panel.GetValue
+PANEL.GetText = debug.getregistry ().Panel.GetValue
 
 function PANEL:IsSelected ()
 	return self.ListBox.SelectionController:IsSelected (self)
@@ -71,7 +71,7 @@ function PANEL:SetIcon (icon)
 	if not icon then
 		self.Icon:Remove ()
 		self.Icon = nil
-		self:SetTextInset (self.Indent + 5)
+		self:SetTextInset (self.Indent + 5, 0)
 		return
 	end
 	if not self.Icon then
@@ -79,7 +79,7 @@ function PANEL:SetIcon (icon)
 		self.Icon:SetPos (self.Indent + 4, 2)
 		self.Icon:SetSize (16, 16)
 	end
-	self:SetTextInset (self.Indent + 24)
+	self:SetTextInset (self.Indent + 24, 0)
 	
 	self.Icon:SetImage (icon)
 end
@@ -88,9 +88,9 @@ function PANEL:SetIndent (indent)
 	self.Indent = indent
 	if self.Icon then
 		self.Icon:SetPos (self.Indent + 4, 2)
-		self:SetTextInset (self.Indent + 24)
+		self:SetTextInset (self.Indent + 24, 0)
 	else
-		self:SetTextInset (self.Indent + 5)
+		self:SetTextInset (self.Indent + 5, 0)
 	end
 end
 
@@ -126,4 +126,4 @@ function PANEL:OnMouseReleased (mouseCode)
 	end
 end
 
-Gooey.Register ("GListBoxItem", PANEL, "DComboBoxItem")
+Gooey.Register ("GListBoxItem", PANEL, "DListBoxItem")

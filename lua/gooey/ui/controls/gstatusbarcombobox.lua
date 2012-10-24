@@ -11,7 +11,7 @@ local arrowWidth = 14
 function PANEL:Init ()
 	self.Label = vgui.Create ("DLabel", self)
 	self.Label:SetTextColor (GLib.Colors.Black)
-	self.Label:SetTextInset (4)
+	self.Label:SetTextInset (4, 0)
 	self.Label:SetContentAlignment (4)
 	
 	self.Menu = vgui.Create ("GMenu")
@@ -80,7 +80,7 @@ function PANEL:GetText ()
 end
 
 function PANEL:Paint (w, h)
-	surface.SetFont ("Default")
+	surface.SetFont ("DermaDefault")
 	local textWidth = surface.GetTextSize (self:GetText ())
 	local boxWidth = math.min (w, 4 + textWidth + textArrowSpacing + arrowWidth)
 	textWidth = boxWidth - 4 - textArrowSpacing - arrowWidth

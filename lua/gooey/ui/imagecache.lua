@@ -7,8 +7,8 @@ function self:ctor ()
 	self.LoadInterval = 0.1
 	self.LastLoadTime = 0
 	
-	self.FallbackImage    = self:LoadImage ("gui/silkicons/cross")
-	self.PlaceholderImage = self:LoadImage ("gui/g_silkicons/hourglass")
+	self.FallbackImage    = self:LoadImage ("icon16/cross.png")
+	self.PlaceholderImage = self:LoadImage ("icon16/hourglass.png")
 end
 
 function self:GetFallbackImage ()
