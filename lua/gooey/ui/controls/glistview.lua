@@ -144,7 +144,7 @@ function PANEL:GetContentBounds ()
 	if self.VBar and self.VBar:IsVisible () then
 		scrollbarWidth = self.VBar:GetWide ()
 	end
-	return 0, self:GetColumnHeight (), self:GetWide () - scrollbarWidth, self:GetTall ()
+	return 1, self:GetColumnHeight (), self:GetWide () - scrollbarWidth, self:GetTall () - 1
 end
 
 function PANEL:GetItemEnumerator ()

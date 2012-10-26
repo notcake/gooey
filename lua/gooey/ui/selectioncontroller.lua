@@ -17,7 +17,7 @@ local SelectionAction =
 {
 	Override	= 0, -- default
 	Toggle		= 1, -- control
-	Merge		= 2,  -- shift
+	Merge		= 2, -- shift
 	Ignore		= 3
 }
 
@@ -134,8 +134,8 @@ end
 -- Internal, do not call
 function self:ClampPosition (x, y)
 	local minx, miny, maxx, maxy = self.Control:GetContentBounds ()
-	if x < minx then x = minx end
-	if y < miny then y = miny end
+	if x <  minx then x = minx end
+	if y <  miny then y = miny end
 	if x >= maxx then x = maxx end
 	if y >= maxy then y = maxy end
 	return x, y
@@ -222,10 +222,10 @@ end
 
 function self:GetBoxSelectionRectangle ()
 	local mouseX, mouseY = self:ClampPosition (self.Control:CursorPos ())
-	local width = math.abs (self.MouseDownX - mouseX)
+	local width  = math.abs (self.MouseDownX - mouseX)
 	local height = math.abs (self.MouseDownY - mouseY)
-	local left = math.min (self.MouseDownX, mouseX)
-	local top = math.min (self.MouseDownY, mouseY)
+	local left   = math.min (self.MouseDownX, mouseX)
+	local top    = math.min (self.MouseDownY, mouseY)
 	return left, top, width, height
 end
 
@@ -269,9 +269,9 @@ function self:MouseMove (_, mouseCode, x, y)
 			local iwidth, iheight = item:GetSize ()
 			
 			-- intersect spans
-			local sleft = math.max (left, ileft)
-			local sright = math.min (left + width, ileft + iwidth)
-			local stop = math.max (top, itop)
+			local sleft   = math.max (left, ileft)
+			local sright  = math.min (left + width, ileft + iwidth)
+			local stop    = math.max (top, itop)
 			local sbottom = math.min (top + height, itop + iheight)
 			if sleft <= sright and stop <= sbottom then
 				self.NewSelectedItems [#self.NewSelectedItems + 1] = item

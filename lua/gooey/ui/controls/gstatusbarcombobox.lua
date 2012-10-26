@@ -35,7 +35,6 @@ function PANEL:Init ()
 		end
 	)
 	
-	
 	self:AddEventListener ("MouseDown",
 		function (_, mouseCode)
 			if mouseCode == MOUSE_LEFT then
