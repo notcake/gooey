@@ -75,9 +75,9 @@ function PANEL:Paint (renderContext)
 	if self.DropDownMenuOpen then
 		draw.RoundedBoxEx (4, buttonWidth,     0, rightWidth,     self.Height,     GLib.Colors.Gray,     false, true, false, not self.DropDownMenuOpen)
 		draw.RoundedBoxEx (4, buttonWidth + 1, 1, rightWidth - 2, self.Height - 2, GLib.Colors.DarkGray, false, true, false, not self.DropDownMenuOpen)
-		draw.SimpleText ("6", "Marlett", self.Height + rightWidth * 0.5 + 1, self.Height * 0.5 + 1, dropDownArrowColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		Gooey.Glyphs.Draw ("down", renderContext, dropDownArrowColor, self.Height + 1, 1, rightWidth, self.Height)
 	else
-		draw.SimpleText ("6", "Marlett", self.Height + rightWidth * 0.5,     self.Height * 0.5,     dropDownArrowColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		Gooey.Glyphs.Draw ("down", renderContext, dropDownArrowColor, self.Height    , 0, rightWidth, self.Height)
 	end
 	
 	if self.Icon then

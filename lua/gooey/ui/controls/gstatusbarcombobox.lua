@@ -98,9 +98,9 @@ function PANEL:Paint (w, h)
 	
 	local arrowColor = self:IsEnabled () and GLib.Colors.Black or GLib.Colors.Gray
 	if (self:IsHovered () and self:IsPressed ()) or self.MenuOpen then
-		draw.SimpleText ("6", "Marlett", 4 + textWidth + textArrowSpacing + arrowWidth * 0.5 + 1, h * 0.5 + 1, arrowColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		Gooey.Glyphs.Draw ("down", Gooey.RenderContext, arrowColor, 4 + textWidth + textArrowSpacing + 1, 1, arrowWidth, h)
 	else
-		draw.SimpleText ("6", "Marlett", 4 + textWidth + textArrowSpacing + arrowWidth * 0.5,     h * 0.5,     arrowColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		Gooey.Glyphs.Draw ("down", Gooey.RenderContext, arrowColor, 4 + textWidth + textArrowSpacing + 0, 0, arrowWidth, h)
 	end
 end
 

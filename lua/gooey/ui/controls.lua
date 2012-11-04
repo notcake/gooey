@@ -4,6 +4,8 @@ include ("orientation.lua")
 include ("sizingmethod.lua")
 include ("tooltippositioningmode.lua")
 
+include ("glyphs.lua")
+
 include ("imagecacheentry.lua")
 include ("imagecache.lua")
 
@@ -71,3 +73,6 @@ include ("controls/gtoolbarseparator.lua")
 include ("controls/gtoolbarsplitbutton.lua")
 
 include ("dialogs/simplebuttondialog.lua")
+
+include ("glyphs/close.lua")
+include ("glyphs/down.lua")

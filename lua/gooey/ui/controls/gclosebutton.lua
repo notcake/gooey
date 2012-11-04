@@ -16,37 +16,6 @@ function PANEL:Init ()
 	self.Gray707070 = Color (0x70, 0x70, 0x70, 0xFF)
 end
 
-local crossPoly1 =
-{
-	{ x = 0, y = 0 },
-	{ x = 2, y = 0 },
-	{ x = 8, y = 7 },
-	{ x = 8, y = 8 },
-	{ x = 7, y = 8 },
-	{ x = 0, y = 2 }
-}
-
-local crossPoly2 =
-{
-	{ x = 8, y = 0 },
-	{ x = 7, y = 0 },
-	{ x = 0, y = 7 },
-	{ x = 0, y = 8 },
-	{ x = 2, y = 8 },
-	{ x = 8, y = 2 }
-}
-
-function PANEL:DrawCross (renderContext, x, y, color)
-	renderContext:PushRelativeViewPort (x, y)
-	
-	surface.SetDrawColor (color)
-	surface.SetTexture (-1)
-	surface.DrawPoly (crossPoly1)
-	surface.DrawPoly (crossPoly2)
-	
-	renderContext:PopViewPort ()
-end
-
 function PANEL:Paint (renderContext)
 	if self:IsEnabled () and self:IsHovered () then
 		-- Enabled and hovered
@@ -62,19 +31,19 @@ function PANEL:Paint (renderContext)
 	if self:IsEnabled () then
 		-- Enabled
 		if self:IsPressed () then
-			self:DrawCross (renderContext, 4, 4, GLib.Colors.Gray)
+			Gooey.Glyphs.Draw ("close", renderContext, GLib.Colors.Gray, 1, 1, self.Width, self.Height)
 		elseif self:IsHovered () then
-			self:DrawCross (renderContext, 3, 3, GLib.Colors.Gray)
+			Gooey.Glyphs.Draw ("close", renderContext, GLib.Colors.Gray, 0, 0, self.Width, self.Height)
 		else
 			if self:GetParent () and not self:GetParent ():IsSelected () then
 				-- Rendering on an inactive tab header
-				self:DrawCross (renderContext, 3, 3, self.Gray707070)
+				Gooey.Glyphs.Draw ("close", renderContext, self.Gray707070, 0, 0, self.Width, self.Height)
 			else
-				self:DrawCross (renderContext, 3, 3, GLib.Colors.DarkGray)
+				Gooey.Glyphs.Draw ("close", renderContext, GLib.Colors.DarkGray, 0, 0, self.Width, self.Height)
 			end
 		end
 	else
 		-- Disabled
-		self:DrawCross (renderContext, 3, 3, GLib.Colors.Gray)
+		Gooey.Glyphs.Draw ("close", renderContext, GLib.Colors.Gray, 0, 0, self.Width, self.Height)
 	end
 end
