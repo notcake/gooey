@@ -25,6 +25,36 @@ function PANEL:Init ()
 	self.TabSet = {}
 	self.SelectedTab = nil
 	
+	self:SetKeyboardMap (Gooey.KeyboardMap ())
+	self:GetKeyboardMap ():Register ({ KEY_TAB },
+		function (self, key, ctrl, shift, alt)
+			if not ctrl then return end
+			
+			local selectedTabIndex = self:GetSelectedTabIndex ()
+			if shift then
+				selectedTabIndex = selectedTabIndex - 1
+			else
+				selectedTabIndex = selectedTabIndex + 1
+			end
+			if selectedTabIndex <= 0 then selectedTabIndex = self:GetTabCount () end
+			if selectedTabIndex > self:GetTabCount () then selectedTabIndex = 1 end
+			
+			self:SetSelectedTabIndex (selectedTabIndex)
+		end
+	)
+	
+	-- Tab scrolling
+	self.TabScrollerEnabled = false
+	self.TabScrollOffset = 0
+	self.TotalHeaderWidth = 0
+	
+	self.LeftScrollButton = nil
+	self.RightScrollButton = nil
+	
+	self.LastThinkTime = SysTime ()
+	self.TargetTabScrollSpeed = 0
+	self.TabScrollSpeed = 0
+	
 	self.CloseRequested = function (tab)
 		self:DispatchEvent ("TabCloseRequested", tab)
 	end
@@ -95,6 +125,29 @@ function PANEL:ContainsTab (tab)
 	return self.TabSet [tab] or false
 end
 
+function PANEL:EnsureTabVisible (tab)
+	if not self.TabScrollerEnabled then return end
+	
+	local left = tab:GetHeader ():GetX ()
+	local right = tab:GetHeader ():GetX () + tab:GetHeader ():GetWide ()
+	if tab:GetHeader ():GetWide () > self:GetAvailableHeaderWidth () then
+		self:SetScrollOffset (left)
+	elseif self.TabScrollOffset > left then
+		self:SetScrollOffset (left)
+	elseif self.TabScrollOffset + self:GetAvailableHeaderWidth () < right then
+		self:SetScrollOffset (right - self:GetAvailableHeaderWidth ())
+	end
+end
+
+function PANEL:GetAvailableHeaderWidth ()
+	local availableHeaderWidth = self:GetWide ()
+	if self.TabScrollerEnabled then
+		availableHeaderWidth = availableHeaderWidth - self.LeftScrollButton:GetWide ()
+		availableHeaderWidth = availableHeaderWidth - self.RightScrollButton:GetWide ()
+	end
+	return availableHeaderWidth
+end
+
 function PANEL:GetEnumerator ()
 	local i = 0
 	return function ()
@@ -105,6 +158,10 @@ end
 
 function PANEL:GetHeaderHeight ()
 	return self.TabHeaderHeight
+end
+
+function PANEL:GetScrollOffset ()
+	return self.TabScrollOffset
 end
 
 function PANEL:GetSelectedContents ()
@@ -118,6 +175,10 @@ function PANEL:GetSelectedTab ()
 	return self.SelectedTab
 end
 
+function PANEL:GetSelectedTabIndex ()
+	return self:GetTabIndex (self.SelectedTab)
+end
+
 function PANEL:GetTab (index)
 	return self.Tabs [index]
 end
@@ -126,17 +187,55 @@ function PANEL:GetTabCount ()
 	return #self.Tabs
 end
 
-function PANEL:Paint (w, h)
-	draw.RoundedBoxEx (4, 0, self.TabHeaderHeight, w, h - self.TabHeaderHeight, GLib.Colors.Silver, self:GetTabCount () == 0, true, true, true)
+function PANEL:GetTabIndex (tab)
+	for k, t in ipairs (self.Tabs) do
+		if t == tab then return k end
+	end
+	return 0
 end
 
-function PANEL:PerformLayout ()
+function PANEL:LayoutTabHeaders ()
 	local x = 0
 	for _, tab in ipairs (self.Tabs) do
 		tab:LayoutContents ()
-		tab:GetHeader ():SetPos (x, 0)
+		tab:GetHeader ():SetX (x, 0)
 		tab:GetHeader ():PerformLayout ()
 		x = x + tab:GetHeader ():GetWide ()
+	end
+	self.TotalHeaderWidth = x
+	
+	if self.TotalHeaderWidth > self:GetWide () then
+		self:EnableTabScroller ()
+		
+		if self.TabScrollOffset + self:GetAvailableHeaderWidth () > self.TotalHeaderWidth then
+			self:SetScrollOffset (self.TotalHeaderWidth - self:GetAvailableHeaderWidth ())
+		end
+	else
+		self:DisableTabScroller ()
+	end
+end
+
+function PANEL:Paint (w, h)
+	draw.RoundedBoxEx (4, 0, self.TabHeaderHeight, w, h - self.TabHeaderHeight, GLib.Colors.Silver, self:GetTabCount () == 0, self.TotalHeaderWidth < self:GetWide () - 4, true, true)
+end
+
+function PANEL:PerformLayout ()
+	self:LayoutTabHeaders ()
+	
+	for _, tab in ipairs (self.Tabs) do
+		tab:GetHeader ():SetPos (tab:GetHeader ():GetX () - self.TabScrollOffset)
+	end
+	
+	local x = self:GetWide ()
+	if self.RightScrollButton then
+		x = x - self.RightScrollButton:GetWide ()
+		self.RightScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.RightScrollButton:GetTall ()))
+		self.RightScrollButton:MoveToFront ()
+	end
+	if self.LeftScrollButton then
+		x = x - self.LeftScrollButton:GetWide ()
+		self.LeftScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.LeftScrollButton:GetTall ()))
+		self.LeftScrollButton:MoveToFront ()
 	end
 end
 
@@ -173,6 +272,17 @@ function PANEL:RemoveTab (tab, delete)
 	self:InvalidateLayout ()
 end
 
+function PANEL:SetScrollOffset (scrollOffset)
+	if scrollOffset + self:GetAvailableHeaderWidth () > self.TotalHeaderWidth then
+		scrollOffset = self.TotalHeaderWidth - self:GetAvailableHeaderWidth ()
+	end
+	if scrollOffset < 0 then scrollOffset = 0 end
+	if self.TabScrollOffset == scrollOffset then return end
+	
+	self.TabScrollOffset = scrollOffset
+	self:InvalidateLayout ()
+end
+
 function PANEL:SetSelectedTab (tab)
 	if tab and tab:GetTabControl () ~= self then return end
 	if self.SelectedTab == tab then return end
@@ -192,21 +302,98 @@ function PANEL:SetSelectedTab (tab)
 	if self.SelectedTab then
 		selectedContents = self.SelectedTab:GetContents ()
 		self.SelectedTab:LayoutContents ()
+		
+		self:LayoutTabHeaders ()
+		self:EnsureTabVisible (self.SelectedTab)
 	end
 	
-	self:DispatchEvent ("SelectedTabChanged", oldSelectedTab, tab)
+	self:DispatchEvent ("SelectedTabChanged", oldSelectedTab, self.SelectedTab)
 	if oldSelectedContents ~= selectedContents then
 		self:DispatchEvent ("SelectedContentsChanged", oldSelectedTab, oldSelectedContents, tab, selectedContents)
 	end
 end
 
+function PANEL:SetSelectedTabIndex (index)
+	if index <= 0 then return end
+	if index > self:GetTabCount () then return end
+	
+	self:SetSelectedTab (self:GetTab (index))
+end
+
+-- Internal, do not call
+function PANEL:EnableTabScroller ()
+	if self.TabScrollerEnabled then return end
+	self.TabScrollerEnabled = true
+	
+	if not self.LeftScrollButton then
+		self.LeftScrollButton = vgui.Create ("GButton", self)
+		self.LeftScrollButton:SetSize (14, 14)
+		self.LeftScrollButton:SetText ("<")
+		self.LeftScrollButton:AddEventListener ("MouseDown",
+			function ()
+				self.TargetTabScrollSpeed = -1024
+				self.TabScrollSpeed = -256
+			end
+		)
+		self.LeftScrollButton:AddEventListener ("MouseUp",
+			function ()
+				self.TargetTabScrollSpeed = 0
+			end
+		)
+		self:InvalidateLayout ()
+	end
+	if not self.RightScrollButton then
+		self.RightScrollButton = vgui.Create ("GButton", self)
+		self.RightScrollButton:SetSize (14, 14)
+		self.RightScrollButton:SetText (">")
+		self.RightScrollButton:AddEventListener ("MouseDown",
+			function ()
+				self.TargetTabScrollSpeed = 1024
+				self.TabScrollSpeed = 256
+			end
+		)
+		self.RightScrollButton:AddEventListener ("MouseUp",
+			function ()
+				self.TargetTabScrollSpeed = 0
+			end
+		)
+		self:InvalidateLayout ()
+	end
+	self.LeftScrollButton:SetVisible (true)
+	self.RightScrollButton:SetVisible (true)
+end
+
+function PANEL:DisableTabScroller ()
+	if not self.TabScrollerEnabled then return end
+	self.TabScrollerEnabled = false
+	
+	self:SetScrollOffset (0)
+	self.LeftScrollButton:SetVisible (false)
+	self.RightScrollButton:SetVisible (false)
+end
+
+-- Event handlers
 function PANEL:OnRemoved ()
 	for _, tab in ipairs (self.Tabs) do
 		tab:Remove ()
 	end
 end
 
--- Event handlers
+function PANEL:Think ()
+	local deltaTime = SysTime () - self.LastThinkTime
+	self.LastThinkTime = SysTime ()
+	
+	local acceleration = 512
+	
+	if self.TargetTabScrollSpeed > self.TabScrollSpeed then
+		self.TabScrollSpeed = math.min (self.TabScrollSpeed + acceleration * deltaTime, self.TargetTabScrollSpeed)
+	elseif self.TargetTabScrollSpeed < self.TabScrollSpeed then
+		self.TabScrollSpeed = math.max (self.TabScrollSpeed - acceleration * deltaTime, self.TargetTabScrollSpeed)
+	end
+	
+	self:SetScrollOffset (self:GetScrollOffset () + self.TabScrollSpeed * deltaTime)
+end
+
 PANEL.ContentsChanged = Gooey.NullCallback
 
 Gooey.Register ("GTabControl", PANEL, "GPanel")

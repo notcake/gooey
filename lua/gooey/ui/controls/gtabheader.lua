@@ -2,6 +2,9 @@ local PANEL = {}
 
 function PANEL:Init ()
 	self.Tab = nil
+	
+	self.X = 0
+	
 	self.Image = Gooey.Image ()
 	self.CloseButton = Gooey.CloseButton ()
 	self.CloseButton:SetVisible (false)
@@ -42,6 +45,10 @@ end
 
 function PANEL:GetText ()
 	return self.Text
+end
+
+function PANEL:GetX ()
+	return self.X
 end
 
 function PANEL:IsCloseButtonVisible ()
@@ -127,6 +134,10 @@ function PANEL:SetText (text)
 	self.Tab:DispatchEvent ("TextChanged", text)
 	
 	self:InvalidateLayout ()
+end
+
+function PANEL:SetX (x)
+	self.X = x
 end
 
 Gooey.Register ("GTabHeader", PANEL, "GPanel")

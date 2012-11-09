@@ -15,8 +15,11 @@ include ("selectioncontroller.lua")
 include ("tooltipcontroller.lua")
 include ("tooltipmanager.lua")
 
+include ("iclipboardtarget.lua")
+
 include ("buttoncontroller.lua")
 include ("clipboardcontroller.lua")
+include ("savecontroller.lua")
 include ("undoredocontroller.lua")
 
 include ("vpanelcontainer.lua")

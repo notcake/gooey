@@ -31,6 +31,10 @@ function PANEL:AddNode (name)
 	return self.RootNode:AddNode (name)
 end
 
+function PANEL:Clear ()
+	self.RootNode:Clear ()
+end
+
 function PANEL.DefaultComparator (a, b)
 	return a:GetText () < b:GetText ()
 end

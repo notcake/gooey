@@ -8,9 +8,13 @@ end
 function self:Execute (control, key, ctrl, shift, alt)
 	if not self.Keys [key] then return false end
 	
-	local handled = self.Keys [key] (control, key, ctrl, shift, alt)
-	if handled == nil then handled = true end
-	return handled
+	local handled
+	for _, handler in ipairs (self.Keys [key]) do
+		handled = handler (control, key, ctrl, shift, alt)
+		if handled == nil then handled = true end
+		if handled then break end
+	end
+	return handled or false
 end
 
 function self:Register (key, handler)
@@ -20,5 +24,6 @@ function self:Register (key, handler)
 		end
 		return
 	end
-	self.Keys [key] = handler
+	self.Keys [key] = self.Keys [key] or {}
+	self.Keys [key] [#self.Keys [key] + 1] = handler
 end

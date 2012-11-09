@@ -296,7 +296,7 @@ function PANEL:OnRemoved ()
 	end
 	
 	-- Now bubble selection upwards.
-	if self.Label:GetSelected () then
+	if self.Label:IsSelected () then
 		self:GetRoot ():SetSelectedItem (self:GetParentNode ())
 	end
 end

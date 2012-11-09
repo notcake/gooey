@@ -13,8 +13,8 @@ Gooey.ClipboardController = Gooey.MakeConstructor (self, Gooey.ButtonController)
 			Fired when the paste command has been enabled or disabled.
 ]]
 
-function self:ctor (control)
-	self.Control = nil
+function self:ctor (clipboardTarget)
+	self.ClipboardTarget = nil
 	
 	self:RegisterAction ("Copy",  "CanCopyChanged")
 	self:RegisterAction ("Cut",   "CanCutChanged")
@@ -24,7 +24,7 @@ function self:ctor (control)
 	self:UpdateButtonState ()
 	
 	-- Event handlers
-	self.SelectionChanged = function ()
+	self.CanCopyChanged = function ()
 		self:UpdateCopyState ()
 		self:UpdateCutState ()
 	end
@@ -35,7 +35,11 @@ function self:ctor (control)
 		end
 	)
 	
-	self:SetControl (control)
+	self:SetClipboardTarget (clipboardTarget)
+end
+
+function self:dtor ()
+	Gooey.Clipboard:UnregisterClipboardController (self)
 end
 
 function self:AddCopyButton (button)
@@ -62,19 +66,19 @@ function self:CanPaste ()
 	return self:CanPerformAction ("Paste")
 end
 
-function self:GetControl ()
-	return self.Control
+function self:GetClipboardTarget ()
+	return self.ClipboardTarget
 end
 
-function self:SetControl (control)
-	if self.Control then
-		self.Control:RemoveEventListener ("SelectionChanged", tostring (self))
+function self:SetClipboardTarget (clipboardTarget)
+	if self.ClipboardTarget then
+		self.ClipboardTarget:RemoveEventListener ("CanCopyChanged", tostring (self))
 	end
 	
-	self.Control = control
+	self.ClipboardTarget = clipboardTarget
 	
-	if self.Control then
-		self.Control:AddEventListener ("SelectionChanged", tostring (self), self.SelectionChanged)
+	if self.ClipboardTarget then
+		self.ClipboardTarget:AddEventListener ("CanCopyChanged", tostring (self), self.CanCopyChanged)
 	end
 	
 	self:UpdateButtonState ()
@@ -88,16 +92,16 @@ function self:UpdateButtonState ()
 end
 
 function self:UpdateCopyState ()
-	self:UpdateActionState ("Copy", self.Control and not self.Control:IsSelectionEmpty () or false)
+	self:UpdateActionState ("Copy", self.ClipboardTarget and self.ClipboardTarget:CanCopy () or false)
 end
 
 function self:UpdateCutState ()
-	self:UpdateActionState ("Cut", self.Control and not self.Control:IsSelectionEmpty () or false)
+	self:UpdateActionState ("Cut", self.ClipboardTarget and self.ClipboardTarget:CanCopy () or false)
 end
 
 function self:UpdatePasteState ()
-	self:UpdateActionState ("Paste", not Gooey.Clipboard:IsEmpty () and self.Control ~= nil)
+	self:UpdateActionState ("Paste", not Gooey.Clipboard:IsEmpty () and self.ClipboardTarget ~= nil)
 end
 
 -- Event handlers
-self.SelectionChanged = Gooey.NullCallback
+self.CanCopyChanged = Gooey.NullCallback

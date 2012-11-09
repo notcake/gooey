@@ -45,7 +45,7 @@ function self:GetIcon ()
 end
 
 function self:GetIndex ()
-	return self.Index
+	return self.TabControl:GetTabIndex (self)
 end
 
 function self:GetTabControl ()
