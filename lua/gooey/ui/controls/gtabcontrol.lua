@@ -128,8 +128,8 @@ end
 function PANEL:EnsureTabVisible (tab)
 	if not self.TabScrollerEnabled then return end
 	
-	local left = tab:GetHeader ():GetX ()
-	local right = tab:GetHeader ():GetX () + tab:GetHeader ():GetWide ()
+	local left = tab:GetHeader ():GetOffset ()
+	local right = tab:GetHeader ():GetOffset () + tab:GetHeader ():GetWide ()
 	if tab:GetHeader ():GetWide () > self:GetAvailableHeaderWidth () then
 		self:SetScrollOffset (left)
 	elseif self.TabScrollOffset > left then
@@ -188,6 +188,8 @@ function PANEL:GetTabCount ()
 end
 
 function PANEL:GetTabIndex (tab)
+	if not self.TabSet [tab] then return 0 end
+	
 	for k, t in ipairs (self.Tabs) do
 		if t == tab then return k end
 	end
@@ -197,8 +199,7 @@ end
 function PANEL:LayoutTabHeaders ()
 	local x = 0
 	for _, tab in ipairs (self.Tabs) do
-		tab:LayoutContents ()
-		tab:GetHeader ():SetX (x, 0)
+		tab:GetHeader ():SetOffset (x, 0)
 		tab:GetHeader ():PerformLayout ()
 		x = x + tab:GetHeader ():GetWide ()
 	end
@@ -223,7 +224,8 @@ function PANEL:PerformLayout ()
 	self:LayoutTabHeaders ()
 	
 	for _, tab in ipairs (self.Tabs) do
-		tab:GetHeader ():SetPos (tab:GetHeader ():GetX () - self.TabScrollOffset)
+		tab:LayoutContents ()
+		tab:GetHeader ():SetPos (tab:GetHeader ():GetOffset () - self.TabScrollOffset)
 	end
 	
 	local x = self:GetWide ()
@@ -280,6 +282,14 @@ function PANEL:SetScrollOffset (scrollOffset)
 	if self.TabScrollOffset == scrollOffset then return end
 	
 	self.TabScrollOffset = scrollOffset
+	
+	if self.LeftScrollButton then
+		self.LeftScrollButton:SetEnabled (self.TabScrollOffset > 0)
+	end
+	if self.RightScrollButton then
+		self.RightScrollButton:SetEnabled (self.TabScrollOffset + self:GetWide () < self.TotalHeaderWidth)
+	end
+	
 	self:InvalidateLayout ()
 end
 
@@ -318,6 +328,22 @@ function PANEL:SetSelectedTabIndex (index)
 	if index > self:GetTabCount () then return end
 	
 	self:SetSelectedTab (self:GetTab (index))
+end
+
+function PANEL:SetTabIndex (tab, index)
+	if index < 1 then index = 1 end
+	if index > #self.Tabs then index = #self.Tabs end
+	if not self.TabSet [tab] then return end
+	
+	local currentIndex = tab:GetIndex ()
+	if index == currentIndex then return end
+	
+	local displacedTab = self.Tabs [index]
+	self.Tabs [index] = tab
+	self.Tabs [currentIndex] = displacedTab
+	
+	self:LayoutTabHeaders ()
+	self:InvalidateLayout ()
 end
 
 -- Internal, do not call
@@ -373,6 +399,10 @@ function PANEL:DisableTabScroller ()
 end
 
 -- Event handlers
+function PANEL:OnMouseWheel (delta)
+	self:SetScrollOffset (self:GetScrollOffset () + delta * -20)
+end
+
 function PANEL:OnRemoved ()
 	for _, tab in ipairs (self.Tabs) do
 		tab:Remove ()

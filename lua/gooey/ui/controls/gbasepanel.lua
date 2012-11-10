@@ -97,8 +97,16 @@ function self:IsPressed ()
 end
 
 function self:Remove ()
+	if self:IsMarkedForDeletion () then return end
+	
 	if self.OnRemoved then self:OnRemoved () end
 	self:DispatchEvent ("Removed")
+	
+	for _, v in ipairs (self:GetChildren ()) do
+		if not v:IsMarkedForDeletion () then
+			v:Remove ()
+		end
+	end
 	
 	debug.getregistry ().Panel.Remove (self)
 end

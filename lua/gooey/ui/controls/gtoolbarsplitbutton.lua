@@ -103,6 +103,7 @@ function PANEL:SetIcon (icon)
 	return self
 end
 
+-- Event handlers
 function PANEL:OnRemoved ()
 	self.DropDownMenu:Remove ()
 end

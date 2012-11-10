@@ -3,7 +3,7 @@ local PANEL = {}
 function PANEL:Init ()
 	self.Tab = nil
 	
-	self.X = 0
+	self.Offset = 0
 	
 	self.Image = Gooey.Image ()
 	self.CloseButton = Gooey.CloseButton ()
@@ -37,18 +37,50 @@ function PANEL:Init ()
 	self.VPanelContainer = Gooey.VPanelContainer (self)
 	self.VPanelContainer:AddControl (self.Image)
 	self.VPanelContainer:AddControl (self.CloseButton)
+	
+	self.DragController = Gooey.DragController (self)
+	self.DragController:AddEventListener ("PositionCorrectionChanged",
+		function ()
+			if not self:GetTabControl () then return end
+			
+			local tabIndex = self.Tab:GetIndex ()
+			local cursorX = self:CursorPos () + self:GetOffset ()
+			if cursorX < self:GetOffset () then
+				repeat
+					tabIndex = tabIndex - 1
+					self:GetTabControl ():SetTabIndex (self.Tab, tabIndex)
+				until cursorX > self:GetOffset () or tabIndex < 1
+			elseif cursorX > self:GetOffset () + self:GetWide () then
+				repeat
+					tabIndex = tabIndex + 1
+					self:GetTabControl ():SetTabIndex (self.Tab, tabIndex)
+				until cursorX <= self:GetOffset () + self:GetWide () or tabIndex > self:GetTabControl ():GetTabCount ()
+			end
+			if self.Tab:IsSelected () then
+				self:GetTabControl ():EnsureTabVisible (self.Tab)
+			end
+		end
+	)
 end
 
 function PANEL:GetIcon ()
 	return self.Image:GetImage ()
 end
 
-function PANEL:GetText ()
-	return self.Text
+function PANEL:GetOffset ()
+	return self.Offset
 end
 
-function PANEL:GetX ()
-	return self.X
+function PANEL:GetTab ()
+	return self.Tab
+end
+
+function PANEL:GetTabControl ()
+	return self.Tab and self.Tab:GetTabControl () or nil
+end
+
+function PANEL:GetText ()
+	return self.Text or ""
 end
 
 function PANEL:IsCloseButtonVisible ()
@@ -98,15 +130,15 @@ function PANEL:PerformLayout ()
 	local w, h = surface.GetTextSize (self:GetText ())
 	x = x + w + 4
 	
-	if self:IsCloseButtonVisible () then
-		local baseline = (self:GetTall () + h) * 0.5
-		self.CloseButton:SetPos (x, baseline - self.CloseButton:GetHeight ())
-		self.CloseButton:SetPos (x, (self:GetTall () - self.CloseButton:GetHeight ()) * 0.5 + 1)
-		x = x + self.CloseButton:GetWidth () + 4
-	end
-	
+	x = x + self.CloseButton:GetWidth () + 4
 	if x < 64 then x = 64 end
 	self:SetWidth (x)
+	
+	if self:IsCloseButtonVisible () then
+		local baseline = (self:GetTall () + h) * 0.5
+		self.CloseButton:SetPos (x - 4 - self.CloseButton:GetWidth (), baseline - self.CloseButton:GetHeight ())
+		self.CloseButton:SetPos (x - 4 - self.CloseButton:GetWidth (), (self:GetTall () - self.CloseButton:GetHeight ()) * 0.5 + 1)
+	end
 end
 
 function PANEL:SetCloseButtonVisible (closeButtonVisible)
@@ -123,11 +155,16 @@ function PANEL:SetIcon (icon)
 	self:InvalidateLayout ()
 end
 
+function PANEL:SetOffset (offset)
+	self.Offset = offset
+end
+
 function PANEL:SetTab (tab)
 	self.Tab = tab
 end
 
 function PANEL:SetText (text)
+	text = text or ""
 	if self.Text == text then return end
 	
 	self.Text = text
@@ -136,8 +173,10 @@ function PANEL:SetText (text)
 	self:InvalidateLayout ()
 end
 
-function PANEL:SetX (x)
-	self.X = x
+-- Event handlers
+function PANEL:OnMouseWheel (delta)
+	if not self:GetTabControl () then return end
+	self:GetTabControl ():OnMouseWheeled (delta)
 end
 
 Gooey.Register ("GTabHeader", PANEL, "GPanel")
