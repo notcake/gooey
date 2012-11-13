@@ -47,6 +47,10 @@ function PANEL:GetPanel2 ()
 	return self.Panel2
 end
 
+function PANEL:GetSplitterFraction ()
+	return self.SplitterFraction
+end
+
 function PANEL:GetSplitterPosition ()
 	return self.SplitterPosition
 end

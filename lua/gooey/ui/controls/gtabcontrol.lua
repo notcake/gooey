@@ -2,6 +2,10 @@ local PANEL = {}
 
 --[[
 	Events:
+		ExternalTabDragEnded (Tab tab)
+			Fired when a tab's header is no longer being dragged outside the header area.
+		ExternalTabDragStarted (Tab tab)
+			Fired when a tab's header has been dragged outside the header area.
 		SelectedContentsChanged (Tab oldSelectedTab, Panel oldSelectedContents, Tab selectedTab, Panel selectedContents)
 			Fired when the selected contents has changed.
 		SelectedTabChanged (Tab oldSelectedTab, Tab selectedTab)
@@ -44,16 +48,47 @@ function PANEL:Init ()
 	)
 	
 	-- Tab scrolling
+	self.LeftScrollButton = vgui.Create ("GButton", self)
+	self.LeftScrollButton:SetSize (14, 14)
+	self.LeftScrollButton:SetText ("<")
+	self.LeftScrollButton:SetVisible (false)
+	self.LeftScrollButton:AddEventListener ("MouseDown",
+		function ()
+			self.TargetTabScrollSpeed = -1024
+			self.TabScrollSpeed = -256
+		end
+	)
+	self.LeftScrollButton:AddEventListener ("MouseUp",
+		function ()
+			self.TargetTabScrollSpeed = 0
+		end
+	)
+	self.RightScrollButton = vgui.Create ("GButton", self)
+	self.RightScrollButton:SetSize (14, 14)
+	self.RightScrollButton:SetText (">")
+	self.RightScrollButton:SetVisible (false)
+	self.RightScrollButton:AddEventListener ("MouseDown",
+		function ()
+			self.TargetTabScrollSpeed = 1024
+			self.TabScrollSpeed = 256
+		end
+	)
+	self.RightScrollButton:AddEventListener ("MouseUp",
+		function ()
+			self.TargetTabScrollSpeed = 0
+		end
+	)
+	
 	self.TabScrollerEnabled = false
 	self.TabScrollOffset = 0
 	self.TotalHeaderWidth = 0
 	
-	self.LeftScrollButton = nil
-	self.RightScrollButton = nil
-	
 	self.LastThinkTime = SysTime ()
 	self.TargetTabScrollSpeed = 0
 	self.TabScrollSpeed = 0
+	
+	-- Tab dragging
+	self.ExternalTabDraggingInProgress = false
 	
 	self.CloseRequested = function (tab)
 		self:DispatchEvent ("TabCloseRequested", tab)
@@ -148,6 +183,19 @@ function PANEL:GetAvailableHeaderWidth ()
 	return availableHeaderWidth
 end
 
+function PANEL:GetContentRectangle ()
+	local x, y, w, h = self:GetPaddedContentRectangle ()
+	x = x + 4
+	y = y + 4
+	w = w - 8
+	h = h - 8
+	return x, y, w, h
+end
+
+function PANEL:GetPaddedContentRectangle ()
+	return 0, self.TabHeaderHeight, self:GetWide (), self:GetTall () - self.TabHeaderHeight
+end
+
 function PANEL:GetEnumerator ()
 	local i = 0
 	return function ()
@@ -158,6 +206,10 @@ end
 
 function PANEL:GetHeaderHeight ()
 	return self.TabHeaderHeight
+end
+
+function PANEL:GetHeaderRectangle ()
+	return 0, 0, self:GetWide (), self.TabHeaderHeight
 end
 
 function PANEL:GetScrollOffset ()
@@ -196,6 +248,12 @@ function PANEL:GetTabIndex (tab)
 	return 0
 end
 
+function PANEL:IsPointInHeaderArea (x, y)
+	if y < 0 then return false end
+	if y > self.TabHeaderHeight then return false end
+	return true
+end
+
 function PANEL:LayoutTabHeaders ()
 	local x = 0
 	for _, tab in ipairs (self.Tabs) do
@@ -229,16 +287,12 @@ function PANEL:PerformLayout ()
 	end
 	
 	local x = self:GetWide ()
-	if self.RightScrollButton then
-		x = x - self.RightScrollButton:GetWide ()
-		self.RightScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.RightScrollButton:GetTall ()))
-		self.RightScrollButton:MoveToFront ()
-	end
-	if self.LeftScrollButton then
-		x = x - self.LeftScrollButton:GetWide ()
-		self.LeftScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.LeftScrollButton:GetTall ()))
-		self.LeftScrollButton:MoveToFront ()
-	end
+	x = x - self.RightScrollButton:GetWide ()
+	self.RightScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.RightScrollButton:GetTall ()))
+	self.RightScrollButton:MoveToFront ()
+	x = x - self.LeftScrollButton:GetWide ()
+	self.LeftScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.LeftScrollButton:GetTall ()))
+	self.LeftScrollButton:MoveToFront ()
 end
 
 function PANEL:RemoveTab (tab, delete)
@@ -315,6 +369,10 @@ function PANEL:SetSelectedTab (tab)
 		
 		self:LayoutTabHeaders ()
 		self:EnsureTabVisible (self.SelectedTab)
+		
+		if self.SelectedTab:GetContents () then
+			self.SelectedTab:GetContents ():RequestFocus ()
+		end
 	end
 	
 	self:DispatchEvent ("SelectedTabChanged", oldSelectedTab, self.SelectedTab)
@@ -347,46 +405,26 @@ function PANEL:SetTabIndex (tab, index)
 end
 
 -- Internal, do not call
+function PANEL:BeginExternalTabDragging (tab)
+	if self.ExternalTabDraggingInProgress then return end
+	self.ExternalTabDraggingInProgress = true
+	
+	self:DispatchEvent ("ExternalTabDragStarted", tab)
+end
+
 function PANEL:EnableTabScroller ()
 	if self.TabScrollerEnabled then return end
 	self.TabScrollerEnabled = true
 	
-	if not self.LeftScrollButton then
-		self.LeftScrollButton = vgui.Create ("GButton", self)
-		self.LeftScrollButton:SetSize (14, 14)
-		self.LeftScrollButton:SetText ("<")
-		self.LeftScrollButton:AddEventListener ("MouseDown",
-			function ()
-				self.TargetTabScrollSpeed = -1024
-				self.TabScrollSpeed = -256
-			end
-		)
-		self.LeftScrollButton:AddEventListener ("MouseUp",
-			function ()
-				self.TargetTabScrollSpeed = 0
-			end
-		)
-		self:InvalidateLayout ()
-	end
-	if not self.RightScrollButton then
-		self.RightScrollButton = vgui.Create ("GButton", self)
-		self.RightScrollButton:SetSize (14, 14)
-		self.RightScrollButton:SetText (">")
-		self.RightScrollButton:AddEventListener ("MouseDown",
-			function ()
-				self.TargetTabScrollSpeed = 1024
-				self.TabScrollSpeed = 256
-			end
-		)
-		self.RightScrollButton:AddEventListener ("MouseUp",
-			function ()
-				self.TargetTabScrollSpeed = 0
-			end
-		)
-		self:InvalidateLayout ()
-	end
 	self.LeftScrollButton:SetVisible (true)
 	self.RightScrollButton:SetVisible (true)
+end
+
+function PANEL:EndExternalTabDragging (tab)
+	if not self.ExternalTabDraggingInProgress then return end
+	self.ExternalTabDraggingInProgress = false
+	
+	self:DispatchEvent ("ExternalTabDragEnded", tab)
 end
 
 function PANEL:DisableTabScroller ()

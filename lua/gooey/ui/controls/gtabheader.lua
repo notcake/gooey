@@ -39,9 +39,21 @@ function PANEL:Init ()
 	self.VPanelContainer:AddControl (self.CloseButton)
 	
 	self.DragController = Gooey.DragController (self)
+	self.DragController:AddEventListener ("DragEnded",
+		function ()
+			if not self:GetTabControl () then return end
+			self:GetTabControl ():EndExternalTabDragging (self:GetTab ())
+		end
+	)
 	self.DragController:AddEventListener ("PositionCorrectionChanged",
 		function ()
 			if not self:GetTabControl () then return end
+			if not self:GetTabControl ():IsPointInHeaderArea (self:GetTabControl ():CursorPos ()) then
+				self:GetTabControl ():BeginExternalTabDragging (self:GetTab ())
+				return
+			else
+				self:GetTabControl ():EndExternalTabDragging (self:GetTab ())
+			end
 			
 			local tabIndex = self.Tab:GetIndex ()
 			local cursorX = self:CursorPos () + self:GetOffset ()

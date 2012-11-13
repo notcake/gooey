@@ -3,7 +3,7 @@ Gooey.Glyphs.Renderers = {}
 
 function Gooey.Glyphs.Draw (name, renderContext, color, x, y, w, h)
 	surface.SetDrawColor (color)
-	Gooey.Glyphs.Renderers [name] (renderContext, color, x, y, w, h)
+	xpcall (Gooey.Glyphs.Renderers [name], Gooey.Error, renderContext, color, x, y, w, h)
 end
 
 function Gooey.Glyphs.Register (name, renderer)

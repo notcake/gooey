@@ -3,6 +3,8 @@ Gooey.DragController = Gooey.MakeConstructor (self)
 
 --[[
 	Events:
+		DragEnded ()
+			Fired when the dragging has ended.
 		PositionCorrectionChanged (deltaX, deltaY)
 			Fired when the control's position needs to be changed.
 ]]
@@ -62,6 +64,8 @@ function self:EndDrag ()
 	
 	self.Dragging = false
 	self.ExpectingDrag = false
+	
+	self:DispatchEvent ("DragEnded")
 end
 
 function self:SetControl (control)

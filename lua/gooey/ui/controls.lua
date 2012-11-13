@@ -1,5 +1,6 @@
 Gooey.UI = {}
 
+
 include ("orientation.lua")
 include ("sizingmethod.lua")
 include ("tooltippositioningmode.lua")
@@ -9,8 +10,12 @@ include ("glyphs.lua")
 include ("imagecacheentry.lua")
 include ("imagecache.lua")
 
+include ("render.lua")
+include ("rendertype.lua")
+
 include ("keyboardmap.lua")
 include ("dragcontroller.lua")
+include ("dragdropcontroller.lua")
 include ("selectioncontroller.lua")
 include ("tooltipcontroller.lua")
 include ("tooltipmanager.lua")

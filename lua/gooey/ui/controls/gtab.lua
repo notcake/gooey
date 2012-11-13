@@ -78,8 +78,10 @@ function self:LayoutContents ()
 	if not self.Contents then return end
 	if self.TabControl then
 		self.Contents:SetParent (self.TabControl)
-		self.Contents:SetPos (4, self.TabControl:GetHeaderHeight () + 4)
-		self.Contents:SetSize (self.TabControl:GetWide () - 8, self.TabControl:GetTall () - self.TabControl:GetHeaderHeight () - 8)
+		
+		local x, y, w, h = self.TabControl:GetContentRectangle ()
+		self.Contents:SetPos (x, y)
+		self.Contents:SetSize (w, h)
 		self.Contents:SetVisible (self:IsSelected ())
 	else
 		self.Contents:SetVisible (false)

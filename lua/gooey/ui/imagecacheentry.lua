@@ -56,3 +56,16 @@ end
 function self:GetWidth ()
 	return self.Width
 end
+
+function self:SetSize (width, height)
+	self.Width  = width
+	self.Height = height
+end
+
+function self:SetWidth (width)
+	self.Width = width
+end
+
+function self:SetHeight (height)
+	self.Height = height
+end

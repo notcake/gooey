@@ -12,6 +12,8 @@ function PANEL:Init ()
 		function (_, visible)
 			if visible then
 				self:Show ()
+			else
+				Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()))
 			end
 		end
 	)
@@ -45,10 +47,7 @@ function PANEL:Lock ()
 	self.Locked = true
 end
 
-local borderColor = Color (32, 32, 32, 255)
 function PANEL:Paint (w, h)
-	draw.RoundedBox (4, 0, 0, w,     h,     borderColor)
-	draw.RoundedBox (4, 1, 1, w - 2, h - 2, self:GetBackgroundColor ())
 end
 
 function PANEL:PerformLayout ()
@@ -64,16 +63,28 @@ function PANEL:SetText (text)
 	self:InvalidateLayout ()
 end
 
+local borderColor = Color (32, 32, 32, 255)
 function PANEL:Show ()
 	self:SetVisible (true)
 	self:MakePopup ()
 	self:MoveToFront ()
 	self:SetKeyboardInputEnabled (false)
 	self:SetMouseInputEnabled (false)
+	
+	Gooey.AddRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()),
+		function ()
+			local x, y = self:GetPos ()
+			local w, h = self:GetSize ()
+			draw.RoundedBox (4, x,     y,     w,     h,     borderColor)
+			draw.RoundedBox (4, x + 1, y + 1, w - 2, h - 2, self:GetBackgroundColor ())
+			self:PaintAt (x, y)
+		end
+	)
 end
 
 -- Event handlers
 function PANEL:OnRemoved ()
+	Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()))
 	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 
