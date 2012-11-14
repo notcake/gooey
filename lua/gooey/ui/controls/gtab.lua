@@ -76,6 +76,7 @@ end
 
 function self:LayoutContents ()
 	if not self.Contents then return end
+	if not self.Contents:IsValid () then return end
 	if self.TabControl then
 		self.Contents:SetParent (self.TabControl)
 		
