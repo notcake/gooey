@@ -292,7 +292,7 @@ end
 
 function PANEL:SetText (text)
 	text = text or ""
-	if self.Text == text then return end
+	if self.Text == text then return self end
 	
 	self.Text = text
 	self:DispatchEvent ("TextChanged", text)
@@ -310,13 +310,14 @@ function PANEL:SetTextColor (color)
 end
 
 function PANEL:SetToolTipText (text)
-	if self.ToolTipText == text then return end
+	if self.ToolTipText == text then return self end
 	
 	self.ToolTipText = text
 	if not self.ToolTipController then
 		self.ToolTipController = Gooey.ToolTipController (self)
 	end
 	self.ToolTipController:SetEnabled (self.ToolTipText ~= nil)
+	return self
 end
 
 function PANEL:SetTop (y)
