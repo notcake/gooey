@@ -13,6 +13,11 @@ function PANEL:SetKeyboardMap (keyboardMap)
 	self.KeyboardMap = keyboardMap
 end
 
+function PANEL:SetSizable (sizable)
+	DFrame.SetSizable (self, sizable)
+	self.ResizeGrip:SetVisible (sizable)
+end
+
 -- Event handlers
 function PANEL:OnCursorMoved (x, y)
 	self:DispatchEvent ("MouseMove", 0, x, y)
