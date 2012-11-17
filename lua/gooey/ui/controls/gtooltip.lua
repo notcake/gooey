@@ -52,6 +52,7 @@ end
 
 function PANEL:PerformLayout ()
 	self.Label:SetPos (6, 2)
+	self.Label:SizeToContents ()
 	
 	local w, h = self.Label:GetSize ()
 	self:SetSize (w + 12, h + 4)
@@ -59,8 +60,7 @@ end
 
 function PANEL:SetText (text)
 	self.Label:SetText (text)
-	self.Label:SizeToContents ()
-	self:InvalidateLayout ()
+	self:PerformLayout ()
 end
 
 local borderColor = Color (32, 32, 32, 255)
