@@ -1,16 +1,14 @@
 if Gooey then return end
-Gooey = {}
+Gooey = Gooey or {}
 
 include ("glib/glib.lua")
-GLib.Import (Gooey)
-Gooey.EventProvider (Gooey)
+
+GLib.Initialize ("Gooey", Gooey)
 Gooey.AddCSLuaFolderRecursive ("gooey")
 
 function Gooey.DeprecatedFunction ()
 	GLib.Error ("Gooey: Derma function should not be called.")
 end
-
-function Gooey.NullCallback () end
 
 if CLIENT then
 	function Gooey.Register (className, classTable, baseClassName)
