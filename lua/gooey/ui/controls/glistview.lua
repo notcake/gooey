@@ -75,9 +75,9 @@ function PANEL:AddLine (...)
 	self:InvalidateLayout ()
 
 	local line = vgui.Create ("GListViewItem", self.pnlCanvas)
-	self.Lines [#self.Lines + 1] = line
-	local id = #self.Lines
-
+	local id = #self.Lines + 1
+	
+	self.Lines [id] = line
 	line:SetListView (self)
 	line:SetID (id)
 	line:SetTall (self.ItemHeight)
@@ -92,9 +92,9 @@ function PANEL:AddLine (...)
 		end
 	end
 	
-	self.Sorted [#self.Sorted + 1] = line
-	local sortID = #self.Sorted
-	if sortID % 2 == 1 then
+	local sortId = #self.Sorted + 1
+	self.Sorted [sortId] = line
+	if sortId % 2 == 1 then
 		line:SetAltLine (true)
 	end
 
@@ -198,7 +198,7 @@ end
 
 function PANEL:RemoveItem (listViewItem)
 	if not listViewItem or not listViewItem:IsValid () then return end
-
+	
 	if self.Lines [listViewItem:GetID ()] ~= listViewItem then return end
 	local selectedID = self:GetSortedID (listViewItem:GetID ())
 	self.Lines [listViewItem:GetID ()] = nil
