@@ -1,6 +1,5 @@
 Gooey.UI = {}
 
-
 include ("orientation.lua")
 include ("sizingmethod.lua")
 include ("tooltippositioningmode.lua")
@@ -22,6 +21,12 @@ include ("tooltipmanager.lua")
 
 include ("iclipboardtarget.lua")
 
+-- Effects
+include ("lerpcontroller.lua")
+include ("alphacontroller.lua")
+include ("tickprovider.lua")
+
+-- Buttons
 include ("buttoncontroller.lua")
 include ("clipboardcontroller.lua")
 include ("savecontroller.lua")
@@ -29,9 +34,11 @@ include ("undoredocontroller.lua")
 
 include ("vpanelcontainer.lua")
 
+-- Control Bases
 include ("controls/gbasepanel.lua")
 include ("controls/gbasescrollbar.lua")
 
+-- Controls
 include ("controls/gbutton.lua")
 include ("controls/gcheckbox.lua")
 include ("controls/gcombobox.lua")
