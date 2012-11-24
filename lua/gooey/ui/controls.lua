@@ -26,6 +26,10 @@ include ("lerpcontroller.lua")
 include ("alphacontroller.lua")
 include ("tickprovider.lua")
 
+-- Custom Text Renderers
+include ("textrenderer.lua")
+include ("silkicontextrenderer.lua")
+
 -- Buttons
 include ("buttoncontroller.lua")
 include ("clipboardcontroller.lua")
@@ -47,6 +51,8 @@ include ("controls/geditablelabel.lua")
 include ("controls/gframe.lua")
 include ("controls/ggroupbox.lua")
 include ("controls/ghscrollbar.lua")
+include ("controls/glabel.lua")
+include ("controls/glabelx.lua")
 include ("controls/glistview.lua")
 include ("controls/glistviewcolumn.lua")
 include ("controls/glistviewitem.lua")

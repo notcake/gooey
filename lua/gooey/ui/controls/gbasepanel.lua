@@ -7,6 +7,8 @@ Gooey.BasePanel = self
 			Fired when this panel's background color has changed.
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
+		FontChanged (font)
+			Fired when this panel's font has changed.
 		ParentChanged (oldParent, parent)
 			Fired when this panel's parent has changed.
 		Removed ()
@@ -26,6 +28,8 @@ function self:_ctor ()
 	
 	self.BackgroundColor = nil
 	self.TextColor = nil
+	
+	self.Font = nil
 	
 	-- Fade effects
 	self.FadingOut = false
@@ -66,6 +70,10 @@ function self:GetBackgroundColor ()
 		self.BackgroundColor = self.m_Skin.control_color or GLib.Colors.DarkGray
 	end
 	return self.BackgroundColor
+end
+
+function self:GetFont ()
+	return self.Font or debug.getregistry ().Panel.GetFont (self)
 end
 
 function self:GetTextColor ()
@@ -124,6 +132,15 @@ function self:SetEnabled (enabled)
 	self.m_bDisabled = not enabled -- for DPanel compatibility
 	
 	self:DispatchEvent ("EnabledChanged", enabled)
+	return self
+end
+
+function self:SetFont (font)
+	if self:GetFont () == font then return end
+	
+	self.m_FontName = font
+	debug.getregistry ().Panel.SetFontInternal (self, font)
+	self:DispatchEvent ("FontChanged", font)
 	return self
 end
 
