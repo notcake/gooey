@@ -119,6 +119,7 @@ function self:ParseText (text)
 		elseif character == "=" then
 			-- Check if this is a valid icon
 			local match = text:match ("^=([a-zA-Z0-9_]+)=", currentOffset)
+			local matchLength = match and #match or 0
 			if match then
 				match = match:lower ()
 				if match == "gaybow" then match = "rainbow" end
@@ -143,7 +144,7 @@ function self:ParseText (text)
 					Value = "icon16/" .. match .. ".png"
 				}
 				
-				currentOffset = currentOffset + #match + 2
+				currentOffset = currentOffset + matchLength + 2
 				spanStart = currentOffset
 			elseif not match then
 				-- Nope, not an icon
