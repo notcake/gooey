@@ -170,6 +170,14 @@ end
 self.SetTall = self.SetHeight
 
 function self:SetTextColor (color)
+	if self.TextColor == color then return end
+	if self.TextColor and
+	   self.TextColor.r == color.r and 
+	   self.TextColor.g == color.g and 
+	   self.TextColor.b == color.b and 
+	   self.TextColor.a == color.a then
+		return
+	end
 	self.TextColor = color
 	
 	if type (color) == "number" then

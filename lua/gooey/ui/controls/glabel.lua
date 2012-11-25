@@ -9,4 +9,10 @@ function PANEL:GetLineHeight ()
 	return lineHeight
 end
 
+function PANEL:UpdateColours (skin)
+	local ret = DLabel.UpdateColours (self, skin)
+	self:SetTextColor (self:GetTextStyleColor ())
+	return ret
+end
+
 Gooey.Register ("GLabel", PANEL, "DLabel")

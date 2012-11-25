@@ -65,11 +65,11 @@ function self:RebuildCache (cache)
 	return cache
 end
 
-function self:RenderFromCache (renderContext, cache)
+function self:RenderFromCache (renderContext, textColor, cache)
 	if not cache then return end
 	
 	surface.SetFont (self:GetFont ())
-	surface.SetTextColor (GLib.Colors.White)
+	surface.SetTextColor (textColor)
 	for i = 1, #cache.Parts do
 		local part  = cache.Parts [i]
 		local type  = part.Type
