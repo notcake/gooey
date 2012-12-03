@@ -70,9 +70,11 @@ function PANEL:Clear ()
 	if not self.ChildNodes then return end
 	self.ChildNodes:Clear ()
 	self.ChildNodeCount = 0
-	self:SetExpanded (false)
-	self:SetExpandable (false)
-	self:MarkUnpopulated ()
+	if not self:IsRoot () then
+		self:SetExpanded (false)
+		self:SetExpandable (false)
+		self:MarkUnpopulated ()
+	end
 	
 	self:LayoutRecursive ()
 end
@@ -145,6 +147,10 @@ end
 
 function PANEL:IsPopulated ()
 	return self.Populated
+end
+
+function PANEL:IsRoot ()
+	return self == self:GetRoot ().RootNode
 end
 
 function PANEL:IsSelected ()
@@ -276,7 +282,7 @@ function PANEL:OnChildRemoved (childNode)
 		end
 	end
 	self.ChildNodeCount = self.ChildNodeCount - 1
-	if self.ChildNodeCount == 0 then
+	if self.ChildNodeCount == 0 and not self:IsRoot () then
 		self:SetExpandable (false)
 	end
 	

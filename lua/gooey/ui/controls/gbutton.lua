@@ -12,9 +12,19 @@ function PANEL:DoRightClick ()
 	self:DispatchEvent ("RightClick")
 end
 
+function PANEL:OnCursorExited ()
+	self:DispatchEvent ("MouseLeave")
+	DButton.OnCursorExited (self)
+	if self.OnMouseLeave then self:OnMouseLeave () end
+	
+	self.Depressed = false
+	self.Pressed = false
+end
+
 function PANEL:OnMousePressed (mouseCode)
 	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
 	DButton.OnMousePressed (self, mouseCode)
+	if self.OnMouseDown then self:OnMouseDown (mouseCode, self:CursorPos ()) end
 	
 	if mouseCode == MOUSE_LEFT then
 		self.Depressed = true
@@ -25,6 +35,7 @@ end
 function PANEL:OnMouseReleased (mouseCode)
 	self:DispatchEvent ("MouseUp", mouseCode, self:CursorPos ())
 	DButton.OnMouseReleased (self, mouseCode)
+	if self.OnMouseUp then self:OnMouseUp (mouseCode, self:CursorPos ()) end
 	
 	if mouseCode == MOUSE_LEFT then
 		self.Depressed = false

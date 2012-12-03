@@ -15,6 +15,12 @@ function self:ctor (control)
 	self.MouseOver = false
 	self.ToolTip = nil
 	
+	self.EnabledChanged = function (_, enabled)
+		if not enabled then
+			self:HideToolTip ()
+		end
+	end
+	
 	self.MouseEnter = function (_)
 		self.MouseEnterTime = SysTime ()
 		self.MouseOver = true
@@ -98,18 +104,20 @@ function self:SetControl (control)
 	
 	self:HideToolTip ()
 	if self.Control then
-		self.Control:RemoveEventListener ("MouseEnter", tostring (self))
-		self.Control:RemoveEventListener ("MouseLeave", tostring (self))
-		self.Control:RemoveEventListener ("Removed",    tostring (self))
+		self.Control:RemoveEventListener ("EnabledChanged", tostring (self))
+		self.Control:RemoveEventListener ("MouseEnter",     tostring (self))
+		self.Control:RemoveEventListener ("MouseLeave",     tostring (self))
+		self.Control:RemoveEventListener ("Removed",        tostring (self))
 		hook.Remove ("Think", "Gooey.ToolTipController")
 	end
 	
 	self.Control = control
 	
 	if self.Control and self.Enabled then
-		self.Control:AddEventListener ("MouseEnter", tostring (self), self.MouseEnter)
-		self.Control:AddEventListener ("MouseLeave", tostring (self), self.MouseLeave)
-		self.Control:AddEventListener ("Removed",    tostring (self), self.Removed)
+		self.Control:AddEventListener ("EnabledChanged", tostring (self), self.EnabledChanged)
+		self.Control:AddEventListener ("MouseEnter",     tostring (self), self.MouseEnter)
+		self.Control:AddEventListener ("MouseLeave",     tostring (self), self.MouseLeave)
+		self.Control:AddEventListener ("Removed",        tostring (self), self.Removed)
 	end
 end
 
@@ -120,12 +128,14 @@ function self:SetEnabled (enabled)
 	
 	if self.Control then
 		if self.Enabled then
-			self.Control:AddEventListener ("MouseEnter", tostring (self), self.MouseEnter)
-			self.Control:AddEventListener ("MouseLeave", tostring (self), self.MouseLeave)
+			self.Control:AddEventListener ("EnabledChanged", tostring (self), self.EnabledChanged)
+			self.Control:AddEventListener ("MouseEnter",     tostring (self), self.MouseEnter)
+			self.Control:AddEventListener ("MouseLeave",     tostring (self), self.MouseLeave)
 		else
 			self:HideToolTip ()
-			self.Control:RemoveEventListener ("MouseEnter", tostring (self))
-			self.Control:RemoveEventListener ("MouseLeave", tostring (self))
+			self.Control:RemoveEventListener ("EnabledChanged", tostring (self))
+			self.Control:RemoveEventListener ("MouseEnter",     tostring (self))
+			self.Control:RemoveEventListener ("MouseLeave",     tostring (self))
 			hook.Remove ("Think", "Gooey.ToolTipController")
 		end
 	end
@@ -204,5 +214,6 @@ function self:ShowToolTip (text)
 end
 
 -- Event handlers
-self.MouseEnter = Gooey.NullCallback
-self.MouseLeave = Gooey.NullCallback
+self.EnabledChanged = Gooey.NullCallback
+self.MouseEnter     = Gooey.NullCallback
+self.MouseLeave     = Gooey.NullCallback
