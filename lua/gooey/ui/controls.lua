@@ -13,6 +13,8 @@ include ("render.lua")
 include ("rendertype.lua")
 
 include ("keyboardmap.lua")
+include ("keyboardmonitor.lua")
+
 include ("dragcontroller.lua")
 include ("dragdropcontroller.lua")
 include ("selectioncontroller.lua")
@@ -20,6 +22,7 @@ include ("tooltipcontroller.lua")
 include ("tooltipmanager.lua")
 
 include ("iclipboardtarget.lua")
+
 
 -- Effects
 include ("lerpcontroller.lua")
