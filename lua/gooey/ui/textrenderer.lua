@@ -102,6 +102,7 @@ function self:SetHeight (height)
 end
 
 function self:SetText (text)
+	text = tostring (text)
 	if self.Text == text then return end
 	
 	self.Text = text
