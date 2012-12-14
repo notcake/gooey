@@ -73,17 +73,17 @@ function PANEL:OnMouseReleased (mouseCode)
 	if mouseCode == MOUSE_LEFT then
 		if SysTime () - self.LastLeftMouseButtonReleaseTime < 0.4 then
 			if self.OnDoubleClick then self:OnDoubleClick (mouseCode, self:CursorPos ()) end
-			self:DispatchEvent ("DoubleClick")
+			self:DispatchEvent ("DoubleClick", self:CursorPos ())
 		else
 			if self.OnClick then self:OnClick (mouseCode, self:CursorPos ()) end
-			self:DispatchEvent ("Click")
+			self:DispatchEvent ("Click", self:CursorPos ())
 		end
 		self.Depressed = false
 		self.Pressed = false
 		
 		self.LastLeftMouseButtonReleaseTime = SysTime ()
 	elseif mouseCode == MOUSE_RIGHT then
-		self:DispatchEvent ("RightClick")
+		self:DispatchEvent ("RightClick", self:CursorPos ())
 	end
 end
 
