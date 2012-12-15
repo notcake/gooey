@@ -11,56 +11,39 @@ function self:RebuildCache (cache)
 	cache = {}
 	cache.Parts = self:ParseText (self:GetText ())
 	cache.RenderParts = {}
-	local x = 0
-	local w = 0
-	local y = 0
-	local line = 0
 	
 	surface.SetFont (self:GetFont ())
 	
-	local previousType = nil
+	local _, tabHeight = surface.GetTextSize ("WWWW")
 	for i = 1, #cache.Parts do
 		local part = cache.Parts [i]
 		local type = part.Type
-		part.X = x
-		part.Y = y
-		part.Width  = 0
-		part.Height = 0
-		part.Line = line
 		if type == "Text" then
-			if previousType == "Icon" then
-				x = x + 2
-				part.X = x
-			end
 			part.Width, part.Height = surface.GetTextSize (part.Value:gsub ("&", "%"))
-			x = x + part.Width
 		elseif type == "Icon" then
-			if previousType == "Text" then
-				x = x + 2
-				part.X = x
-			end
 			part.Image = Gooey.ImageCache:GetImage (part.Value)
 			part.Width  = part.Image:GetWidth ()
 			part.Height = part.Image:GetHeight ()
-			x = x + part.Width
 		elseif type == "Newline" then
-			w = math.max (w, x)
-			x = 0
-			line = line + 1
+			part.Width  = 0
+			part.Height = 0
 		elseif type == "Tab" then
-			part.Width, part.Height = surface.GetTextSize ("WWWW")
-			x = x + part.Width
+			part.Width = 0
+			part.Height = tabHeight
 		end
-		previousType = type
 	end
 	
-	local lineHeight = self:CalculateLineHeight (cache.Parts, 1, #cache.Parts)
-	lineHeight = math.max (lineHeight, 16)
-	self:VerticalAlignParts (cache.Parts, 1, #cache.Parts, lineHeight)
+	local w = self:PerformWordWrap (cache)
 	
-	w = math.max (w, x)
-	self:SetWidth (w)
-	self:SetHeight (#cache.Parts > 0 and (cache.Parts [#cache.Parts].Y + lineHeight) or lineHeight)
+	if not self:GetWordWrap () then
+		self:SetWidth (w)
+	end
+	
+	local lineHeight = self:CalculateLineHeight (cache.RenderParts, 1, #cache.RenderParts)
+	lineHeight = math.max (lineHeight, 16)
+	self:VerticalAlignParts (cache.RenderParts, 1, #cache.RenderParts, lineHeight)
+	
+	self:SetHeight (#cache.RenderParts > 0 and (cache.RenderParts [#cache.RenderParts].Y + lineHeight) or lineHeight)
 	
 	return cache
 end
@@ -70,8 +53,8 @@ function self:RenderFromCache (renderContext, textColor, cache)
 	
 	surface.SetFont (self:GetFont ())
 	surface.SetTextColor (textColor)
-	for i = 1, #cache.Parts do
-		local part  = cache.Parts [i]
+	for i = 1, #cache.RenderParts do
+		local part  = cache.RenderParts [i]
 		local type  = part.Type
 		local value = part.Value
 		if type == "Text" then
@@ -175,6 +158,142 @@ function self:CalculateLineHeight (partArray, startIndex, endIndex)
 		end
 	end
 	return lineHeight
+end
+
+function self:PerformWordWrap (cache)
+	local wordWrapWidth = self:GetWordWrap () and self:GetWordWrapWidth () or math.huge
+	
+	local x = 0
+	local w = 0
+	local line = 0
+	local previousType = nil
+	
+	local tabWidth, tabHeight = surface.GetTextSize ("WWWW")
+	
+	for i = 1, #cache.Parts do
+		local part = cache.Parts [i]
+		local type = part.Type
+		
+		part.X = x
+		part.Line = line
+		
+		cache.RenderParts [#cache.RenderParts + 1] = part
+		if type == "Text" then
+			if previousType == "Icon" then
+				x = x + 2
+				part.X = x
+			end
+			if x + part.Width > wordWrapWidth then
+				cache.RenderParts [#cache.RenderParts] = nil
+				
+				local words = ""
+				local wordsWidth = 0
+				for word, wordType in GLib.UTF8.WordIterator (part.Value) do
+					local wordWidth = surface.GetTextSize (word:gsub ("&", "%"))
+					
+					if x + wordsWidth + wordWidth > wordWrapWidth and wordType ~= GLib.WordType.Whitespace then
+						-- Addition of this word will overflow the line
+						
+						if wordWidth > wordWrapWidth then
+							-- Word is wider than the maximum allowable width
+							-- Do a character wrap
+							for c in GLib.UTF8.Iterator (word) do
+								-- Note: c could be a combining character
+								local newWords = words .. c
+								local newWordsWidth = surface.GetTextSize (newWords:gsub ("&", "%"))
+								
+								if x + newWordsWidth > wordWrapWidth then
+									-- Commit
+									local newPart = {}
+									newPart.X = x
+									newPart.Line = line
+									newPart.Width = wordsWidth
+									newPart.Height = part.Height
+									newPart.Type = "Text"
+									newPart.Value = words
+									cache.RenderParts [#cache.RenderParts + 1] = newPart
+									
+									w = math.max (w, x + wordsWidth)
+									
+									x = 0
+									line = line + 1
+									
+									words = c
+									wordsWidth = surface.GetTextSize (c:gsub ("&", "%"))
+								else
+									words = newWords
+									wordsWidth = newWordsWidth
+								end
+							end
+						else
+							-- The word fits on the next line
+							-- Commit the current word span
+							local newPart = {}
+							newPart.X = x
+							newPart.Line = line
+							newPart.Width = wordsWidth
+							newPart.Height = part.Height
+							newPart.Type = "Text"
+							newPart.Value = words
+							cache.RenderParts [#cache.RenderParts + 1] = newPart
+							
+							w = math.max (w, x + wordsWidth)
+							
+							x = 0
+							line = line + 1
+							
+							words = word
+							wordsWidth = wordWidth
+						end
+					else
+						-- Addition of this word will not overflow the line
+						words = words .. word
+						wordsWidth = wordsWidth + wordWidth
+					end
+				end
+				
+				if words ~= "" then
+					-- Commit
+					local newPart = {}
+					newPart.X = x
+					newPart.Line = line
+					newPart.Width = wordsWidth
+					newPart.Height = part.Height
+					newPart.Type = "Text"
+					newPart.Value = words
+					cache.RenderParts [#cache.RenderParts + 1] = newPart
+					x = x + wordsWidth
+				end
+			else
+				x = x + part.Width
+			end
+		elseif type == "Icon" then
+			if previousType == "Text" then
+				x = x + 2
+				part.X = x
+			end
+			if previousType and x + part.Width > wordWrapWidth then
+				x = 0
+				line = line + 1
+				part.X = x
+				part.Line = line
+			end
+			x = x + part.Width
+		elseif type == "Newline" then
+			x = 0
+			line = line + 1
+			previousType = nil
+		elseif type == "Tab" then
+			part.Width = tabWidth - x % tabWidth
+			x = x + part.Width
+		end
+		
+		w = math.max (w, x)
+		
+		previousType = type
+	end
+	
+	return w
 end
 
 function self:VerticalAlignParts (partArray, startIndex, endIndex, lineHeight)
