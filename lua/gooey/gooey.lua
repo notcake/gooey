@@ -4,7 +4,9 @@ Gooey = Gooey or {}
 include ("glib/glib.lua")
 
 GLib.Initialize ("Gooey", Gooey)
-Gooey.AddCSLuaFolderRecursive ("gooey")
+GLib.AddCSLuaPackFile ("autorun/gooey.lua")
+GLib.AddCSLuaPackFolderRecursive ("gooey")
+GLib.AddCSLuaPackSystem ("Gooey")
 
 function Gooey.DeprecatedFunction ()
 	GLib.Error ("Gooey: Derma function should not be called.")
