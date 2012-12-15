@@ -34,10 +34,7 @@ function self:RebuildCache (cache)
 	end
 	
 	local w = self:PerformWordWrap (cache)
-	
-	if not self:GetWordWrap () then
-		self:SetWidth (w)
-	end
+	self:SetWidth (w)
 	
 	local lineHeight = self:CalculateLineHeight (cache.RenderParts, 1, #cache.RenderParts)
 	lineHeight = math.max (lineHeight, 16)
