@@ -35,7 +35,7 @@ end
 
 function PANEL:Paint (w, h)
 	if not self.TextRenderer then return end
-	self.TextRenderer:Render (Gooey.RenderContext, self:GetTextColor ())
+	self.TextRenderer:Render (Gooey.RenderContext, 0, 0, self:GetTextColor ())
 	return true
 end
 

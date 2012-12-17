@@ -45,7 +45,7 @@ function self:RebuildCache (cache)
 	return cache
 end
 
-function self:RenderFromCache (renderContext, textColor, cache)
+function self:RenderFromCache (renderContext, x, y, textColor, cache)
 	if not cache then return end
 	
 	surface.SetFont (self:GetFont ())
@@ -55,10 +55,10 @@ function self:RenderFromCache (renderContext, textColor, cache)
 		local type  = part.Type
 		local value = part.Value
 		if type == "Text" then
-			surface.SetTextPos (part.X, part.Y)
+			surface.SetTextPos (x + part.X, y + part.Y)
 			surface.DrawText (part.Value)
 		elseif type == "Icon" then
-			Gooey.ImageCache:GetImage (part.Value):Draw (renderContext, part.X, part.Y, 255, 255, 255, 255)
+			Gooey.ImageCache:GetImage (part.Value):Draw (renderContext, x + part.X, y + part.Y, 255, 255, 255, textColor.a)
 		end
 	end
 end

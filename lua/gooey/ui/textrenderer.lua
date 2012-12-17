@@ -75,15 +75,15 @@ function self:RebuildCache (cache)
 	return cache
 end
 
-function self:Render (renderContext, textColor)
+function self:Render (renderContext, x, y, textColor)
 	if not self.CacheValid then
 		self.Cache = self:RebuildCache (self.Cache)
 		self.CacheValid = true
 	end
-	self:RenderFromCache (renderContext, textColor or GLib.Colors.CornflowerBlue, self.Cache)
+	self:RenderFromCache (renderContext, x or 0, y or 0, textColor or GLib.Colors.CornflowerBlue, self.Cache)
 end
 
-function self:RenderFromCache (renderContext, textColor, cache)
+function self:RenderFromCache (renderContext, x, y, textColor, cache)
 end
 
 function self:SetFont (font)
