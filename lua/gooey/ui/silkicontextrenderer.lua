@@ -2,6 +2,19 @@ local self = {}
 Gooey.SilkiconTextRenderer = Gooey.MakeConstructor (self, Gooey.TextRenderer)
 
 function self:ctor ()
+	self.IconScale = 1
+end
+
+function self:GetIconScale ()
+	return self.IconScale
+end
+
+function self:SetIconScale (iconScale)
+	iconScale = iconScale or 1
+	if self.IconScale == iconScale then return end
+	
+	self.IconScale = iconScale
+	self:InvalidateCache ()
 end
 
 function self:RebuildCache (cache)
@@ -22,8 +35,8 @@ function self:RebuildCache (cache)
 			part.Width, part.Height = surface.GetTextSize (part.Value:gsub ("&", "%"))
 		elseif type == "Icon" then
 			part.Image = Gooey.ImageCache:GetImage (part.Value)
-			part.Width  = part.Image:GetWidth ()
-			part.Height = part.Image:GetHeight ()
+			part.Width  = part.Image:GetWidth ()  * self.IconScale
+			part.Height = part.Image:GetHeight () * self.IconScale
 		elseif type == "Newline" then
 			part.Width  = 0
 			part.Height = 0
@@ -58,7 +71,14 @@ function self:RenderFromCache (renderContext, x, y, textColor, cache)
 			surface.SetTextPos (x + part.X, y + part.Y)
 			surface.DrawText (part.Value)
 		elseif type == "Icon" then
-			Gooey.ImageCache:GetImage (part.Value):Draw (renderContext, x + part.X, y + part.Y, 255, 255, 255, textColor.a)
+			local image = Gooey.ImageCache:GetImage (part.Value)
+			local w = image:GetWidth ()  * self.IconScale
+			local h = image:GetHeight () * self.IconScale
+			render.PushFilterMin (TEXFILTER.POINT)
+			render.PushFilterMag (TEXFILTER.POINT)
+			image:DrawEx (renderContext, x + part.X, y + part.Y, w, h, 255, 255, 255, textColor.a)
+			render.PopFilterMin ()
+			render.PopFilterMag ()
 		end
 	end
 end

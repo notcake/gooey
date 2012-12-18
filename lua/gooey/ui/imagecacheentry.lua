@@ -41,6 +41,12 @@ function self:Draw (renderContext, x, y, r, g, b, a)
 	surface.DrawTexturedRect (x or 0, y or 0, self.Width, self.Height)
 end
 
+function self:DrawEx (renderContext, x, y, w, h, r, g, b, a)
+	surface.SetMaterial (self.Material)
+	surface.SetDrawColor (r or 255, g or 255, b or 255, a or 255)
+	surface.DrawTexturedRect (x or 0, y or 0, w or self.Width, h or self.Height)
+end
+
 function self:GetHeight ()
 	return self.Height
 end
