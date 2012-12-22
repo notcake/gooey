@@ -296,7 +296,7 @@ end
 function PANEL:OnRemoved ()	
 	-- Remove children first, so selection can bubble up to us.
 	if self.ChildNodes then
-		for _, item in pairs (self.ChildNodes:GetItems ()) do
+		for _, item in pairs (self.ChildNodes:GetChildren ()) do
 			item:Remove ()
 		end
 	end

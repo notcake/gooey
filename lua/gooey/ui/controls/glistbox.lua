@@ -2,9 +2,9 @@ local PANEL = {}
 
 --[[
 	Events:
-		SelectedChanged (item)
+		SelectionChanged (item)
 			Fired when the selected item has changed.
-		SelectedCleared ()
+		SelectionCleared ()
 			Fired when the selection has been cleared.
 ]]
 

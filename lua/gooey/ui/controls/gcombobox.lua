@@ -1,10 +1,22 @@
 local PANEL = {}
 
+--[[
+	GComboBox
+	
+	Events:
+		SelectedItemChanged (text, data)
+			Fired when the selected item has changed.
+]]
+
 function PANEL:Init ()
 end
 
-function PANEL:OnSelect (index, value, data)
-	self:DispatchEvent ("ItemSelected", value, data)
+function PANEL:AddItem (text, data)
+	self:AddChoice (text, data)
 end
 
-Gooey.Register ("GComboBox", PANEL, "DMultiChoice")
+function PANEL:OnSelect (index, text, data)
+	self:DispatchEvent ("SelectedItemChanged", text, data)
+end
+
+Gooey.Register ("GComboBox", PANEL, "DComboBox")
