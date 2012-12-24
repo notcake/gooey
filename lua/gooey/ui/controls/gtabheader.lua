@@ -22,6 +22,7 @@ function PANEL:Init ()
 				if not self.CloseButton:IsHovered () then
 					self.Tab:Select ()
 				end
+				self.Tab:RequestFocus ()
 			end
 		end
 	)

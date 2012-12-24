@@ -106,6 +106,11 @@ function self:Remove ()
 	self:DispatchEvent ("Removed")
 end
 
+function self:RequestFocus ()
+	if not self.Contents then return end
+	self.Contents:RequestFocus ()
+end
+
 function self:Select ()
 	if not self.TabControl then return end
 	self.TabControl:SetSelectedTab (self)
