@@ -104,6 +104,13 @@ function PANEL:Init ()
 		self:DispatchEvent ("TabTextChanged", tab, text)
 		self:InvalidateLayout ()
 	end
+	
+	self:AddEventListener ("SizeChanged",
+		function (_, w, h)
+			if not self:IsTabHeaderVisible (self:GetSelectedTab ()) then return end
+			self:EnsureTabVisible (self:GetSelectedTab ())
+		end
+	)
 end
 
 function PANEL:AddTab (...)
@@ -252,6 +259,15 @@ function PANEL:IsPointInHeaderArea (x, y)
 	if y < 0 then return false end
 	if y > self.TabHeaderHeight then return false end
 	return true
+end
+
+function PANEL:IsTabHeaderVisible (tab)
+	if not tab then return false end
+	if not self.TabScrollerEnabled then return true end
+	
+	local left = tab:GetHeader ():GetOffset ()
+	local right = tab:GetHeader ():GetOffset () + tab:GetHeader ():GetWide ()
+	return right > self.TabScrollOffset and left < self.TabScrollOffset + self:GetWide ()
 end
 
 function PANEL:LayoutTabHeaders ()
