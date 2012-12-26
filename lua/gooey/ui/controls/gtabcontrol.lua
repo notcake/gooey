@@ -294,8 +294,9 @@ function PANEL:PerformLayout ()
 	self.LeftScrollButton:SetPos (x, 0.5 * (self:GetHeaderHeight () - self.LeftScrollButton:GetTall ()))
 	self.LeftScrollButton:MoveToFront ()
 	
+	-- x is now self:GetWide () - total scroll button width
 	self.LeftScrollButton:SetEnabled (self.TabScrollOffset > 0)
-	self.RightScrollButton:SetEnabled (self.TabScrollOffset + self:GetWide () < self.TotalHeaderWidth)
+	self.RightScrollButton:SetEnabled (self.TabScrollOffset + x < self.TotalHeaderWidth)
 end
 
 function PANEL:RemoveTab (tab, delete)
