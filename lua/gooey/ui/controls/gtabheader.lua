@@ -143,7 +143,10 @@ function PANEL:PerformLayout ()
 	local w, h = surface.GetTextSize (self:GetText ())
 	x = x + w + 4
 	
-	x = x + self.CloseButton:GetWidth () + 4
+	if self:IsCloseButtonVisible () then
+		x = x + self.CloseButton:GetWidth () + 4
+	end
+	
 	if x < 64 then x = 64 end
 	self:SetWidth (x)
 	
