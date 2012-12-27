@@ -10,6 +10,8 @@ function PANEL:GetLineHeight ()
 end
 
 function PANEL:UpdateColours (skin)
+	if self.TextColor then return end
+	
 	local ret = DLabel.UpdateColours (self, skin)
 	self:SetTextColor (self:GetTextStyleColor ())
 	return ret

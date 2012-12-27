@@ -8,6 +8,9 @@ end
 function PANEL:Init ()
 	self.Icon = nil
 	self.Text = text
+	
+	self.DrawBackground = true
+	
 	self:SetWidth (14)
 	self:SetHeight (14)
 	
@@ -17,7 +20,8 @@ function PANEL:Init ()
 end
 
 function PANEL:Paint (renderContext)
-	if self:IsEnabled () and self:IsHovered () then
+	if self:ShouldDrawBackground () and
+	   self:IsEnabled () and self:IsHovered () then
 		-- Enabled and hovered
 		if self:IsPressed () then
 			draw.RoundedBox (4, 0, 0, self.Width, self.Height, GLib.Colors.Gray)
@@ -46,4 +50,12 @@ function PANEL:Paint (renderContext)
 		-- Disabled
 		Gooey.Glyphs.Draw ("close", renderContext, GLib.Colors.Gray, 0, 0, self.Width, self.Height)
 	end
+end
+
+function PANEL:SetShouldDrawBackground (shouldDrawBackground)
+	self.DrawBackground = shouldDrawBackground
+end
+
+function PANEL:ShouldDrawBackground ()
+	return self.DrawBackground
 end

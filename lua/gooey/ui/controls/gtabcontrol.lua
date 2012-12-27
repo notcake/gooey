@@ -291,7 +291,12 @@ function PANEL:LayoutTabHeaders ()
 end
 
 function PANEL:Paint (w, h)
-	draw.RoundedBoxEx (4, 0, self.TabHeaderHeight, w, h - self.TabHeaderHeight, GLib.Colors.Silver, self:GetTabCount () == 0, self.TotalHeaderWidth < self:GetWide () - 4, true, true)
+	draw.RoundedBoxEx (4, 0, self.TabHeaderHeight, w, h - self.TabHeaderHeight, GLib.Colors.Silver,
+		self:GetTabCount () == 0,
+		self.TotalHeaderWidth - self.TabScrollOffset < self:GetWide () - 4,
+		true,
+		true
+	)
 end
 
 function PANEL:PerformLayout ()
