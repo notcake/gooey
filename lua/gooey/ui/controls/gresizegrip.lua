@@ -68,9 +68,7 @@ end
 
 -- Event handlers
 function PANEL:OnRemoved ()
-	if self:GetParent () and self:GetParent ():IsValid () then
-		self:GetParent ():RemoveEventListener ("SizeChanged", tostring (self:GetTable ()))
-	end
+	self:DispatchEvent ("ParentChanged", self:GetParent (), nil)
 end
 
 Gooey.Register ("GResizeGrip", PANEL, "GPanel")
