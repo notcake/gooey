@@ -4,8 +4,9 @@ Gooey.ImageCache = Gooey.MakeConstructor (self)
 function self:ctor ()
 	self.Images = {}
 	
-	self.LoadInterval = 0.1
-	self.LastLoadTime = 0
+	self.LoadDuration  = 0.005
+	self.LastLoadFrame = 0
+	self.LoadStartTime = 0
 	
 	self.FallbackImage    = self:LoadImage ("icon16/cross.png")
 	self.PlaceholderImage = self:LoadImage ("icon16/hourglass.png")
@@ -24,10 +25,13 @@ function self:GetImage (image)
 	if self.Images [image] then
 		return self.Images [image]
 	end
-	if SysTime () - self.LastLoadTime < self.LoadInterval then
+	if self.LastLoadFrame ~= CurTime () then
+		self.LastLoadFrame = CurTime ()
+		self.LoadStartTime = SysTime ()
+	end
+	if SysTime () - self.LoadStartTime > self.LoadDuration then
 		return self:GetPlaceholderImage ()
 	end
-	self.LastLoadTime = SysTime ()
 	
 	local imageCacheEntry = Gooey.ImageCacheEntry (self, image)
 	self.Images [image] = imageCacheEntry
