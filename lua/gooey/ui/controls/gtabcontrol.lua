@@ -455,7 +455,12 @@ function PANEL:DisableTabScroller ()
 end
 
 -- Event handlers
-function PANEL:OnMouseWheel (delta)
+function PANEL:OnMouseWheel (delta, x, y)
+	local headerX, headerY, headerWidth, headerHeight = self:GetHeaderRectangle ()
+	if x < headerX or x > headerX + headerWidth or
+	   y < headerY or y > headerY + headerHeight then
+		return
+	end
 	self:SetScrollOffset (self:GetScrollOffset () + delta * -20)
 end
 

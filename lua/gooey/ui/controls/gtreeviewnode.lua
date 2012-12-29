@@ -289,7 +289,7 @@ function PANEL:OnChildRemoved (childNode)
 	self:GetRoot ():LayoutRecursive ()
 end
 
-function PANEL:OnMouseWheel (delta)
+function PANEL:OnMouseWheel (delta, x, y)
 	self:GetTreeView ():OnMouseWheeled (delta)
 end
 

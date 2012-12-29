@@ -46,7 +46,7 @@ function PANEL:Init ()
 		end
 	)
 	self:AddEventListener ("MouseWheel",
-		function (_, delta)
+		function (_, delta, x, y)
 			self:Scroll (delta * -2)
 		end
 	)

@@ -88,8 +88,8 @@ function PANEL:OnMouseReleased (mouseCode)
 end
 
 function PANEL:OnMouseWheeled (delta)
-	self:DispatchEvent ("MouseWheel", delta)
-	if self.OnMouseWheel then self:OnMouseWheel (delta) end
+	self:DispatchEvent ("MouseWheel", delta, self:CursorPos ())
+	if self.OnMouseWheel then self:OnMouseWheel (delta, self:CursorPos ()) end
 end
 
 Gooey.Register ("GPanel", PANEL, "DPanel")

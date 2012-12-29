@@ -190,7 +190,7 @@ function PANEL:SetText (text)
 end
 
 -- Event handlers
-function PANEL:OnMouseWheel (delta)
+function PANEL:OnMouseWheel (delta, x, y)
 	if not self:GetTabControl () then return end
 	self:GetTabControl ():OnMouseWheeled (delta)
 end
