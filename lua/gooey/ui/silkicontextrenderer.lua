@@ -32,7 +32,7 @@ function self:RebuildCache (cache)
 		local part = cache.Parts [i]
 		local type = part.Type
 		if type == "Text" then
-			part.Width, part.Height = surface.GetTextSize (part.Value:gsub ("&", "%"))
+			part.Width, part.Height = surface.GetTextSize (part.Value:gsub ("&", "#"))
 		elseif type == "Icon" then
 			part.Image = Gooey.ImageCache:GetImage (part.Value)
 			part.Width  = part.Image:GetWidth ()  * self.IconScale
@@ -206,7 +206,7 @@ function self:PerformWordWrap (cache)
 				local words = ""
 				local wordsWidth = 0
 				for word, wordType in GLib.UTF8.WordIterator (part.Value) do
-					local wordWidth = surface.GetTextSize (word:gsub ("&", "%"))
+					local wordWidth = surface.GetTextSize (word:gsub ("&", "#"))
 					
 					if x + wordsWidth + wordWidth > wordWrapWidth and wordType ~= GLib.WordType.Whitespace then
 						-- Addition of this word will overflow the line
@@ -217,7 +217,7 @@ function self:PerformWordWrap (cache)
 							for c in GLib.UTF8.Iterator (word) do
 								-- Note: c could be a combining character
 								local newWords = words .. c
-								local newWordsWidth = surface.GetTextSize (newWords:gsub ("&", "%"))
+								local newWordsWidth = surface.GetTextSize (newWords:gsub ("&", "#"))
 								
 								if x + newWordsWidth > wordWrapWidth then
 									-- Commit
@@ -236,7 +236,7 @@ function self:PerformWordWrap (cache)
 									line = line + 1
 									
 									words = c
-									wordsWidth = surface.GetTextSize (c:gsub ("&", "%"))
+									wordsWidth = surface.GetTextSize (c:gsub ("&", "#"))
 								else
 									words = newWords
 									wordsWidth = newWordsWidth
