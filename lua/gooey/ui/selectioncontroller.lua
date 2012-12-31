@@ -40,9 +40,9 @@ function self:ctor (control)
 	self.SelectionMode = Gooey.SelectionMode.Multiple
 	self.SelectionAction = SelectionAction.Override
 	
+	self.SelectedItem = nil			-- The last item added to the selection
 	self.SelectedItems = {}			-- Array of selected items
 	self.SelectedItemSet = {}		-- Set of selected items (items as keys)
-	self.SelectedItem = nil			-- The last item added to the selection
 	
 	self.NewSelectedItems = {}		-- Array of box selected items
 	self.NewSelectedItemSet = {}	-- Set of box selected items (items as keys)
@@ -58,6 +58,7 @@ function self:AddToSelection (item)
 	if not item then return end
 	if self:IsSelected (item) then return end
 	
+	self.SelectedItem = self.SelectedItem or item
 	self.SelectedItems [#self.SelectedItems + 1] = item
 	self.SelectedItemSet [item] = true
 	self:DispatchEvent ("SelectionChanged", item)
@@ -65,9 +66,9 @@ end
 
 function self:ClearSelection ()
 	if #self.SelectedItems == 0 then return end
+	self.SelectedItem = nil
 	self.SelectedItems = {}
 	self.SelectedItemSet = {}
-	self.SelectedItem = nil
 	
 	self:DispatchEvent ("SelectionCleared")
 	self:DispatchEvent ("SelectionChanged", nil)

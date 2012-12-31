@@ -77,6 +77,20 @@ function PANEL.DefaultComparator (a, b)
 	return a:GetText () < b:GetText ()
 end
 
+function PANEL:EnsureVisible (listBoxItem)
+	if not listBoxItem then return end
+	if self:IsItemVisible (listBoxItem) then return end
+	
+	local left, top, right, bottom = self:GetContentBounds ()
+	local _, y = listBoxItem:GetPos ()
+	local h = listBoxItem:GetTall ()
+	if y < self:GetScrollOffset () then
+		self:SetScrollOffset (-top + y)
+	elseif y + h > self:GetScrollOffset () + self:GetTall () then
+		self:SetScrollOffset (y + h - bottom)
+	end
+end
+
 function PANEL:GetContentBounds ()
 	return 1, 1, self:GetWide () - 1, self:GetTall () - 1
 end
@@ -94,12 +108,25 @@ function PANEL:GetItemByID (id)
 	return nil
 end
 
+function PANEL:GetItemBySortedId (sortedId)
+	return self.Sorted [sortedId]
+end
+
+function PANEL:GetItemCount ()
+	return #self.Items
+end
+
 function PANEL:GetItemEnumerator ()
 	local next, tbl, key = pairs (self:GetItems ())
 	return function ()
 		key = next (tbl, key)
 		return tbl [key]
 	end
+end
+
+function PANEL:GetScrollOffset ()
+	if not self.VBar then return 0 end
+	return self.VBar:GetScroll ()
 end
 
 function PANEL:GetSelectedItems ()
@@ -125,6 +152,10 @@ function PANEL:HasFocus ()
 	return self.VBar:HasFocus () or self.VBar.btnUp:HasFocus () or self.VBar.btnDown:HasFocus () or self.VBar.btnGrip:HasFocus ()
 end
 
+function PANEL:IsEmpty ()
+	return next (self.Items) == nil
+end
+
 function PANEL:IsHovered ()
 	if self.Hovered then
 		return true
@@ -138,6 +169,16 @@ function PANEL:IsHovered ()
 		return true
 	end
 	return false
+end
+
+--- Returns whether the specified ListBoxItem lies fully within the visible part of the ListBox
+-- @return A boolean indicating whether the specified ListBoxItem lies fully within the visible part of the ListBox
+function PANEL:IsItemVisible (listBoxItem)
+	if not listBoxItem then return false end
+	local _, y = listBoxItem:GetPos ()
+	local h = listBoxItem:GetTall ()
+	local viewY = self:GetScrollOffset ()
+	return y >= viewY and y + h < viewY + self:GetTall ()
 end
 
 function PANEL:ItemFromPoint (x, y)
@@ -159,9 +200,8 @@ function PANEL:PaintOver ()
 end
 
 function PANEL:Rebuild ()
-	if CurTime () - self.LastRebuildTime == 0 then
-		return
-	end
+	if CurTime () == self.LastRebuildTime then return end
+	
 	local offset = 0
 	
 	local padding = self.Padding
@@ -170,7 +210,9 @@ function PANEL:Rebuild ()
 	local canvasWidth = self.pnlCanvas:GetWide ()
 	local y = padding
 	local h = 0
-	for _, panel in ipairs (self.Sorted) do
+	for sortedId, panel in ipairs (self.Sorted) do
+		panel:SetSortedId (sortedId)
+		
 		h = panel:GetTall ()
 		if panel:IsVisible () then
 			panel:SetPos (padding, y)
@@ -224,6 +266,20 @@ function PANEL:SetItemID (item, id)
 		self.ItemsByID [id] = item
 	end
 	item:SetID (id)
+end
+
+function PANEL:SetScrollOffset (scrollOffset)
+	if scrollOffset + self:GetTall () > self.pnlCanvas:GetTall () then
+		scrollOffset = self.pnlCanvas:GetTall () - self:GetTall ()
+	end
+	if scrollOffset < 0 then scrollOffset = 0 end
+	
+	self.VBar:SetScroll (scrollOffset)
+end
+
+function PANEL:SetSelectedItem (listBoxItem)
+	self.SelectionController:ClearSelection ()
+	self.SelectionController:AddToSelection (listBoxItem)
 end
 
 function PANEL:SetSelectionMode (selectionMode)

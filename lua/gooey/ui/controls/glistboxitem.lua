@@ -10,6 +10,8 @@ function PANEL:Init ()
 	self.Indent = 0
 	self.Icon = nil
 	
+	self.SortedId = 0
+	
 	-- Selection
 	self.Selectable = true
 	
@@ -32,6 +34,10 @@ function PANEL:GetIndent ()
 	return self.Indent
 end
 
+function PANEL:GetSortedId ()
+	return self.SortedId
+end
+
 PANEL.GetText = debug.getregistry ().Panel.GetValue
 
 function PANEL:IsSelected ()
@@ -42,12 +48,11 @@ end
 	Taken from skins/default.lua
 ]]
 function PANEL:Paint (w, h)
+	local col = self:GetSkin ().combobox_selected
 	if self:IsSelected () then
-		local col = self:GetSkin ().combobox_selected
 		surface.SetDrawColor (col.r, col.g, col.b, col.a)
 		self:DrawFilledRect ()
 	elseif self.Hovered then
-		local col = self:GetSkin ().combobox_selected
 		surface.SetDrawColor (col.r, col.g, col.b, col.a * 0.25)
 		self:DrawFilledRect ()
 	end
@@ -102,6 +107,10 @@ function PANEL:SetID (id)
 		self.ListBox:SetItemID (self, id)
 	end
 	self.ID = id
+end
+
+function PANEL:SetSortedId (sortedId)
+	self.SortedId = sortedId
 end
 
 -- Event handlers

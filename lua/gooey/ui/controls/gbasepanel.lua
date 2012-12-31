@@ -138,6 +138,7 @@ end
 function self:SetFont (font)
 	if self:GetFont () == font then return end
 	
+	self.Font = font
 	self.m_FontName = font
 	debug.getregistry ().Panel.SetFontInternal (self, font)
 	self:DispatchEvent ("FontChanged", font)
