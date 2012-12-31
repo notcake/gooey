@@ -22,6 +22,11 @@ function PANEL:CanSelect ()
 	return self.Selectable
 end
 
+function PANEL:EnsureVisible ()
+	if not self.ListBox then return end
+	self.ListBox:EnsureVisible (self)
+end
+
 function PANEL:GetIcon ()
 	return self.Icon and self.Icon.ImageName or nil
 end
@@ -35,6 +40,9 @@ function PANEL:GetIndent ()
 end
 
 function PANEL:GetSortedId ()
+	if self.ListBox then
+		self.ListBox:ValidateSortedIds ()
+	end
 	return self.SortedId
 end
 
@@ -116,6 +124,10 @@ end
 -- Event handlers
 function PANEL:DoClick ()
 	self.ListBox:DoClick (self)
+end
+
+function PANEL:DoDoubleClick ()
+	self.ListBox:DoDoubleClick (self)
 end
 
 function PANEL:DoRightClick ()

@@ -11,6 +11,8 @@ Gooey.BasePanel = self
 			Fired when this panel's font has changed.
 		ParentChanged (oldParent, parent)
 			Fired when this panel's parent has changed.
+		PositionChanged (x, y)
+			Fired when this panel's position has changed.
 		Removed ()
 			Fired when this panel has been removed.
 		SizeChanged (width, height)
@@ -104,6 +106,15 @@ function self:IsPressed ()
 	return self.Pressed
 end
 
+function self:LocalToParent (x, y)
+	return x + self.X, y + self.Y
+end
+
+function self:LocalToScreen (x, y)
+	local parentX, parentY = self:LocalToParent (x, y)
+	return self:GetParent ():LocalToScreen (parentX, parentY)
+end
+
 function self:Remove ()
 	if self:IsMarkedForDeletion () then return end
 	
@@ -159,6 +170,14 @@ function self:SetParent (parent)
 	
 	debug.getregistry ().Panel.SetParent (self, parent)
 	self:DispatchEvent ("ParentChanged", oldParent, self:GetParent ())
+end
+
+function self:SetPos (x, y, ...)
+	local currentX, currentY = self:GetPos ()
+	if currentX == x and currentY == y then return end
+	
+	debug.getregistry ().Panel.SetPos (self, x, y)
+	self:DispatchEvent ("PositionChanged", x, y)
 end
 
 function self:SetSize (width, height, ...)

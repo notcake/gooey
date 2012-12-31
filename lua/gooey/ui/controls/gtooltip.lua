@@ -73,6 +73,8 @@ function PANEL:Show ()
 	
 	Gooey.AddRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()),
 		function ()
+			if not self:IsValid ()   then return end
+			if not self:IsVisible () then return end
 			local x, y = self:GetPos ()
 			local w, h = self:GetSize ()
 			draw.RoundedBox (4, x,     y,     w,     h,     borderColor)

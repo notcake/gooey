@@ -2,6 +2,8 @@ local PANEL = {}
 
 --[[
 	Events:
+		Scroll (scrollOffset)
+			Fired when the ListBox has been scrolled.
 		SelectionChanged (item)
 			Fired when the selected item has changed.
 		SelectionCleared ()
@@ -10,18 +12,25 @@ local PANEL = {}
 
 function PANEL:Init ()
 	self.SelectionController = Gooey.SelectionController (self)
+	
+	self.LastClickTime = 0
 
+	self.pnlCanvas.LocalToParent = self.LocalToParent
+	self.pnlCanvas.LocalToScreen = self.LocalToScreen
 	self.pnlCanvas.OnMouseReleased = function (self, mouseCode)
 		self:GetParent ():OnMouseReleased (mouseCode)
 	end
 	
 	self.ItemsByID = {}
 	self.Sorted = {}
+	self.SortedIdsValid = true
+	
 	self.Comparator = nil
+	
+	self.ExpectingScrollLayout = false
+	self.LastRebuildTime = 0
 
 	self.Menu = nil
-	
-	self.LastRebuildTime = 0
 	
 	self.SelectionController:AddEventListener ("SelectionChanged",
 		function (_, item)
@@ -37,28 +46,30 @@ function PANEL:Init ()
 end
 
 function PANEL:AddItem (text, id)
-    local item = vgui.Create ("GListBoxItem", self)
+    local listBoxItem = vgui.Create ("GListBoxItem", self)
 	
 	-- inline expansion of SetMother and SetID
-    item.ListBox = self
-	item.m_pMother = self
-	item.ID = id
-    item:SetText (text)
+    listBoxItem.ListBox = self
+	listBoxItem.m_pMother = self
+	listBoxItem.ID = id
+    listBoxItem:SetText (text)
 	if id then
-		self.ItemsByID [id] = item
+		self.ItemsByID [id] = listBoxItem
 	end
 
-    -- inline expansion of DPanelList.AddItem (self, item)
-	item:SetVisible (true)
-	item:SetParent (self.pnlCanvas)
-	self.Items [#self.Items + 1] = item
+    -- inline expansion of DPanelList.AddItem (self, listBoxItem)
+	listBoxItem:SetVisible (true)
+	listBoxItem:SetParent (self.pnlCanvas)
+	self.Items [#self.Items + 1] = listBoxItem
 	
-	self.Sorted [#self.Sorted + 1] = item
+	self.Sorted [#self.Sorted + 1] = listBoxItem
+	listBoxItem:SetSortedId (#self.Sorted)
+	
 	self.LastRebuildTime = 0
 	
 	self:InvalidateLayout ()
 	
-    return item
+    return listBoxItem
 end
 
 function PANEL:Clear ()
@@ -199,6 +210,15 @@ function PANEL:PaintOver ()
 	self.SelectionController:PaintOver (self)
 end
 
+function PANEL:PerformLayout ()
+	DListBox.PerformLayout (self)
+	
+	if self.ExpectingScrollLayout then
+		self.ExpectingScrollLayout = false
+		self:DispatchEvent ("Scroll", self:GetScrollOffset ())
+	end
+end
+
 function PANEL:Rebuild ()
 	if CurTime () == self.LastRebuildTime then return end
 	
@@ -208,15 +228,18 @@ function PANEL:Rebuild ()
 	local spacing = self.Spacing
 	
 	local canvasWidth = self.pnlCanvas:GetWide ()
+	canvasWidth = canvasWidth - padding
+	if not self.VBar or not self.VBar:IsVisible () then
+		canvasWidth = canvasWidth - padding
+	end
+	
 	local y = padding
 	local h = 0
-	for sortedId, panel in ipairs (self.Sorted) do
-		panel:SetSortedId (sortedId)
-		
+	for _, panel in ipairs (self.Sorted) do
 		h = panel:GetTall ()
 		if panel:IsVisible () then
 			panel:SetPos (padding, y)
-			panel:SetWide (canvasWidth - padding * 2)
+			panel:SetWide (canvasWidth)
 			
 			y = y + h + spacing
 		end
@@ -240,6 +263,7 @@ function PANEL:RemoveItem (item)
 	for k, v in pairs (self.Sorted) do
 		if v == item then
 			table.remove (self.Sorted, k)
+			self:InvalidateSortedIds ()
 			break
 		end
 	end
@@ -296,16 +320,42 @@ function PANEL:Sort (comparator)
 		end
 	)
 	
+	self:InvalidateSortedIds ()
 	self:InvalidateLayout ()
+end
+
+-- Internal, do not call
+function PANEL:InvalidateSortedIds ()
+	self.SortedIdsValid = false
+end
+
+function PANEL:ValidateSortedIds ()
+	if self.SortedIdsValid then return end
+	self.SortedIdsValid = true
+	
+	for sortedId, listBoxItem in ipairs (self.Sorted) do
+		listBoxItem:SetSortedId (sortedId)
+	end
 end
 
 -- Event handlers
 function PANEL:DoClick (item)
+	if SysTime () - self.LastClickTime < 0.3 then
+		self:DoDoubleClick ()
+		self.LastClickTime = 0
+	else
+		self:DispatchEvent ("Click", self:ItemFromPoint (self:CursorPos ()))
+		self.LastClickTime = SysTime ()
+	end
 	self:DispatchEvent ("Click", item)
 end
 
-function PANEL:DoRightClick (item)
-	self:DispatchEvent ("RightClick", item)
+function PANEL:DoDoubleClick ()
+	self:DispatchEvent ("DoubleClick", self:ItemFromPoint (self:CursorPos ()))
+end
+
+function PANEL:DoRightClick ()
+	self:DispatchEvent ("RightClick", self:ItemFromPoint (self:CursorPos ()))
 end
 
 function PANEL:OnCursorMoved (x, y)
@@ -328,6 +378,11 @@ function PANEL:OnMouseReleased (mouseCode)
 			if self.Menu then self.Menu:Open (self:GetSelectedItem ()) end
 		end
 	end
+end
+
+function PANEL:OnVScroll (scrollOffset)
+	DListBox.OnVScroll (self, scrollOffset)
+	self.ExpectingScrollLayout = true
 end
 
 Gooey.Register ("GListBox", PANEL, "DListBox")
