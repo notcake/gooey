@@ -114,7 +114,7 @@ function PANEL:Open (targetItem)
 end
 
 function PANEL:OpenSubMenu (item, menu)
-	if not self:IsEnabled () then return end
+	if item and not item:IsEnabled () then return end
 	
 	local openSubMenu = self:GetOpenSubMenu ()
 	if openSubMenu then
