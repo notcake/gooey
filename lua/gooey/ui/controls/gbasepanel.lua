@@ -112,6 +112,7 @@ end
 
 function self:LocalToScreen (x, y)
 	local parentX, parentY = self:LocalToParent (x, y)
+	if not self:GetParent () then return parentX, parentY end
 	return self:GetParent ():LocalToScreen (parentX, parentY)
 end
 
