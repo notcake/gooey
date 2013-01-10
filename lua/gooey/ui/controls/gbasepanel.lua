@@ -158,34 +158,42 @@ function self:SetFont (font)
 end
 
 function self:SetHeight (height)
-	if self:GetTall () == height then return end
+	if self:GetTall () == height then return self end
 	
 	debug.getregistry ().Panel.SetTall (self, height)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+	
+	return self
 end
 
 function self:SetParent (parent)
-	if self:GetParent () == parent then return end
+	if self:GetParent () == parent then return self end
 	
 	local oldParent = self:GetParent ()
 	
 	debug.getregistry ().Panel.SetParent (self, parent)
 	self:DispatchEvent ("ParentChanged", oldParent, self:GetParent ())
+	
+	return self
 end
 
 function self:SetPos (x, y, ...)
 	local currentX, currentY = self:GetPos ()
-	if currentX == x and currentY == y then return end
+	if currentX == x and currentY == y then return self end
 	
 	debug.getregistry ().Panel.SetPos (self, x, y)
 	self:DispatchEvent ("PositionChanged", x, y)
+	
+	return self
 end
 
 function self:SetSize (width, height, ...)
-	if self:GetWide () == width and self:GetTall () == height then return end
+	if self:GetWide () == width and self:GetTall () == height then return self end
 	
 	debug.getregistry ().Panel.SetSize (self, width, height)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+	
+	return self
 end
 
 self.SetTall = self.SetHeight
@@ -214,27 +222,33 @@ function self:SetTextColor (color)
 end
 
 function self:SetToolTipText (text)
-	if self.ToolTipText == text then return end
+	if self.ToolTipText == text then return self end
 	
 	self.ToolTipText = text
 	if not self.ToolTipController then
 		self.ToolTipController = Gooey.ToolTipController (self)
 	end
 	self.ToolTipController:SetEnabled (self.ToolTipText ~= nil)
+	
+	return self
 end
 
 function self:SetVisible (visible)
-	if self:IsVisible () == visible then return end
+	if self:IsVisible () == visible then return self end
 	
 	debug.getregistry ().Panel.SetVisible (self, visible)
 	self:DispatchEvent ("VisibleChanged", visible)
+	
+	return self
 end
 
 function self:SetWide (width)
-	if self:GetWide () == width then return end
+	if self:GetWide () == width then return self end
 	
 	debug.getregistry ().Panel.SetWide (self, width)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+	
+	return self
 end
 
 self.SetWidth = self.SetWide

@@ -268,6 +268,7 @@ end
 
 function PANEL:SetParent (parent)
 	self.Parent = parent
+	return self
 end
 
 function PANEL:SetPos (x, y)
@@ -283,6 +284,7 @@ end
 
 function PANEL:SetShouldCaptureMouse (shouldCaptureMouse)
 	self.ShouldCaptureMouse = shouldCaptureMouse
+	return self
 end
 
 function PANEL:SetSize (width, height)
@@ -318,6 +320,7 @@ function PANEL:SetToolTipText (text)
 		self.ToolTipController = Gooey.ToolTipController (self)
 	end
 	self.ToolTipController:SetEnabled (self.ToolTipText ~= nil)
+	
 	return self
 end
 
@@ -327,10 +330,12 @@ function PANEL:SetTop (y)
 end
 
 function PANEL:SetVisible (visible)
-	if self.Visible == visible then return end
+	if self.Visible == visible then return self end
 	
 	self.Visible = visible
 	self:DispatchEvent ("VisibleChanged", visible)
+	
+	return self
 end
 
 function PANEL:SetWidth (width)
