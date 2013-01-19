@@ -28,7 +28,7 @@ end
 -- Event handlers
 function PANEL:OnCursorEntered ()
 	self.Depressed = input.IsMouseDown (MOUSE_LEFT)
-	self.Pressed = input.IsMouseDown (MOUSE_LEFT)
+	self.Pressed   = input.IsMouseDown (MOUSE_LEFT)
 	
 	self:DispatchEvent ("MouseEnter")
 	if self.OnMouseEnter then self:OnMouseEnter () end
@@ -36,7 +36,13 @@ end
 
 function PANEL:OnCursorMoved (x, y)
 	self:DispatchEvent ("MouseMove", 0, x, y)
-	if self.OnMouseMove then self:OnMouseMove (0, self:CursorPos ()) end
+	
+	local mouseCode = 0
+	if input.IsMouseDown (MOUSE_LEFT)   then mouseCode = mouseCode + MOUSE_LEFT end
+	if input.IsMouseDown (MOUSE_RIGHT)  then mouseCode = mouseCode + MOUSE_RIGHT end
+	if input.IsMouseDown (MOUSE_MIDDLE) then mouseCode = mouseCode + MOUSE_MIDDLE end
+	
+	if self.OnMouseMove then self:OnMouseMove (mouseCode, self:CursorPos ()) end
 end
 
 function PANEL:OnCursorExited ()
@@ -62,7 +68,7 @@ function PANEL:OnMousePressed (mouseCode)
 	
 	if mouseCode == MOUSE_LEFT then
 		self.Depressed = true
-		self.Pressed = true
+		self.Pressed   = true
 	end
 end
 
@@ -79,7 +85,7 @@ function PANEL:OnMouseReleased (mouseCode)
 			self:DispatchEvent ("Click", self:CursorPos ())
 		end
 		self.Depressed = false
-		self.Pressed = false
+		self.Pressed   = false
 		
 		self.LastLeftMouseButtonReleaseTime = SysTime ()
 	elseif mouseCode == MOUSE_RIGHT then
