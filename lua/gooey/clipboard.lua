@@ -9,24 +9,26 @@ function self:ctor ()
 	
 	self.ClipboardControllers = Gooey.WeakKeyTable ()
 	
+	self.CopyTextEntry  = nil
+	self.PasteTextEntry = nil
 	--[[
 	timer.Create ("Gooey.Clipboard", 0.5, 0,
 		function ()
-			if not self or not self.TextEntry or not self.TextEntry:IsValid () then return end
+			if not self or not self.PasteTextEntry or not self.PasteTextEntry:IsValid () then return end
 			
 			self.ObtainedClipboardText = false
 			
 			self.IgnoreTextChange = true
-			self.TextEntry:SetText ("")
+			self.PasteTextEntry:SetText ("")
 			self.IgnoreTextChange = false
-			self.TextEntry:PostMessage ("DoPaste", "", "")
+			self.PasteTextEntry:PostMessage ("DoPaste", "", "")
 			
 			timer.Simple (0.2,
 				function ()
-					if not self or not self.TextEntry or not self.TextEntry:IsValid () then return end
+					if not self or not self.PasteTextEntry or not self.PasteTextEntry:IsValid () then return end
 					
 					if not self.ObtainedClipboardText then
-						self.TextEntry:OnTextChanged ()
+						self.PasteTextEntry:OnTextChanged ()
 					end
 				end
 			)
@@ -44,8 +46,11 @@ function self:ctor ()
 end
 
 function self:dtor ()
-	if self.TextEntry and self.TextEntry:IsValid () then
-		self.TextEntry:Remove ()
+	if self.CopyTextEntry and self.CopyTextEntry:IsValid () then
+		self.CopyTextEntry:Remove ()
+	end
+	if self.PasteTextEntry and self.PasteTextEntry:IsValid () then
+		self.PasteTextEntry:Remove ()
 	end
 	
 	timer.Destroy ("Gooey.Clipboard")
@@ -54,23 +59,26 @@ end
 
 function self:CreateTextEntry ()
 	if DTextEntry then
-		self.TextEntry = vgui.Create ("DTextEntry")
-	end
-	
-	if not self.TextEntry then
-		return timer.Create ("Gooey.Clipboard.CreateTextEntry", 0.5, 1,
+		self.CopyTextEntry  = vgui.Create ("DTextEntry")
+		self.PasteTextEntry = vgui.Create ("DTextEntry")
+	else
+		timer.Create ("Gooey.Clipboard.CreateTextEntry", 0.5, 1,
 			function ()
 				self:CreateTextEntry ()
 			end
 		)
+		return
 	end
 	
-	self.TextEntry:SetText ("")
-	self.TextEntry:SetVisible (false)
-	self.TextEntry.OnTextChanged = function ()
+	self.CopyTextEntry:SetText ("")
+	self.CopyTextEntry:SetVisible (false)
+	
+	self.PasteTextEntry:SetText ("")
+	self.PasteTextEntry:SetVisible (false)
+	self.PasteTextEntry.OnTextChanged = function ()
 		if self.IgnoreTextChange then return false end
 		
-		local newClipboardText = self.TextEntry:GetText ()
+		local newClipboardText = self.PasteTextEntry:GetText ()
 		if newClipboardText == self.ClipboardText then return end
 		
 		self.ClipboardText = newClipboardText
@@ -99,8 +107,14 @@ function self:RegisterClipboardController (clipboardController)
 	self.ClipboardControllers [clipboardController] = true
 end
 
+-- TextEntry hack thanks to Python1320
 function self:SetText (newClipboardText)
-	SetClipboardText (GLib.UTF8.ToLatin1 (newClipboardText))
+	local _, newlineCount = string.gsub (newClipboardText, "\n", "")
+	newClipboardText = newClipboardText .. string.rep (" ", newlineCount)
+	
+	self.CopyTextEntry:SetText (newClipboardText)
+	self.CopyTextEntry:SelectAllText ()
+	self.CopyTextEntry:CutSelected ()
 	
 	if self.ClipboardText == newClipboardText then return end
 	
