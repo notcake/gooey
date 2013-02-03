@@ -170,17 +170,21 @@ end
 
 Gooey.Register ("GMenu", PANEL, "DMenu")
 
-hook.Add ("VGUIMousePressed", "GMenus", function (panel, mouseCode)
-	while panel ~= nil and panel:IsValid () do
-		if panel.ClassName == "DMenu" then
-			return
+hook.Add ("VGUIMousePressed", "GMenus",
+	function (panel, mouseCode)
+		while panel ~= nil and panel:IsValid () do
+			if panel.ClassName == "DMenu" then
+				return
+			end
+			panel = panel:GetParent ()
 		end
-		panel = panel:GetParent ()
+		
+		Gooey.CloseMenus ()
 	end
-	
-	Gooey.CloseMenus ()
-end)
+)
 
-Gooey:AddEventListener ("Unloaded", function ()
-	Gooey.CloseMenus ()
-end)
+Gooey:AddEventListener ("Unloaded",
+	function ()
+		Gooey.CloseMenus ()
+	end
+)

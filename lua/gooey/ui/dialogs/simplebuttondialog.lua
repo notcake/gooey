@@ -9,14 +9,22 @@ function PANEL:Init ()
 	self:MakePopup ()
 	
 	self.Buttons = {}
-	self.Text = vgui.Create ("DLabel", self)
-	self.Text:SetContentAlignment ("7")
+	self.TextLabel = vgui.Create ("DLabel", self)
+	self.TextLabel:SetContentAlignment ("7")
 	
 	self.Callback = Gooey.NullCallback
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
-		self:Remove ()
-	end)
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self.TextLabel:SetText (text)
+		end
+	)
+	
+	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()),
+		function ()
+			self:Remove ()
+		end
+	)
 end
 
 function PANEL:AddButton (text)
@@ -36,16 +44,12 @@ function PANEL:AddButton (text)
 	self:InvalidateLayout ()
 end
 
-function PANEL:GetText ()
-	return self.Text:GetText ()
-end
-
 function PANEL:PerformLayout ()
 	DFrame.PerformLayout (self)
 	
 	if self.Buttons then
-		self.Text:SetPos (8, 28)
-		self.Text:SetSize (self:GetWide () - 16, self:GetTall ())
+		self.TextLabel:SetPos (8, 28)
+		self.TextLabel:SetSize (self:GetWide () - 16, self:GetTall ())
 	
 		local x = self:GetWide ()
 		for i = #self.Buttons, 1, -1 do
@@ -57,11 +61,6 @@ end
 
 function PANEL:SetCallback (callback)
 	self.Callback = callback or Gooey.NullCallback
-	return self
-end
-
-function PANEL:SetText (text)
-	self.Text:SetText (text)
 	return self
 end
 

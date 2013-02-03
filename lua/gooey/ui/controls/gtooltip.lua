@@ -8,6 +8,13 @@ function PANEL:Init ()
 	
 	self:SetBackgroundColor (GLib.Colors.Snow)
 	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self.Label:SetText (text)
+			self:PerformLayout ()
+		end
+	)
+	
 	self:AddEventListener ("VisibleChanged",
 		function (_, visible)
 			if visible then
@@ -56,11 +63,6 @@ function PANEL:PerformLayout ()
 	
 	local w, h = self.Label:GetSize ()
 	self:SetSize (w + 12, h + 4)
-end
-
-function PANEL:SetText (text)
-	self.Label:SetText (text)
-	self:PerformLayout ()
 end
 
 local borderColor = Color (32, 32, 32, 255)

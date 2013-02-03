@@ -7,7 +7,6 @@ function PANEL:Init ()
 	self.Container = vgui.Create ("GPanel", self)
 	
 	self:SetOutlineColor (Color (160, 160, 160, 255))
-	self:SetFont ("TabLarge")
 	
 	for k, _ in pairs (self:GetTable ()) do
 		if k:sub (1, 6) == "Create" then
@@ -16,6 +15,21 @@ function PANEL:Init ()
 			end
 		end
 	end
+	
+	self:AddEventListener ("FontChanged",
+		function (_, text)
+			self.Title:SetFont (font)
+		end
+	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self.Title:SetText (text)
+			self.Title:SizeToContents ()
+		end
+	)
+	
+	self:SetFont ("TabLarge")
 end
 
 function PANEL:GetContainer ()
@@ -46,19 +60,8 @@ function PANEL:PerformLayout ()
 	self:DispatchEvent ("PerformLayout")
 end
 
-function PANEL:SetFont (font)
-	self.Font = font
-	self.Title:SetFont (font)
-end
-
 function PANEL:SetOutlineColor (color)
 	self.OutlineColor = color
-end
-
-function PANEL:SetText (text)
-	debug.getregistry ().Panel.SetText (self, text)
-	self.Title:SetText (text)
-	self.Title:SizeToContents ()
 end
 
 Gooey.Register ("GGroupBox", PANEL, "GPanel")

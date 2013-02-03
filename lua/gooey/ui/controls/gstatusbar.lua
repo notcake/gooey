@@ -17,6 +17,13 @@ function PANEL:Init ()
 			end
 		end
 	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			if self:GetPanelCount () == 0 then return end
+			self:GetPanel (1):SetText (text)
+		end
+	)
 end
 
 function PANEL:AddPanel (text)
@@ -164,11 +171,6 @@ function PANEL:PerformLayout ()
 			end
 		end
 	end
-end
-
-function PANEL:SetText (text)
-	if self:GetPanelCount () == 0 then self.Text = text or "" return end
-	self:GetPanel (1):SetText (text)
 end
 
 -- Event handlers

@@ -18,6 +18,12 @@ function PANEL:Init ()
 			end
 		end
 	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self:SetColumnText (1, text)
+		end
+	)
 end
 
 function PANEL:DataLayout (listView)
@@ -62,7 +68,7 @@ function PANEL:GetListView ()
 end
 
 function PANEL:GetText (i)
-	return self.Columns [i or 1]:GetValue ()
+	return self.Columns [i or 1] and self.Columns [i or 1]:GetValue () or ""
 end
 
 function PANEL:IsHovered ()
@@ -142,10 +148,6 @@ end
 
 function PANEL:SetListView (listView)
 	self.ListView = listView
-end
-
-function PANEL:SetText (text)
-	self:SetColumnText (1, text)
 end
 
 -- Event handlers

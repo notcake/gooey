@@ -39,11 +39,6 @@ function PANEL:SetIndex (index)
 	self:SetColumnID (index)
 end
 
-function PANEL:SetText (text)
-	debug.getregistry ().Panel.SetText (self, text)
-	return self
-end
-
 function PANEL:SetType (type)
 	self.Type = type
 	return self

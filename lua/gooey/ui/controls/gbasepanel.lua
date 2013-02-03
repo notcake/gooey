@@ -17,6 +17,8 @@ Gooey.BasePanel = self
 			Fired when this panel has been removed.
 		SizeChanged (width, height)
 			Fired when this panel's size has changed.
+		TextChanged (text)
+			Fired when this panel's text has changed.
 		VisibleChanged (visible)
 			Fired when this panel's visibility has changed.
 ]]
@@ -31,6 +33,7 @@ function self:_ctor ()
 	self.BackgroundColor = nil
 	self.TextColor = nil
 	
+	self.Text = self:GetText ()
 	self.Font = nil
 	
 	-- Fade effects
@@ -76,6 +79,10 @@ end
 
 function self:GetFont ()
 	return self.Font or debug.getregistry ().Panel.GetFont (self)
+end
+
+function self:GetText ()
+	return self.Text or debug.getregistry ().Panel.GetText (self)
 end
 
 function self:GetTextColor ()
@@ -197,6 +204,17 @@ function self:SetSize (width, height, ...)
 end
 
 self.SetTall = self.SetHeight
+
+function self:SetText (text)
+	if self.Text == text then return end
+	
+	self.Text = text
+	debug.getregistry ().Panel.SetText (self, text)
+	
+	self:DispatchEvent ("TextChanged", self.Text)
+	
+	return self
+end
 
 function self:SetTextColor (color)
 	if self.TextColor == color then return end

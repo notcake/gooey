@@ -2,7 +2,6 @@ local PANEL = {}
 
 function PANEL:Init ()
 	self.TextRenderer = nil
-	self.Text = nil
 	
 	self:AddEventListener ("FontChanged",
 		function (_, font)
@@ -15,6 +14,13 @@ function PANEL:Init ()
 		function (_, width, height)
 			if not self.TextRenderer then return end
 			self.TextRenderer:SetWordWrapWidth (width)
+		end
+	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			if not self.TextRenderer then return end
+			self.TextRenderer:SetText (self.Text)
 		end
 	)
 	
@@ -47,16 +53,6 @@ function PANEL:SetTextRenderer (textRenderer)
 		self.TextRenderer:SetWordWrap (self:GetWordWrap ())
 		self.TextRenderer:SetWordWrapWidth (self:GetWide ())
 	end
-end
-
-function PANEL:SetText (text)
-	if self.Text == text then return end
-	
-	self.Text = text
-	debug.getregistry ().Panel.SetText (self, text)
-	
-	if not self.TextRenderer then return end
-	self.TextRenderer:SetText (self.Text)
 end
 
 function PANEL:SetWordWrap (wordWrap)

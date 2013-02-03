@@ -1,16 +1,11 @@
 local PANEL = {}
 
 function PANEL:Init ()
-	self.Text = ""
 	self.LastLeftMouseButtonReleaseTime = 0
 end
 
 function PANEL:GetKeyboardMap ()
 	return self.KeyboardMap
-end
-
-function PANEL:GetText ()
-	return self.Text or ""
 end
 
 function PANEL:Paint (w, h)
@@ -19,10 +14,6 @@ end
 
 function PANEL:SetKeyboardMap (keyboardMap)
 	self.KeyboardMap = keyboardMap
-end
-
-function PANEL:SetText (text)
-	self.Text = text or ""
 end
 
 -- Event handlers

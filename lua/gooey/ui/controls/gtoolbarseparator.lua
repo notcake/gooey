@@ -11,6 +11,6 @@ function PANEL:Init ()
 end
 
 function PANEL:Paint (renderContext)
-	surface.SetDrawColor (128, 128, 128, 255)
+	surface.SetDrawColor (GLib.Colors.Gray)
 	surface.DrawLine (1, 2, 1, self.Height - 2)
 end

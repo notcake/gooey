@@ -23,6 +23,13 @@ function PANEL:Init ()
 			end
 		end
 	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			if not self.Contents then return end
+			self.Contents:SetText (text)
+		end
+	)
 end
 
 function PANEL:GetContents ()
@@ -126,13 +133,6 @@ function PANEL:SetProgress (progress)
 	if not progress then return end
 	
 	self.Contents:SetProgress (progress)
-end
-
-function PANEL:SetText (text)
-	if not self.Contents then return end
-	text = text or ""
-	
-	self.Contents:SetText (text)
 end
 
 Gooey.Register ("GStatusBarPanel", PANEL, "GPanel")

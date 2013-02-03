@@ -72,10 +72,12 @@ function PANEL:Init ()
 			end
 		end
 	)
-end
-
-function PANEL:GetText ()
-	return self.Label:GetText ()
+	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self.Label:SetText (text)
+		end
+	)
 end
 
 function PANEL:Paint (w, h)
@@ -126,10 +128,6 @@ function PANEL:PositionMenu ()
 		self.MenuDownwards = true
 	end
 	self.Menu:SetPos (x, y)
-end
-
-function PANEL:SetText (text)
-	self.Label:SetText (text)
 end
 
 -- Event handlers

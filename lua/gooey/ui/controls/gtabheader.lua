@@ -27,6 +27,13 @@ function PANEL:Init ()
 		end
 	)
 	
+	self:AddEventListener ("TextChanged",
+		function (_, text)
+			self.Tab:DispatchEvent ("TextChanged", text)
+			self:InvalidateLayout ()
+		end
+	)
+	
 	self:AddEventListener ("RightClick",
 		function (_)
 			if self.Tab:GetContextMenu () then
