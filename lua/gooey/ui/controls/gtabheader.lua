@@ -59,15 +59,29 @@ function PANEL:Init ()
 			local tabIndex = self.Tab:GetIndex ()
 			local cursorX = self:CursorPos () + self:GetOffset ()
 			if cursorX < self:GetOffset () then
-				repeat
+				-- Move the tab header left while the mouse
+				-- would be "better" if moved left
+				tabIndex = tabIndex - 1
+				local previousHeader = self:GetTabControl ():GetTabHeader (tabIndex)
+				while previousHeader and
+				      cursorX < self:GetOffset () and
+				      cursorX < previousHeader:GetOffset () + self:GetWide () do
+					self:GetTabControl ():SetTabIndex (self.Tab, tabIndex)
 					tabIndex = tabIndex - 1
-					self:GetTabControl ():SetTabIndex (self.Tab, tabIndex)
-				until cursorX > self:GetOffset () or tabIndex < 1
+					previousHeader = self:GetTabControl ():GetTabHeader (tabIndex)
+				end
 			elseif cursorX > self:GetOffset () + self:GetWide () then
-				repeat
-					tabIndex = tabIndex + 1
+				-- Move the tab header right while the mouse
+				-- would be closer to it if moved right
+				tabIndex = tabIndex + 1
+				local nextHeader = self:GetTabControl ():GetTabHeader (tabIndex)
+				while nextHeader and
+				      cursorX > self:GetOffset () + self:GetWide () and
+				      cursorX > self:GetOffset () + nextHeader:GetWide () do
 					self:GetTabControl ():SetTabIndex (self.Tab, tabIndex)
-				until cursorX <= self:GetOffset () + self:GetWide () or tabIndex > self:GetTabControl ():GetTabCount ()
+					tabIndex = tabIndex + 1
+					nextHeader = self:GetTabControl ():GetTabHeader (tabIndex)
+				end
 			end
 			if self.Tab:IsSelected () then
 				self:GetTabControl ():EnsureTabVisible (self.Tab)

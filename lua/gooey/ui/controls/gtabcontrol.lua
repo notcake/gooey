@@ -247,6 +247,10 @@ function PANEL:GetTabCount ()
 	return #self.Tabs
 end
 
+function PANEL:GetTabHeader (index)
+	return self.Tabs [index] and self.Tabs [index]:GetHeader ()
+end
+
 function PANEL:GetTabIndex (tab)
 	if not self.TabSet [tab] then return 0 end
 	
