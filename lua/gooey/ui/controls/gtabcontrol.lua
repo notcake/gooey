@@ -28,6 +28,7 @@ function PANEL:Init ()
 	self.Tabs = {}
 	self.TabSet = {}
 	self.SelectedTab = nil
+	self.SelectedTabHeaderVisible = false
 	
 	self:SetKeyboardMap (Gooey.KeyboardMap ())
 	self:GetKeyboardMap ():Register ({ KEY_TAB },
@@ -107,7 +108,7 @@ function PANEL:Init ()
 	
 	self:AddEventListener ("SizeChanged",
 		function (_, w, h)
-			if not self:IsTabHeaderVisible (self:GetSelectedTab ()) then return end
+			if not self.SelectedTabHeaderVisible then return end
 			self:EnsureTabVisible (self:GetSelectedTab ())
 		end
 	)
@@ -318,6 +319,8 @@ function PANEL:PerformLayout ()
 	-- x is now self:GetWide () - total scroll button width
 	self.LeftScrollButton:SetEnabled (self.TabScrollOffset > 0)
 	self.RightScrollButton:SetEnabled (self.TabScrollOffset + x < self.TotalHeaderWidth)
+	
+	self.SelectedTabHeaderVisible = self:IsTabHeaderVisible (self:GetSelectedTab ())
 end
 
 function PANEL:RemoveTab (tab, delete)
