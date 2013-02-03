@@ -20,63 +20,41 @@ function PANEL:Init ()
 	
 	self.Menus = {}
 	self.Items = {}
+	
+	self.OpenMenus = {}
 end
 
 function PANEL:AddMenu (id)
 	if self.Menus [id] then return self.Menus [id] end
 	
 	local menu = vgui.Create ("GMenu")
+	menu:SetOwner (self)
 	menu:SetText (id)
 	menu.Id = id
 	self.Menus [id] = menu
 	
-	local item = vgui.Create ("GButton", self)
-	item:SetText (id)
-	item:SetIsMenu (true)
-	item:SetDrawBackground (false)
-	item:SizeToContentsX (16)
-	item.Id = id
-	item.Menu = menu
-	self.Items [#self.Items + 1] = item
-	
-	menu:AddEventListener ("EnabledChanged",
-		function (_, enabled)
-			item:SetEnabled (enabled)
-		end
-	)
-	
 	menu:AddEventListener ("MenuClosed",
 		function (_)
-			menu.CloseTime = CurTime ()
+			self.OpenMenus [menu] = nil
 		end
 	)
 	
-	menu:AddEventListener ("TextChanged",
-		function (_, text)
-			item:SetText (text)
-			self:InvalidateLayout ()
-		end
-	)
-	
-	item:AddEventListener ("MouseDown",
+	menu:AddEventListener ("MenuOpening",
 		function (_)
-			if not item.Menu or not item.Menu:IsValid () then return end
-			
-			if item.Menu:IsVisible () or
-			   item.Menu.CloseTime == CurTime () then
-				item.Menu:Hide ()
-				return
-			end
-			
-			local x, y = item:LocalToScreen (0, item:GetTall ())
-			item.Menu:Open ()
-			item.Menu:SetPos (x, y)
+			self.OpenMenus [menu] = true
 		end
 	)
+	
+	local item = vgui.Create ("GMenuStripItem", self)
+	item:SetMenuStrip (self)
+	item:SetMenu (menu)
+	item:SetText (id)
+	item.Id = id
+	self.Items [#self.Items + 1] = item
 	
 	item:AddEventListener ("TextChanged",
-		function (_)
-			item:SizeToContentsX (16)
+		function (_, text)
+			self:InvalidateLayout ()
 		end
 	)
 	
@@ -94,6 +72,12 @@ function PANEL:AddSeparator (id)
 	return item
 end
 
+function PANEL:CloseMenus ()
+	for menu, _ in pairs (self.OpenMenus) do
+		menu:Hide ()
+	end
+end
+
 function PANEL:GetItemById (id)
 	for _, item in pairs (self.Items) do
 		if item.Id == id then
@@ -107,15 +91,19 @@ function PANEL:GetTargetItem ()
 	return self.TargetItem
 end
 
+function PANEL:IsMenuOpen ()
+	return next (self.OpenMenus) ~= nil
+end
+
 function PANEL:PerformLayout ()
-	local x = 0
+	local x = 1
 	for _, item in ipairs (self.Items) do
 		item:SetPos (x, 1)
-		item:SetTall (self:GetTall () - 2)
+		item:SetTall (self:GetTall () - 3)
 		item:PerformLayout ()
 		
 		if item:IsVisible () then
-			x = x + item:GetWide () + 5
+			x = x + item:GetWide () + 3
 		end
 	end
 end

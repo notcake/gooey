@@ -3,13 +3,19 @@ Gooey.BasePanel = self
 
 --[[
 	Events:
+		ActionChanged (action)
+			Fired when this panel's action has changed.
+		ActionMapChanged (ActionMap actionMap)
+			Fired when this panel's action map has changed.
 		BackgroundColorChanged (backgroundColor)
 			Fired when this panel's background color has changed.
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
 		FontChanged (font)
 			Fired when this panel's font has changed.
-		ParentChanged (oldParent, parent)
+		OwnerChanged (Panel oldOwner, Panel owner)
+			Fired when this panel's owner has changed.
+		ParentChanged (Panel oldParent, Panel parent)
 			Fired when this panel's parent has changed.
 		PositionChanged (x, y)
 			Fired when this panel's position has changed.
@@ -36,6 +42,8 @@ function self:_ctor ()
 	self.Text = self:GetText ()
 	self.Font = nil
 	
+	self.Owner = nil
+	
 	-- Fade effects
 	self.FadingOut = false
 	self.FadeEndTime = SysTime ()
@@ -44,6 +52,10 @@ function self:_ctor ()
 	-- ToolTip
 	self.ToolTipText = nil
 	self.ToolTipController = nil
+	
+	-- Actions
+	self.Action    = nil
+	self.ActionMap = nil
 	
 	Gooey.EventProvider (self)
 end
@@ -70,6 +82,32 @@ function self:FadeOut ()
 	self:FadeThink ()
 end
 
+function self:GetAction ()
+	return self.Action
+end
+
+function self:GetActionMap ()
+	if self.ActionMap then
+		return self.ActionMap
+	end
+	
+	local parent = self:GetParent ()
+	while parent and parent:IsValid () do
+		if type (parent.GetActionMap) == "function" then
+			return parent:GetActionMap ()
+		end
+		if type (parent.GetOwner) == "function" then
+			local owner = parent:GetOwner ()
+			if owner and owner:IsValid () and type (owner.GetActionMap) == "function" then
+				return owner:GetActionMap ()
+			end
+		end
+		parent = parent:GetParent ()
+	end
+	
+	return nil
+end
+
 function self:GetBackgroundColor ()
 	if not self.BackgroundColor then
 		self.BackgroundColor = self.m_Skin.control_color or GLib.Colors.DarkGray
@@ -79,6 +117,10 @@ end
 
 function self:GetFont ()
 	return self.Font or debug.getregistry ().Panel.GetFont (self)
+end
+
+function self:GetOwner ()
+	return self.Owner
 end
 
 function self:GetText ()
@@ -138,6 +180,24 @@ function self:Remove ()
 	debug.getregistry ().Panel.Remove (self)
 end
 
+function self:SetAction (action)
+	if self.Action == action then return self end
+	
+	self.Action = action
+	self:DispatchEvent ("ActionChanged", self.Action)
+	
+	return self
+end
+
+function self:SetActionMap (actionMap)
+	if self.ActionMap == actionMap then return self end
+	
+	self.ActionMap = actionMap
+	self:DispatchEvent ("ActionMapChanged", self.ActionMap)
+	
+	return self
+end
+
 function self:SetBackgroundColor (color)
 	self.BackgroundColor = color
 	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
@@ -169,6 +229,17 @@ function self:SetHeight (height)
 	
 	debug.getregistry ().Panel.SetTall (self, height)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+	
+	return self
+end
+
+function self:SetOwner (owner)
+	if self.Owner == owner then return self end
+	
+	local oldParent = self.Owner
+	self.Owner = owner
+	
+	self:DispatchEvent ("OwnerChanged", oldOwner, self.Owner)
 	
 	return self
 end
@@ -206,7 +277,7 @@ end
 self.SetTall = self.SetHeight
 
 function self:SetText (text)
-	if self.Text == text then return end
+	if self.Text == text then return self end
 	
 	self.Text = text
 	debug.getregistry ().Panel.SetText (self, text)

@@ -165,6 +165,8 @@ end
 
 -- Event handlers
 function PANEL:OnRemoved ()
+	if self:IsVisible () then self:Hide () end
+	
 	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 

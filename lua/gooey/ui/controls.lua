@@ -6,12 +6,18 @@ include ("tooltippositioningmode.lua")
 
 include ("glyphs.lua")
 
+-- Images
 include ("imagecacheentry.lua")
 include ("imagecache.lua")
 
 include ("render.lua")
 include ("rendertype.lua")
 
+-- Actions
+include ("action.lua")
+include ("actionmap.lua")
+
+-- Keyboard
 include ("keyboardmap.lua")
 include ("keyboardmonitor.lua")
 
@@ -22,7 +28,6 @@ include ("tooltipcontroller.lua")
 include ("tooltipmanager.lua")
 
 include ("iclipboardtarget.lua")
-
 
 -- Effects
 include ("lerpcontroller.lua")
@@ -65,6 +70,7 @@ include ("controls/gmenu.lua")
 include ("controls/gmenuitem.lua")
 include ("controls/gmenuseparator.lua")
 include ("controls/gmenustrip.lua")
+include ("controls/gmenustripitem.lua")
 include ("controls/gmodelchoice.lua")
 include ("controls/gpanel.lua")
 include ("controls/gpanellist.lua")
@@ -97,7 +103,9 @@ include ("controls/gtoolbarbutton.lua")
 include ("controls/gtoolbarseparator.lua")
 include ("controls/gtoolbarsplitbutton.lua")
 
+-- Dialogs
 include ("dialogs/simplebuttondialog.lua")
 
+-- Glyphs
 include ("glyphs/close.lua")
 include ("glyphs/down.lua")

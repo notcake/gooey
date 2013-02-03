@@ -12,6 +12,12 @@ function PANEL:DoRightClick ()
 	self:DispatchEvent ("RightClick")
 end
 
+function PANEL:OnCursorEntered ()
+	self:DispatchEvent ("MouseEnter")
+	DButton.OnCursorEntered (self)
+	if self.OnMouseEnter then self:OnMouseEnter () end
+end
+
 function PANEL:OnCursorExited ()
 	self:DispatchEvent ("MouseLeave")
 	DButton.OnCursorExited (self)
