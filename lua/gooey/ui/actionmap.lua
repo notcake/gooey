@@ -51,6 +51,12 @@ function self:Register (actionName, handler, canRunFunction)
 end
 
 function self:SetChainedActionMap (actionMap, control)
+	-- Prevent cycles
+	if actionMap == self then
+		actionMap = nil
+		control = nil
+	end
+	
 	self.ChainedActionMap = actionMap
 	self.ChainedActionMapControl = control
 end
