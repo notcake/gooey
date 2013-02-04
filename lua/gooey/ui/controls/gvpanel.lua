@@ -3,10 +3,16 @@ Gooey.VPanel = Gooey.MakeConstructor (PANEL)
 
 --[[
 	Events:
+		ActionChanged (action)
+			Fired when this panel's action has changed.
+		ActionMapChanged (ActionMap actionMap)
+			Fired when this panel's action map has changed.
 		BackgroundColorChanged (backgroundColor)
 			Fired when this panel's background color has changed.
 		EnabledChanged (enabled)
 			Fired when this panel has been enabled or disabled.
+		OwnerChanged (Panel oldOwner, Panel owner)
+			Fired when this panel's owner has changed.
 		Removed ()
 			Fired when this panel has been removed.
 		TextChanged (text)
@@ -24,6 +30,7 @@ function PANEL:Init ()
 	self.Id = ""
 	
 	self.Parent = nil
+	self.Owner = nil
 	self.Children = {}
 	
 	self.Enabled = true
@@ -34,6 +41,7 @@ function PANEL:Init ()
 	self.ShouldCaptureMouse = false
 	self.MouseCaptured = false
 	
+	-- Colors
 	self.BackgroundColor = nil
 	self.TextColor = nil
 	
@@ -48,6 +56,10 @@ function PANEL:Init ()
 	-- ToolTip
 	self.ToolTipText = nil
 	self.ToolTipController = nil
+	
+	-- Actions
+	self.Action    = nil
+	self.ActionMap = nil
 	
 	self.LayoutValid = false
 	
@@ -107,6 +119,37 @@ function PANEL:ContainsPoint (x, y)
 	       y >= 0 and y < self:GetHeight ()
 end
 
+function PANEL:GetAction ()
+	return self.Action
+end
+
+function PANEL:GetActionMap ()
+	if self.ActionMap then
+		return self.ActionMap
+	end
+	
+	local actionMap = self:GetOwner () and self:GetOwner ():GetActionMap ()
+	if actionMap then return actionMap end
+	
+	local parent = self:GetParent ()
+	while parent and parent:IsValid () do
+		if type (parent.GetActionMap) == "function" then
+			actionMap = parent:GetActionMap ()
+			if actionMap then return actionMap end
+		end
+		if type (parent.GetOwner) == "function" then
+			local owner = parent:GetOwner ()
+			if owner and owner:IsValid () and type (owner.GetActionMap) == "function" then
+				actionMap = owner:GetActionMap ()
+				if actionMap then return actionMap end
+			end
+		end
+		parent = parent:GetParent ()
+	end
+	
+	return nil
+end
+
 function PANEL:GetBackgroundColor ()
 	if not self.BackgroundColor then
 		self.BackgroundColor = GLib.Colors.DarkGray
@@ -128,6 +171,10 @@ end
 
 function PANEL:GetLeft ()
 	return self.X
+end
+
+function PANEL:GetOwner ()
+	return self.Owner
 end
 
 function PANEL:GetParent ()
@@ -224,6 +271,31 @@ function PANEL:Remove ()
 	self:DispatchEvent ("Removed")
 end
 
+function PANEL:RunAction (target, ...)
+	if not self:GetAction () then return end
+	local actionMap = self:GetActionMap ()
+	if not actionMap then return end
+	actionMap:Execute (self:GetAction (), target, ...)
+end
+
+function PANEL:SetAction (action)
+	if self.Action == action then return self end
+	
+	self.Action = action
+	self:DispatchEvent ("ActionChanged", self.Action)
+	
+	return self
+end
+
+function PANEL:SetActionMap (actionMap)
+	if self.ActionMap == actionMap then return self end
+	
+	self.ActionMap = actionMap
+	self:DispatchEvent ("ActionMapChanged", self.ActionMap)
+	
+	return self
+end
+
 function PANEL:SetBackgroundColor (color)
 	self.BackgroundColor = color
 	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
@@ -263,6 +335,17 @@ end
 
 function PANEL:SetLeft (x)
 	self.X = x
+	return self
+end
+
+function PANEL:SetOwner (owner)
+	if self.Owner == owner then return self end
+	
+	local oldParent = self.Owner
+	self.Owner = owner
+	
+	self:DispatchEvent ("OwnerChanged", oldOwner, self.Owner)
+	
 	return self
 end
 

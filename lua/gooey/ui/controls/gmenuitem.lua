@@ -6,6 +6,13 @@ function PANEL:Init ()
 	
 	self:SetContentAlignment (4)
 	self:SetTextInset (20, 0)
+	
+	self:AddEventListener ("Click",
+		function (_)
+			if self:GetAction () then A = self end
+			self:RunAction ()
+		end
+	)
 end
 
 function PANEL:ContainsPoint (x, y)

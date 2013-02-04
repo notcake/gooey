@@ -20,6 +20,10 @@ function self:ctor (savable)
 	self:SetSavable (savable)
 end
 
+function self:AddSaveAction (action)
+	self:AddAction ("Save", action)
+end
+
 function self:AddSaveButton (button)
 	self:AddButton ("Save", button)
 end

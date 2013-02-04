@@ -8,6 +8,12 @@ function PANEL:ctor (text)
 	self.Width = 24
 	self.Height = 24
 	
+	self:AddEventListener ("Click",
+		function (_, text)
+			self:RunAction ()
+		end
+	)
+	
 	self:AddEventListener ("TextChanged",
 		function (_, text)
 			self:SetToolTipText (text)

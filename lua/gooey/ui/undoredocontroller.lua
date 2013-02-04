@@ -23,6 +23,10 @@ function self:ctor (undoRedoStack)
 	self:SetUndoRedoStack (undoRedoStack)
 end
 
+function self:AddRedoAction (action)
+	self:AddAction ("Redo", action)
+end
+
 function self:AddRedoButton (button)
 	self:AddButton ("Redo", button)
 	
@@ -32,6 +36,10 @@ function self:AddRedoButton (button)
 			self.UndoRedoStack:Redo ()
 		end
 	)
+end
+
+function self:AddUndoAction (action)
+	self:AddAction ("Undo", action)
 end
 
 function self:AddUndoButton (button)

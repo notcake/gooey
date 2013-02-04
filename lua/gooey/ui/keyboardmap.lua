@@ -24,6 +24,7 @@ function self:Register (key, handler)
 		end
 		return
 	end
+	
 	self.Keys [key] = self.Keys [key] or {}
 	self.Keys [key] [#self.Keys [key] + 1] = handler
 end

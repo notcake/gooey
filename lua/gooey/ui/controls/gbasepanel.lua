@@ -32,17 +32,18 @@ Gooey.BasePanel = self
 function self:_ctor ()
 	if self.BasePanelInitialized then return end
 	self.BasePanelInitialized = true
-
+	
+	self.Owner = nil
+	
 	self.Enabled = true
 	self.Pressed = false
 	
+	-- Colors
 	self.BackgroundColor = nil
 	self.TextColor = nil
 	
 	self.Text = self:GetText ()
 	self.Font = nil
-	
-	self.Owner = nil
 	
 	-- Fade effects
 	self.FadingOut = false
@@ -91,15 +92,20 @@ function self:GetActionMap ()
 		return self.ActionMap
 	end
 	
+	local actionMap = self:GetOwner () and self:GetOwner ():GetActionMap ()
+	if actionMap then return actionMap end
+	
 	local parent = self:GetParent ()
 	while parent and parent:IsValid () do
 		if type (parent.GetActionMap) == "function" then
-			return parent:GetActionMap ()
+			actionMap = parent:GetActionMap ()
+			if actionMap then return actionMap end
 		end
 		if type (parent.GetOwner) == "function" then
 			local owner = parent:GetOwner ()
 			if owner and owner:IsValid () and type (owner.GetActionMap) == "function" then
-				return owner:GetActionMap ()
+				actionMap = owner:GetActionMap ()
+				if actionMap then return actionMap end
 			end
 		end
 		parent = parent:GetParent ()
@@ -178,6 +184,13 @@ function self:Remove ()
 	end
 	
 	debug.getregistry ().Panel.Remove (self)
+end
+
+function self:RunAction (target, ...)
+	if not self:GetAction () then return end
+	local actionMap = self:GetActionMap ()
+	if not actionMap then return end
+	actionMap:Execute (self:GetAction (), target, ...)
 end
 
 function self:SetAction (action)

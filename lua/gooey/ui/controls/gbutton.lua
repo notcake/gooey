@@ -1,6 +1,11 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self:AddEventListener ("Click",
+		function (_)
+			self:RunAction ()
+		end
+	)
 end
 
 -- Event handlers

@@ -98,12 +98,20 @@ function self:ControlFromPoint (x, y)
 	return nil
 end
 
+function self:GetParent ()
+	return self.Control
+end
+
 function self:IsHovered ()
 	return self.Control and self.Control.IsHovered and self.Control:IsHovered () or false
 end
 
 function self:IsSelected ()
 	return self.Control and self.Control.IsSelected and self.Control:IsSelected () or false
+end
+
+function self:IsValid ()
+	return true
 end
 
 function self:LocalToScreen (x, y)

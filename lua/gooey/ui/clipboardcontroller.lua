@@ -42,12 +42,24 @@ function self:dtor ()
 	Gooey.Clipboard:UnregisterClipboardController (self)
 end
 
+function self:AddCopyAction (action)
+	self:AddAction ("Copy", action)
+end
+
 function self:AddCopyButton (button)
 	self:AddButton ("Copy", button)
 end
 
+function self:AddCutAction (action)
+	self:AddAction ("Cut", action)
+end
+
 function self:AddCutButton (button)
 	self:AddButton ("Cut", button)
+end
+
+function self:AddPasteAction (action)
+	self:AddAction ("Paste", action)
 end
 
 function self:AddPasteButton (button)
@@ -92,15 +104,15 @@ function self:UpdateButtonState ()
 end
 
 function self:UpdateCopyState ()
-	self:UpdateActionState ("Copy", self.ClipboardTarget and self.ClipboardTarget:CanCopy () or false)
+	self:UpdateActionState ("Copy", self.ClipboardTarget ~= nil and self.ClipboardTarget:CanCopy ())
 end
 
 function self:UpdateCutState ()
-	self:UpdateActionState ("Cut", self.ClipboardTarget and self.ClipboardTarget:CanCopy () or false)
+	self:UpdateActionState ("Cut", self.ClipboardTarget ~= nil and self.ClipboardTarget:CanCut ())
 end
 
 function self:UpdatePasteState ()
-	self:UpdateActionState ("Paste", not Gooey.Clipboard:IsEmpty () and self.ClipboardTarget ~= nil)
+	self:UpdateActionState ("Paste", not Gooey.Clipboard:IsEmpty () and self.ClipboardTarget ~= nil and self.ClipboardTarget:CanPaste ())
 end
 
 -- Event handlers

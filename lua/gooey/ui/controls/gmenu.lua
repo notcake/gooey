@@ -101,6 +101,17 @@ function PANEL:Open (targetItem)
 	
 	openMenus [self] = self
 	self:SetPos (gui.MouseX (), gui.MouseY ())
+	
+	-- Set the enabled state of all menu items associated with an action
+	local actionMap = self:GetActionMap ()
+	if actionMap then
+		for _, item in pairs (self:GetCanvas ():GetChildren ()) do
+			if not item:IsMarkedForDeletion () and item:GetAction () then
+				item:SetEnabled (actionMap:CanRunAction (item:GetAction ()))
+			end
+		end
+	end
+	
 	self:DispatchEvent ("MenuOpening", targetItem)
 	
 	-- The MenuOpening hook may override our display position
@@ -126,6 +137,7 @@ function PANEL:OpenSubMenu (item, menu)
 	if not menu then return end
 
 	local x, y = item:LocalToScreen (self:GetWide (), 0)
+	menu:SetOwner (self)
 	menu:Open ()
 	menu:SetPos (x - 3, y)
 	
