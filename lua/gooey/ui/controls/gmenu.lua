@@ -103,11 +103,11 @@ function PANEL:Open (targetItem)
 	self:SetPos (gui.MouseX (), gui.MouseY ())
 	
 	-- Set the enabled state of all menu items associated with an action
-	local actionMap = self:GetActionMap ()
+	local actionMap, control = self:GetActionMap ()
 	if actionMap then
 		for _, item in pairs (self:GetCanvas ():GetChildren ()) do
 			if not item:IsMarkedForDeletion () and item:GetAction () then
-				item:SetEnabled (actionMap:CanRunAction (item:GetAction ()))
+				item:SetEnabled (actionMap:CanRunAction (item:GetAction (), control))
 			end
 		end
 	end

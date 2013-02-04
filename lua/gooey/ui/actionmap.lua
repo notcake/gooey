@@ -3,38 +3,38 @@ Gooey.ActionMap = Gooey.MakeConstructor (self)
 
 function self:ctor ()
 	self.ChainedActionMap = nil
+	self.ChainedActionMapControl = nil
 	
-	self.Target = nil
 	self.Actions = {}
 end
 
-function self:CanRunAction (actionName, ...)
-	local action, target = self:GetAction (actionName)
+function self:CanRunAction (actionName, control, ...)
+	local action, control = self:GetAction (actionName, control)
 	if not action then return false end
 	
-	return action:CanRun (target, ...)
+	return action:CanRun (control, ...)
 end
 
-function self:Execute (actionName, ...)
-	local action, target = self:GetAction (actionName)
+function self:Execute (actionName, control, ...)
+	local action, control = self:GetAction (actionName, control)
 	if not action then return false end
-	if not action:CanRun (target, ...) then return false end
+	if not action:CanRun (control, ...) then return false end
 	
-	action:Execute (target, ...)
+	action:Execute (control, ...)
 	return true
 end
 
-function self:GetAction (actionName)
+function self:GetAction (actionName, control)
 	if self.ChainedActionMap then
-		local action, target = self.ChainedActionMap:GetAction (actionName)
-		if action then return action, target end
+		local action, control = self.ChainedActionMap:GetAction (actionName, self.ChainedActionMapControl)
+		if action then return action, control end
 	end
 	
-	return self.Actions [actionName], self.Target
+	return self.Actions [actionName], control
 end
 
 function self:GetChainedActionMap ()
-	return self.ChainedActionMap
+	return self.ChainedActionMap, self.ChainedActionMapControl
 end
 
 function self:GetTarget ()
@@ -50,10 +50,7 @@ function self:Register (actionName, handler, canRunFunction)
 	return action
 end
 
-function self:SetChainedActionMap (actionMap)
+function self:SetChainedActionMap (actionMap, control)
 	self.ChainedActionMap = actionMap
-end
-
-function self:SetTarget (target)
-	self.Target = target
+	self.ChainedActionMapControl = control
 end

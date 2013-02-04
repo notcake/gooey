@@ -19,19 +19,19 @@ function self:ctor (name)
 	Gooey.EventProvider (self)
 end
 
-function self:CanRun (target, ...)
+function self:CanRun (control, ...)
 	if not self:IsEnabled () then return false end
 	
-	if self.CanRunFunction and not self.CanRunFunction (target, ...) then
+	if self.CanRunFunction and not self.CanRunFunction (control, ...) then
 		return false
 	end
 	return true
 end
 
-function self:Execute (target, ...)
-	if not self:CanRun (target, ...) then return end
+function self:Execute (control, ...)
+	if not self:CanRun (control, ...) then return end
 	
-	self.Handler (target, ...)
+	self.Handler (control, ...)
 end
 
 function self:GetDisplayName ()

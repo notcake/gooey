@@ -119,35 +119,44 @@ function PANEL:ContainsPoint (x, y)
 	       y >= 0 and y < self:GetHeight ()
 end
 
+function PANEL:DispatchAction (actionName, ...)
+	local actionMap, control = self:GetActionMap ()
+	if not actionMap then return end
+	actionMap:Execute (actionName, control, ...)
+end
+
 function PANEL:GetAction ()
 	return self.Action
 end
 
 function PANEL:GetActionMap ()
 	if self.ActionMap then
-		return self.ActionMap
+		return self.ActionMap, self
 	end
 	
-	local actionMap = self:GetOwner () and self:GetOwner ():GetActionMap ()
-	if actionMap then return actionMap end
+	local actionMap, control = nil, nil
+	if self:GetOwner () then
+		actionMap, control = self:GetOwner ():GetActionMap ()
+	end
+	if actionMap then return actionMap, control end
 	
 	local parent = self:GetParent ()
 	while parent and parent:IsValid () do
 		if type (parent.GetActionMap) == "function" then
-			actionMap = parent:GetActionMap ()
-			if actionMap then return actionMap end
+			actionMap, control = parent:GetActionMap ()
+			if actionMap then return actionMap, control end
 		end
 		if type (parent.GetOwner) == "function" then
 			local owner = parent:GetOwner ()
 			if owner and owner:IsValid () and type (owner.GetActionMap) == "function" then
-				actionMap = owner:GetActionMap ()
-				if actionMap then return actionMap end
+				actionMap, control = owner:GetActionMap ()
+				if actionMap then return actionMap, control end
 			end
 		end
 		parent = parent:GetParent ()
 	end
 	
-	return nil
+	return nil, nil
 end
 
 function PANEL:GetBackgroundColor ()
@@ -271,11 +280,8 @@ function PANEL:Remove ()
 	self:DispatchEvent ("Removed")
 end
 
-function PANEL:RunAction (target, ...)
-	if not self:GetAction () then return end
-	local actionMap = self:GetActionMap ()
-	if not actionMap then return end
-	actionMap:Execute (self:GetAction (), target, ...)
+function PANEL:RunAction (...)
+	self:DispatchAction (self:GetAction (), ...)
 end
 
 function PANEL:SetAction (action)
