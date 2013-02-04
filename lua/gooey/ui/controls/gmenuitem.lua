@@ -9,7 +9,6 @@ function PANEL:Init ()
 	
 	self:AddEventListener ("Click",
 		function (_)
-			if self:GetAction () then A = self end
 			self:RunAction ()
 		end
 	)
