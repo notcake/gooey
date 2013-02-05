@@ -161,7 +161,7 @@ function PANEL:PerformLayout ()
 	end
 	
 	surface.SetFont ("DermaDefault")
-	local w, h = surface.GetTextSize (self:GetText ())
+	local w, h = surface.GetTextSize (string.gsub (self:GetText (), "&", "#"))
 	x = x + w + 4
 	
 	if self:IsCloseButtonVisible () then
