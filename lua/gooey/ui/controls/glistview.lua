@@ -147,6 +147,10 @@ function PANEL:GetContentBounds ()
 	return 1, self:GetColumnHeight (), self:GetWide () - scrollbarWidth, self:GetTall () - 1
 end
 
+function PANEL:GetItemCount ()
+	return #self.Sorted
+end
+
 function PANEL:GetItemEnumerator ()
 	local next, tbl, key = pairs (self:GetItems ())
 	return function ()
