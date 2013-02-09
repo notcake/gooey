@@ -315,7 +315,7 @@ local function TryImport ()
 			Gooey.Register ("GTreeViewNode", PANEL, "GPanel")
 			return
 		end
-		timer.Simple (0.001, TryImport)
+		GLib.CallDelayed (TryImport)
 		return
 	end
 	
