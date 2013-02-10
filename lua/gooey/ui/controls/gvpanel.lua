@@ -135,7 +135,7 @@ function PANEL:GetActionMap ()
 	end
 	
 	local actionMap, control = nil, nil
-	if self:GetOwner () then
+	if self:GetOwner () and type (self:GetOwner ().GetActionMap) == "function" then
 		actionMap, control = self:GetOwner ():GetActionMap ()
 	end
 	if actionMap then return actionMap, control end
@@ -281,6 +281,7 @@ function PANEL:Remove ()
 end
 
 function PANEL:RunAction (...)
+	if not self:GetAction () then return end
 	self:DispatchAction (self:GetAction (), ...)
 end
 

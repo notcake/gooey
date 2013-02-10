@@ -99,7 +99,7 @@ function self:GetActionMap ()
 	end
 	
 	local actionMap, control = nil, nil
-	if self:GetOwner () then
+	if self:GetOwner () and type (self:GetOwner ().GetActionMap) == "function" then
 		actionMap, control = self:GetOwner ():GetActionMap ()
 	end
 	if actionMap then return actionMap, control end
@@ -196,6 +196,7 @@ function self:Remove ()
 end
 
 function self:RunAction (...)
+	if not self:GetAction () then return end
 	self:DispatchAction (self:GetAction (), ...)
 end
 
