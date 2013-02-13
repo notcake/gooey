@@ -4,16 +4,8 @@ function PANEL:Init ()
 	self.LastLeftMouseButtonReleaseTime = 0
 end
 
-function PANEL:GetKeyboardMap ()
-	return self.KeyboardMap
-end
-
 function PANEL:Paint (w, h)
 	draw.RoundedBox (4, 0, 0, w, h, self:GetBackgroundColor ())
-end
-
-function PANEL:SetKeyboardMap (keyboardMap)
-	self.KeyboardMap = keyboardMap
 end
 
 -- Event handlers
@@ -42,14 +34,7 @@ function PANEL:OnCursorExited ()
 end
 
 function PANEL:OnKeyCodePressed (keyCode)
-	local ctrl    = input.IsKeyDown (KEY_LCONTROL) or input.IsKeyDown (KEY_RCONTROL)
-	local shift   = input.IsKeyDown (KEY_LSHIFT)   or input.IsKeyDown (KEY_RSHIFT)
-	local alt     = input.IsKeyDown (KEY_LALT)     or input.IsKeyDown (KEY_RALT)
-	
-	local keyboardMap = self:GetKeyboardMap ()
-	if keyboardMap then
-		keyboardMap:Execute (self, keyCode, ctrl, shift, alt)
-	end
+	self:DispatchKeyboardAction (keyCode)
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
 

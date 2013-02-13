@@ -6,6 +6,7 @@ function self:ctor ()
 end
 
 function self:Execute (control, key, ctrl, shift, alt)
+	print ("KBDMAP:Execute ", self, control.ClassName, key, ctrl, shift, alt)
 	if not self.Keys [key] then return false end
 	
 	local handled

@@ -5,14 +5,6 @@ function PANEL:Init ()
 	self.ResizeGrip:SetSize (16, 16)
 end
 
-function PANEL:GetKeyboardMap ()
-	return self.KeyboardMap
-end
-
-function PANEL:SetKeyboardMap (keyboardMap)
-	self.KeyboardMap = keyboardMap
-end
-
 function PANEL:SetSizable (sizable)
 	DFrame.SetSizable (self, sizable)
 	self.ResizeGrip:SetVisible (sizable)
@@ -25,14 +17,7 @@ function PANEL:OnCursorMoved (x, y)
 end
 
 function PANEL:OnKeyCodePressed (keyCode)
-	local ctrl    = input.IsKeyDown (KEY_LCONTROL) or input.IsKeyDown (KEY_RCONTROL)
-	local shift   = input.IsKeyDown (KEY_LSHIFT)   or input.IsKeyDown (KEY_RSHIFT)
-	local alt     = input.IsKeyDown (KEY_LALT)     or input.IsKeyDown (KEY_RALT)
-	
-	local keyboardMap = self:GetKeyboardMap ()
-	if keyboardMap then
-		keyboardMap:Execute (self, keyCode, ctrl, shift, alt)
-	end
+	self:DispatchKeyboardAction (keyCode)
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
 

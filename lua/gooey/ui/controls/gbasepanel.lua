@@ -55,8 +55,9 @@ function self:_ctor ()
 	self.ToolTipController = nil
 	
 	-- Actions
-	self.Action    = nil
-	self.ActionMap = nil
+	self.Action      = nil
+	self.ActionMap   = nil
+	self.KeyboardMap = nil
 	
 	Gooey.EventProvider (self)
 end
@@ -77,8 +78,32 @@ end
 
 function self:DispatchAction (actionName, ...)
 	local actionMap, control = self:GetActionMap ()
-	if not actionMap then return end
-	actionMap:Execute (actionName, control, ...)
+	if not actionMap then return false end
+	return actionMap:Execute (actionName, control, ...)
+end
+
+function self:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
+	if ctrl  == nil then ctrl    = input.IsKeyDown (KEY_LCONTROL) or input.IsKeyDown (KEY_RCONTROL) end
+	if shift == nil then shift   = input.IsKeyDown (KEY_LSHIFT)   or input.IsKeyDown (KEY_RSHIFT)   end
+	if alt   == nil then alt     = input.IsKeyDown (KEY_LALT)     or input.IsKeyDown (KEY_RALT)     end
+	
+	local keyHandled = false
+	local keyboardMap = self:GetKeyboardMap ()
+	if keyboardMap then
+		keyHandled = keyboardMap:Execute (self, keyCode, ctrl, shift, alt)
+	end
+	
+	if not keyHandled then
+		local parent = self:GetParent ()
+		while parent and parent:IsValid () do
+			if type (parent.DispatchKeyboardAction) == "function" then
+				return parent:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
+			end
+			parent = parent:GetParent ()
+		end
+	end
+	
+	return false
 end
 
 function self:FadeOut ()
@@ -132,6 +157,10 @@ end
 
 function self:GetFont ()
 	return self.Font or debug.getregistry ().Panel.GetFont (self)
+end
+
+function self:GetKeyboardMap ()
+	return self.KeyboardMap
 end
 
 function self:GetOwner ()
@@ -251,6 +280,10 @@ function self:SetHeight (height)
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 	
 	return self
+end
+
+function self:SetKeyboardMap (keyboardMap)
+	self.KeyboardMap = keyboardMap
 end
 
 function self:SetOwner (owner)
