@@ -261,6 +261,8 @@ function PANEL:GetTabIndex (tab)
 end
 
 function PANEL:IsPointInHeaderArea (x, y)
+	if x < 0 then return false end
+	if x > self:GetWide () then return false end
 	if y < 0 then return false end
 	if y > self.TabHeaderHeight then return false end
 	return true
