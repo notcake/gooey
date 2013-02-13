@@ -10,7 +10,12 @@ function self:Execute (control, key, ctrl, shift, alt)
 	
 	local handled
 	for _, handler in ipairs (self.Keys [key]) do
-		handled = handler (control, key, ctrl, shift, alt)
+		if type (handler) == "string" then
+			handled = control:DispatchAction (handler)
+		else
+			handled = handler (control, key, ctrl, shift, alt)
+		end
+		
 		if handled == nil then handled = true end
 		if handled then break end
 	end
