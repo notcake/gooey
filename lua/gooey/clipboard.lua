@@ -109,12 +109,16 @@ end
 
 -- TextEntry hack thanks to Python1320
 function self:SetText (newClipboardText)
-	local _, newlineCount = string.gsub (newClipboardText, "\n", "")
-	newClipboardText = newClipboardText .. string.rep (" ", newlineCount)
-	
-	self.CopyTextEntry:SetText (newClipboardText)
-	self.CopyTextEntry:SelectAllText ()
-	self.CopyTextEntry:CutSelected ()
+	if not GLib.UTF8.ContainsSequences (newClipboardText) then
+		SetClipboardText (newClipboardText)
+	else
+		local _, newlineCount = string.gsub (newClipboardText, "\n", "")
+		newClipboardText = newClipboardText .. string.rep (" ", newlineCount)
+		
+		self.CopyTextEntry:SetText (newClipboardText)
+		self.CopyTextEntry:SelectAllText ()
+		self.CopyTextEntry:CutSelected ()
+	end
 	
 	if self.ClipboardText == newClipboardText then return end
 	
