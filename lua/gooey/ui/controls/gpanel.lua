@@ -1,6 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	-- Double Clicks
 	self.LastLeftMouseButtonReleaseTime = 0
 end
 

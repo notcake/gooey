@@ -8,6 +8,9 @@ function PANEL:Init ()
 	self:SetDeleteOnClose (true)
 	self:MakePopup ()
 	
+	self:SetMaximizable (false)
+	self:SetSizable (false)
+	
 	self.Buttons = {}
 	self.TextLabel = vgui.Create ("DLabel", self)
 	self.TextLabel:SetContentAlignment ("7")
