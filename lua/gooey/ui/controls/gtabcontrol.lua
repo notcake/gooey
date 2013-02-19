@@ -277,6 +277,16 @@ function PANEL:GetTabIndex (tab)
 	return 0
 end
 
+function PANEL:GetVisibleTabCount ()
+	local visibleTabCount = 0
+	for tab in self:GetEnumerator () do
+		if tab:IsVisible () then
+			visibleTabCount = visibleTabCount + 1
+		end
+	end
+	return visibleTabCount
+end
+
 function PANEL:IsPointInHeaderArea (x, y)
 	if x < 0 then return false end
 	if x > self:GetWide () then return false end

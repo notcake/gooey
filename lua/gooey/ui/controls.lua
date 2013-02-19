@@ -2,6 +2,7 @@ Gooey.UI = {}
 
 include ("orientation.lua")
 include ("sizingmethod.lua")
+include ("splitcontainerpanel.lua")
 include ("tooltippositioningmode.lua")
 
 include ("glyphs.lua")

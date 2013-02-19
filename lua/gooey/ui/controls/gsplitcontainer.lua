@@ -12,7 +12,9 @@ function PANEL:Init ()
 	self.InverseSplitterPosition = 0
 	
 	self.SplitterThickness = 5
-	self.FixedPanel = nil
+	
+	self.FixedPanel = Gooey.SplitContainerPanel.None
+	self.HiddenPanel = Gooey.SplitContainerPanel.None
 	
 	self.Splitter.DragController:AddEventListener ("PositionCorrectionChanged",
 		function (_, deltaX, deltaY)
@@ -71,12 +73,12 @@ function PANEL:PerformLayout ()
 	local panel2Size
 	
 	panel1Offset = 0
-	if not self.FixedPanel then
+	if self.FixedPanel == Gooey.SplitContainerPanel.None then
 		panel2Offset = size * self.SplitterFraction + splitterSize * 0.5
 		
 		self.SplitterPosition = size * self.SplitterFraction
 		self.InverseSplitterPosition = size - self.SplitterPosition
-	elseif self.FixedPanel == 1 then
+	elseif self.FixedPanel == Gooey.SplitContainerPanel.Panel1 then
 		panel2Offset = self.SplitterPosition + splitterSize * 0.5
 		
 		self.InverseSplitterPosition = size - self.SplitterPosition
@@ -115,6 +117,26 @@ function PANEL:PerformLayout ()
 		self.Splitter:SetSize (self:GetWide (), splitterSize)
 	end
 	
+	if self.HiddenPanel == Gooey.SplitContainerPanel.Panel1 then
+		self.Panel1:SetVisible (false)
+		self.Splitter:SetVisible (false)
+		
+		panel1Width = self:GetWide ()
+		panel1Height = self:GetTall ()
+	elseif self.HiddenPanel == Gooey.SplitContainerPanel.Panel2 then
+		self.Panel2:SetVisible (false)
+		self.Splitter:SetVisible (false)
+		
+		panel2X = 0
+		panel2Y = 0
+		panel2Width = self:GetWide ()
+		panel2Height = self:GetTall ()
+	else
+		self.Panel1:SetVisible (true)
+		self.Panel2:SetVisible (true)
+		self.Splitter:SetVisible (true)
+	end
+	
 	if self.Panel1 then
 		self.Panel1:SetPos (panel1X, panel1Y)
 		self.Panel1:SetSize (panel1Width, panel1Height)
@@ -126,9 +148,20 @@ function PANEL:PerformLayout ()
 end
 
 function PANEL:SetFixedPanel (fixedPanel)
+	fixedPanel = fixedPanel or Gooey.SplitContainerPanel.None
+	
 	if self.FixedPanel == fixedPanel then return end
 	
 	self.FixedPanel = fixedPanel
+	self:InvalidateLayout ()
+end
+
+function PANEL:SetHiddenPanel (hiddenPanel)
+	hiddenPanel = hiddenPanel or Gooey.SplitContainerPanel.None
+	
+	if self.HiddenPanel == hiddenPanel then return end
+	
+	self.HiddenPanel = hiddenPanel
 	self:InvalidateLayout ()
 end
 
