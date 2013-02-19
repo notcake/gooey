@@ -16,6 +16,10 @@ include ("rendertype.lua")
 -- Actions
 include ("action.lua")
 include ("actionmap.lua")
+include ("toggleaction.lua")
+
+include ("booleancontroller.lua")
+include ("visibilitycontroller.lua")
 
 -- Keyboard
 include ("keyboardmap.lua")

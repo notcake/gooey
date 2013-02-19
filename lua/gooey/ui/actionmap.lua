@@ -8,6 +8,12 @@ function self:ctor ()
 	self.Actions = {}
 end
 
+function self:dtor ()
+	for _, action in pairs (self.Actions) do
+		action:dtor ()
+	end
+end
+
 function self:CanRunAction (actionName, control, ...)
 	local action, control = self:GetAction (actionName, control)
 	if not action then return false end
@@ -46,6 +52,14 @@ function self:Register (actionName, handler, canRunFunction)
 	self.Actions [actionName] = action
 	
 	action:SetHandler (handler)
+	action:SetCanRunFunction (canRunFunction)
+	return action
+end
+
+function self:RegisterToggle (actionName, booleanController, canRunFunction)
+	local action = Gooey.ToggleAction (actionName, booleanController)
+	self.Actions [actionName] = action
+	
 	action:SetCanRunFunction (canRunFunction)
 	return action
 end

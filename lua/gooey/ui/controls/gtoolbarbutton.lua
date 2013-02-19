@@ -8,6 +8,20 @@ function PANEL:ctor (text)
 	self.Width = 24
 	self.Height = 24
 	
+	self:AddEventListener ("ActionChanged",
+		function (_, actionName)
+			local actionMap, control = self:GetActionMap ()
+			if not actionMap then return end
+			
+			local action = actionMap:GetAction (actionName, control)
+			if not action then return end
+			
+			if action and action:GetIcon () then
+				self:SetIcon (action:GetIcon ())
+			end
+		end
+	)
+	
 	self:AddEventListener ("Click",
 		function (_, text)
 			self:RunAction ()

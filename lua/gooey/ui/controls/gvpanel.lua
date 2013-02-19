@@ -3,7 +3,7 @@ Gooey.VPanel = Gooey.MakeConstructor (PANEL)
 
 --[[
 	Events:
-		ActionChanged (action)
+		ActionChanged (actionName)
 			Fired when this panel's action has changed.
 		ActionMapChanged (ActionMap actionMap)
 			Fired when this panel's action map has changed.
