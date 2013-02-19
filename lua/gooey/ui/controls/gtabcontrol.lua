@@ -20,6 +20,8 @@ local PANEL = {}
 			Fired when a tab has been removed from this TabControl.
 		TabTextChanged (Tab tab, text)
 			Fired when a tab's header text has changed.
+		TabVisibilityChanged (Tab tab, visible)
+			Fired when a tab's visibility has changed.
 ]]
 
 function PANEL:Init ()
@@ -28,23 +30,26 @@ function PANEL:Init ()
 	self.Tabs = {}
 	self.TabSet = {}
 	self.SelectedTab = nil
+	self.SelectedTabIndex = 0
 	self.SelectedTabHeaderVisible = false
 	
 	self:SetKeyboardMap (Gooey.KeyboardMap ())
 	self:GetKeyboardMap ():Register ({ KEY_TAB },
 		function (self, key, ctrl, shift, alt)
-			if not ctrl then return end
+			if not ctrl then return false end
 			
-			local selectedTabIndex = self:GetSelectedTabIndex ()
+			local selectedTabIndex
 			if shift then
-				selectedTabIndex = selectedTabIndex - 1
+				selectedTabIndex = self:GetPreviousSelectableTabIndex (self:GetSelectedTabIndex ())
 			else
-				selectedTabIndex = selectedTabIndex + 1
+				selectedTabIndex = self:GetNextSelectableTabIndex (self:GetSelectedTabIndex ())
 			end
-			if selectedTabIndex <= 0 then selectedTabIndex = self:GetTabCount () end
-			if selectedTabIndex > self:GetTabCount () then selectedTabIndex = 1 end
 			
-			self:SetSelectedTabIndex (selectedTabIndex)
+			GLib.CallDelayed (
+				function ()
+					self:SetSelectedTabIndex (selectedTabIndex)
+				end
+			)
 		end
 	)
 	
@@ -105,6 +110,17 @@ function PANEL:Init ()
 		self:DispatchEvent ("TabTextChanged", tab, text)
 		self:InvalidateLayout ()
 	end
+	self.VisibleChanged = function (tab, visible)
+		if self:GetSelectedTab () == tab and not visible then
+			self:SelectNextBestTab ()
+		end
+		if not self:GetSelectedTab () and visible then
+			self:SetSelectedTab (tab)
+		end
+		self:LayoutTabHeaders ()
+		self:InvalidateLayout ()
+		self:DispatchEvent ("TabVisibilityChanged", tab, visible)
+	end
 	
 	self:AddEventListener ("SizeChanged",
 		function (_, w, h)
@@ -142,6 +158,7 @@ function PANEL:AddTab (...)
 	tab:AddEventListener ("CloseRequested",  tostring (self:GetTable ()), self.CloseRequested)
 	tab:AddEventListener ("ContentsChanged", tostring (self:GetTable ()), self.ContentsChanged)
 	tab:AddEventListener ("TextChanged",     tostring (self:GetTable ()), self.TextChanged)
+	tab:AddEventListener ("VisibleChanged",  tostring (self:GetTable ()), self.VisibleChanged)
 	
 	if not self:GetSelectedTab () then
 		self:SetSelectedTab (tab)
@@ -200,10 +217,6 @@ function PANEL:GetContentRectangle ()
 	return x, y, w, h
 end
 
-function PANEL:GetPaddedContentRectangle ()
-	return 0, self.TabHeaderHeight, self:GetWide (), self:GetTall () - self.TabHeaderHeight
-end
-
 function PANEL:GetEnumerator ()
 	local i = 0
 	return function ()
@@ -218,6 +231,10 @@ end
 
 function PANEL:GetHeaderRectangle ()
 	return 0, 0, self:GetWide (), self.TabHeaderHeight
+end
+
+function PANEL:GetPaddedContentRectangle ()
+	return 0, self.TabHeaderHeight, self:GetWide (), self:GetTall () - self.TabHeaderHeight
 end
 
 function PANEL:GetScrollOffset ()
@@ -282,7 +299,9 @@ function PANEL:LayoutTabHeaders ()
 	for _, tab in ipairs (self.Tabs) do
 		tab:GetHeader ():SetOffset (x, 0)
 		tab:GetHeader ():PerformLayout ()
-		x = x + tab:GetHeader ():GetWide ()
+		if tab:IsVisible () then
+			x = x + tab:GetHeader ():GetWide ()
+		end
 	end
 	self.TotalHeaderWidth = x
 	
@@ -299,7 +318,7 @@ end
 
 function PANEL:Paint (w, h)
 	draw.RoundedBoxEx (4, 0, self.TabHeaderHeight, w, h - self.TabHeaderHeight, GLib.Colors.Silver,
-		self:GetTabCount () == 0,
+		self.TotalHeaderWidth == 0,
 		self.TotalHeaderWidth - self.TabScrollOffset < self:GetWide () - 4,
 		true,
 		true
@@ -333,6 +352,7 @@ function PANEL:RemoveTab (tab, delete)
 	if delete == nil then delete = true end
 	if not self.TabSet [tab] then return end
 	
+	-- Determine tab index
 	local index = 1
 	for k, v in ipairs (self.Tabs) do
 		if v == tab then
@@ -341,12 +361,21 @@ function PANEL:RemoveTab (tab, delete)
 			break
 		end
 	end
+	
+	-- Update selected tab index
+	if self.SelectedTabIndex and index < self.SelectedTabIndex then
+		self.SelectedTabIndex = self.SelectedTabIndex - 1
+	end
+	
 	self.TabSet [tab] = nil
 	
+	-- Unhook tab
 	tab:RemoveEventListener ("CloseRequested",  tostring (self:GetTable ()))
 	tab:RemoveEventListener ("ContentsChanged", tostring (self:GetTable ()))
 	tab:RemoveEventListener ("TextChanged",     tostring (self:GetTable ()))
+	tab:RemoveEventListener ("VisibleChanged",  tostring (self:GetTable ()))
 	
+	-- Update selected tab
 	if self:GetSelectedTab () == tab then
 		self:SetSelectedTab (self.Tabs [index] or self.Tabs [index - 1])
 	end
@@ -378,6 +407,19 @@ function PANEL:SetSelectedTab (tab)
 	if tab and tab:GetTabControl () ~= self then return end
 	if self.SelectedTab == tab then return end
 	
+	self:SetSelectedTabIndex (self:GetTabIndex (tab))
+end
+
+function PANEL:SetSelectedTabIndex (tabIndex)
+	if tabIndex < 0 then return end
+	if tabIndex > self:GetTabCount () then return end
+	
+	local selectedTab = self:GetTab (tabIndex)
+	if self.SelectedTab == selectedTab and
+	   self.SelectedTabIndex == tabIndex then
+		return
+	end
+	
 	local oldSelectedTab = self.SelectedTab
 	local oldSelectedContents = nil
 	if self.SelectedTab then
@@ -387,7 +429,8 @@ function PANEL:SetSelectedTab (tab)
 		end
 	end
 	
-	self.SelectedTab = tab
+	self.SelectedTab = selectedTab
+	self.SelectedTabIndex = tabIndex
 	
 	local selectedContents = nil
 	if self.SelectedTab then
@@ -408,17 +451,12 @@ function PANEL:SetSelectedTab (tab)
 	end
 end
 
-function PANEL:SetSelectedTabIndex (index)
-	if index <= 0 then return end
-	if index > self:GetTabCount () then return end
-	
-	self:SetSelectedTab (self:GetTab (index))
-end
-
 function PANEL:SetTabIndex (tab, index)
+	if not self.TabSet [tab] then return end
+	
+	-- Clamp index
 	if index < 1 then index = 1 end
 	if index > #self.Tabs then index = #self.Tabs end
-	if not self.TabSet [tab] then return end
 	
 	local currentIndex = tab:GetIndex ()
 	if index == currentIndex then return end
@@ -426,6 +464,9 @@ function PANEL:SetTabIndex (tab, index)
 	local displacedTab = self.Tabs [index]
 	self.Tabs [index] = tab
 	self.Tabs [currentIndex] = displacedTab
+	
+	-- Update selected tab index
+	self.SelectedTabIndex = self:GetTabIndex (self.SelectedTab)
 	
 	self:LayoutTabHeaders ()
 	self:InvalidateLayout ()
@@ -463,6 +504,82 @@ function PANEL:DisableTabScroller ()
 	self.RightScrollButton:SetVisible (false)
 end
 
+-- Internal, do not call
+function PANEL:GetNextSelectableTabIndex (tabIndex)
+	local initialTabIndex = tabIndex
+	tabIndex = tabIndex + 1
+	
+	while self.Tabs [tabIndex] and
+	      not self.Tabs [tabIndex]:IsVisible () do
+		tabIndex = tabIndex + 1
+	end
+	
+	if self.Tabs [tabIndex] then return tabIndex end
+	
+	-- Search from the beginning
+	tabIndex = 1
+	while self.Tabs [tabIndex] and
+	      tabIndex <= initialTabIndex and
+	      not self.Tabs [tabIndex]:IsVisible () do
+		tabIndex = tabIndex + 1
+	end
+	
+	if not self.Tabs [tabIndex] or
+	   not self.Tabs [tabIndex]:IsVisible () then
+		tabIndex = 0
+	end
+	
+	return tabIndex
+end
+
+function PANEL:GetPreviousSelectableTabIndex (tabIndex)
+	local initialTabIndex = tabIndex
+	tabIndex = tabIndex - 1
+	
+	while self.Tabs [tabIndex] and
+	      not self.Tabs [tabIndex]:IsVisible () do
+		tabIndex = tabIndex - 1
+	end
+	
+	if self.Tabs [tabIndex] then return tabIndex end
+	
+	-- Search from the beginning
+	tabIndex = self:GetTabCount ()
+	while self.Tabs [tabIndex] and
+	      tabIndex >= initialTabIndex and
+	      not self.Tabs [tabIndex]:IsVisible () do
+		tabIndex = tabIndex - 1
+	end
+	
+	if not self.Tabs [tabIndex] or
+	   not self.Tabs [tabIndex]:IsVisible () then
+		tabIndex = 0
+	end
+	
+	return tabIndex
+end
+
+function PANEL:SelectNextBestTab ()
+	local tabIndex = self.SelectedTabIndex
+	
+	-- Go forwards until we find an appropriate tab
+	while self.Tabs [tabIndex] and
+	      not self.Tabs [tabIndex]:IsVisible () do
+		tabIndex = tabIndex + 1
+	end
+	
+	if not self.Tabs [tabIndex] then
+		-- Overshot, look backwards instead
+		tabIndex = self.SelectedTabIndex
+		while self.Tabs [tabIndex] and 
+		      not self.Tabs [tabIndex]:IsVisible () do
+			tabIndex = tabIndex - 1
+		end
+	end
+	
+	self:SetSelectedTabIndex (tabIndex)
+end
+
 -- Event handlers
 function PANEL:OnMouseWheel (delta, x, y)
 	local headerX, headerY, headerWidth, headerHeight = self:GetHeaderRectangle ()
@@ -494,6 +611,9 @@ function PANEL:Think ()
 	self:SetScrollOffset (self:GetScrollOffset () + self.TabScrollSpeed * deltaTime)
 end
 
+PANEL.CloseRequested  = Gooey.NullCallback
 PANEL.ContentsChanged = Gooey.NullCallback
+PANEL.TextChanged     = Gooey.NullCallback
+PANEL.VisibleChanged  = Gooey.NullCallback
 
 Gooey.Register ("GTabControl", PANEL, "GPanel")

@@ -11,10 +11,15 @@ Gooey.Tab = Gooey.MakeConstructor (self)
 			Fired when this tab has been removed and destroyed.
 		TextChanged (text)
 			Fired when this tab's header text has changed.
+		VisibleChanged (visible)
+			Fired when this tab's visibility has changed.
 ]]
 
 function self:ctor ()
 	self.TabControl = nil
+	
+	self.Visible = true
+	
 	self.Header = vgui.Create ("GTabHeader")
 	self.Header:SetTab (self)
 	self.Header:SetVisible (false)
@@ -70,8 +75,7 @@ function self:IsSelected ()
 end
 
 function self:IsVisible ()
-	if not self.TabControl then return false end
-	return self.TabControl:GetSelectedTab () == self
+	return self.Visible
 end
 
 function self:LayoutContents ()
@@ -118,10 +122,11 @@ end
 
 function self:SetCloseButtonVisible (closeButtonVisible)
 	self.Header:SetCloseButtonVisible (closeButtonVisible)
+	return self
 end
 
 function self:SetContents (contents)
-	if self.Contents == contents then return end
+	if self.Contents == contents then return self end
 	
 	local oldContents = self.Contents
 	self.Contents = contents
@@ -129,6 +134,7 @@ function self:SetContents (contents)
 	self:LayoutContents ()
 	
 	self:DispatchEvent ("ContentsChanged", oldContents, self.Contents)
+	return self
 end
 
 function self:SetContextMenu (contextMenu, giveOwnership)
@@ -140,10 +146,12 @@ function self:SetContextMenu (contextMenu, giveOwnership)
 	end
 	self.ContextMenu = contextMenu
 	self.OwnsContextMenu = giveOwnership
+	return self
 end
 
 function self:SetIcon (icon)
 	self.Header:SetIcon (icon)
+	return self
 end
 
 function self:SetTabControl (tabControl)
@@ -167,8 +175,20 @@ end
 
 function self:SetText (text)
 	self.Header:SetText (text)
+	return self
 end
 
 function self:SetToolTipText (text)
 	self.Header:SetToolTipText (text)
+	return self
+end
+
+function self:SetVisible (visible)
+	if self.Visible == visible then return self end
+	
+	self.Visible = visible
+	self.Header:SetVisible (self.Visible)
+	self:DispatchEvent ("VisibleChanged", self.Visible)
+	
+	return self
 end

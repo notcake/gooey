@@ -109,8 +109,13 @@ function PANEL:Open (targetItem)
 			if not item:IsMarkedForDeletion () and item:GetAction () then
 				local action = actionMap:GetAction (item:GetAction (), control)
 				item:SetEnabled (action and action:CanRun (control) or false)
-				if action and action:GetIcon ()then
-					item:SetIcon (action:GetIcon ())
+				if action then
+					if action:GetIcon ()then
+						item:SetIcon (action:GetIcon ())
+					end
+					if action:IsToggleAction () then
+						item:SetChecked (action:IsToggled ())
+					end
 				end
 			end
 		end

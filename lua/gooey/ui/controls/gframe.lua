@@ -136,7 +136,7 @@ function PANEL:OnCursorMoved (x, y)
 end
 
 function PANEL:OnKeyCodePressed (keyCode)
-	self:DispatchKeyboardAction (keyCode)
+	return self:DispatchKeyboardAction (keyCode)
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
 

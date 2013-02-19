@@ -103,7 +103,7 @@ function self:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
 		end
 	end
 	
-	return false
+	return keyHandled
 end
 
 function self:FadeOut ()

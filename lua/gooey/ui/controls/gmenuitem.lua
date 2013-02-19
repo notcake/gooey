@@ -1,7 +1,14 @@
 local PANEL = {}
 
+--[[
+	Events:
+		CheckedChanged (checked)
+			Fired when this menu item's check state has changed.
+]]
+
 function PANEL:Init ()
 	self.ContainingMenu = nil
+	self.Checked = false
 	self.Icon = nil
 	
 	self:SetContentAlignment (4)
@@ -31,8 +38,20 @@ function PANEL:GetContainingMenu ()
 	return self.ContainingMenu
 end
 
+function PANEL:IsChecked ()
+	return self.Checked
+end
+
 function PANEL:Paint (w, h)
+	if self:IsChecked () then
+		surface.SetDrawColor (GLib.Colors.LightBlue)
+		surface.DrawRect (2, 2, w - 4, h - 4)
+		surface.SetDrawColor (GLib.Colors.CornflowerBlue)
+		surface.DrawOutlinedRect (2, 2, w - 4, h - 4)
+	end
+	
 	derma.SkinHook ("Paint", "MenuOption", self, w, h)
+	
 	surface.SetFont ("DermaDefault")
 	if self:IsEnabled () then
 		surface.SetTextColor (GLib.Colors.Black)
@@ -46,6 +65,15 @@ function PANEL:Paint (w, h)
 	end
 	surface.DrawText (self:GetText ())
 	return true
+end
+
+function PANEL:SetChecked (checked)
+	if self.Checked == checked then return self end
+	
+	self.Checked = checked
+	self:DispatchEvent ("CheckedChanged", self.Checked)
+	
+	return self
 end
 
 function PANEL:SetIcon (icon)

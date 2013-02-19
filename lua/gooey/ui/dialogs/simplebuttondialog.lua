@@ -6,6 +6,7 @@ function PANEL:Init ()
 	self:SetSize (300, 128)
 	self:Center ()
 	self:SetDeleteOnClose (true)
+	self:SetKeyboardInputEnabled (true)
 	self:MakePopup ()
 	
 	self:SetMaximizable (false)
@@ -16,6 +17,14 @@ function PANEL:Init ()
 	self.TextLabel:SetContentAlignment ("7")
 	
 	self.Callback = Gooey.NullCallback
+	
+	self:SetKeyboardMap (Gooey.KeyboardMap ())
+	self:GetKeyboardMap ():Register ({ KEY_ESCAPE },
+		function (self, key, ctrl, shift, alt)
+			self:Remove ()
+			gui.HideGameUI ()
+		end
+	)
 	
 	self:AddEventListener ("TextChanged",
 		function (_, text)
