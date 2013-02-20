@@ -155,6 +155,7 @@ function self:DragDrop (dragDropController)
 	if self.Control.OnDragDrop then
 		self.Control:OnDragDrop (dragDropController)
 	end
+	if not self.Control then return end
 	self.Control:DispatchEvent ("DragDrop", dragDropController)
 	
 	self:OnDragDrop (self.Control, dragDropController)
@@ -169,6 +170,7 @@ function self:DragEnter (dragDropController, lastDropPanel)
 	if self.Control.OnDragEnter then
 		self.Control:OnDragEnter (dragDropController, lastDropPanel)
 	end
+	if not self.Control then return end
 	self.Control:DispatchEvent ("DragEnter", dragDropController, lastDropPanel)
 	
 	self:OnDragEnter (self.Control, dragDropController, lastDropPanel)
@@ -183,6 +185,7 @@ function self:DragLeave (dragDropController, newDropPanel)
 	if self.Control.OnDragLeave then
 		self.Control:OnDragLeave (dragDropController, newDropPanel)
 	end
+	if not self.Control then return end
 	self.Control:DispatchEvent ("DragLeave", dragDropController, newDropPanel)
 	
 	self:OnDragLeave (self.Control, dragDropController, newDropPanel)
@@ -197,6 +200,7 @@ function self:DragOver (dragDropController, x, y)
 	if self.Control.OnDragOver then
 		self.Control:OnDragOver (dragDropController, x, y)
 	end
+	if not self.Control then return end
 	self.Control:DispatchEvent ("DragOver", dragDropController, x, y)
 	
 	self:OnDragOver (self.Control, dragDropController, x, y)

@@ -125,16 +125,16 @@ function PANEL:PerformLayout ()
 		self.Panel1:SetVisible (false)
 		self.Splitter:SetVisible (false)
 		
-		panel1Width = self:GetWide ()
-		panel1Height = self:GetTall ()
-	elseif self.HiddenPanel == Gooey.SplitContainerPanel.Panel2 then
-		self.Panel2:SetVisible (false)
-		self.Splitter:SetVisible (false)
-		
 		panel2X = 0
 		panel2Y = 0
 		panel2Width = self:GetWide ()
 		panel2Height = self:GetTall ()
+	elseif self.HiddenPanel == Gooey.SplitContainerPanel.Panel2 then
+		self.Panel2:SetVisible (false)
+		self.Splitter:SetVisible (false)
+		
+		panel1Width = self:GetWide ()
+		panel1Height = self:GetTall ()
 	else
 		self.Panel1:SetVisible (true)
 		self.Panel2:SetVisible (true)
