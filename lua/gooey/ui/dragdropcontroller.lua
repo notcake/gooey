@@ -3,7 +3,8 @@ Gooey.DragDropController = Gooey.MakeConstructor (self)
 
 --[[
 	Events:
-		
+		ControlChanged (oldControl, control)
+			Fired when this DragDropController's control has changed.
 ]]
 
 function self:ctor (control)
@@ -52,6 +53,10 @@ function self:EndDrag ()
 	self:SetHoveredPanel (nil)
 end
 
+function self:GetControl ()
+	return self.Control
+end
+
 function self:GetObjectType ()
 	return self.ObjectType
 end
@@ -71,6 +76,7 @@ end
 function self:SetControl (control)
 	if self.Control == control then return end
 	
+	local oldControl = self.Control
 	if self.Control then
 		self.Control.DropTarget = nil
 	end
@@ -82,6 +88,8 @@ function self:SetControl (control)
 	if self.Control then
 		self.Control.DropTarget = self
 	end
+	
+	self:DispatchEvent ("ControlChanged", oldControl, control)
 end
 
 function self:SetDragRenderer (dragRenderer)
@@ -142,22 +150,28 @@ end
 
 -- Internal, do not call
 function self:DragDrop (dragDropController)
+	if not self.Control then return end
 	if self.Control.OnDragDrop then
 		self.Control:OnDragDrop (dragDropController)
 	end
-	if not self.Control then return end
 	self.Control:DispatchEvent ("DragDrop", dragDropController)
+	
+	self:OnDragDrop (self.Control, dragDropController)
+	self:DispatchEvent ("DragDrop", self.Control, dragDropController)
 end
 
 function self:DragEnter (dragDropController, lastDropPanel)
 	if self.Hovered then return end
 	self.Hovered = true
 	
+	if not self.Control then return end
 	if self.Control.OnDragEnter then
 		self.Control:OnDragEnter (dragDropController, lastDropPanel)
 	end
-	if not self.Control then return end
 	self.Control:DispatchEvent ("DragEnter", dragDropController, lastDropPanel)
+	
+	self:OnDragEnter (self.Control, dragDropController, lastDropPanel)
+	self:DispatchEvent ("DragEnter", self.Control, dragDropController, lastDropPanel)
 end
 
 function self:DragLeave (dragDropController, newDropPanel)
@@ -168,8 +182,10 @@ function self:DragLeave (dragDropController, newDropPanel)
 	if self.Control.OnDragLeave then
 		self.Control:OnDragLeave (dragDropController, newDropPanel)
 	end
-	if not self.Control then return end
 	self.Control:DispatchEvent ("DragLeave", dragDropController, newDropPanel)
+	
+	self:OnDragLeave (self.Control, dragDropController, newDropPanel)
+	self:DispatchEvent ("DragLeave", self.Control, dragDropController, newDropPanel)
 end
 
 function self:DragOver (dragDropController, x, y)
@@ -181,6 +197,9 @@ function self:DragOver (dragDropController, x, y)
 		self.Control:OnDragOver (dragDropController, x, y)
 	end
 	self.Control:DispatchEvent ("DragOver", dragDropController, x, y)
+	
+	self:OnDragOver (self.Control, dragDropController, x, y)
+	self:DispatchEvent ("DragOver", self.Control, dragDropController, x, y)
 end
 
 function self:SetHoveredPanel (hoveredPanel)
@@ -212,4 +231,17 @@ function self:UnhookControl (control)
 	if not control then return end
 	
 	control:RemoveEventListener ("Removed", tostring (self))
+end
+
+-- Event handlers
+function self:OnDragDrop (control, dragDropController)
+end
+
+function self:OnDragEnter (control, dragDropController, lastDropPanel)
+end
+
+function self:OnDragLeave (control, dragDropController, newDropPanel)
+end
+
+function self:OnDragOver (control, dragDropController, x, y)
 end

@@ -37,6 +37,10 @@ function PANEL:GetFixedPanel ()
 	return self.FixedPanel
 end
 
+function PANEL:GetHiddenPanel ()
+	return self.HiddenPanel
+end
+
 function PANEL:GetOrientation ()
 	return self.Orientation
 end
