@@ -89,6 +89,7 @@ function self:SetControl (control)
 		self.Control.DropTarget = self
 	end
 	
+	self:OnControlChanged (oldControl, control)
 	self:DispatchEvent ("ControlChanged", oldControl, control)
 end
 
@@ -234,6 +235,9 @@ function self:UnhookControl (control)
 end
 
 -- Event handlers
+function self:OnControlChanged (oldControl, control)
+end
+
 function self:OnDragDrop (control, dragDropController)
 end
 
