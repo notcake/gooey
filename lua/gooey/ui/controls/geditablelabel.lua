@@ -5,25 +5,31 @@ function PANEL:Init ()
 	self:SetKeyboardInputEnabled (true)
 	self:SetTextInset (3, 0)
 
-	self.TextEntry = vgui.Create ("DTextEntry", self)
+	self.TextEntry = vgui.Create ("GTextEntry", self)
 	self.TextEntry:SetText (self:GetText ())
 	self.TextEntry:SetVisible (false)
 	
 	self.DoNotHideTextEntry = false
-	self.TextEntry.OnCursorEntered = function (textEntry)
-		self.DoNotHideTextEntry = false
-	end
-	self.TextEntry.OnCursorExited = function (textEntry)
-		if self:ShouldHideTextEntry () then
-			self:HideTextEntry ()
+	self.TextEntry:AddEventListener ("MouseEnter",
+		function (_)
+			self.DoNotHideTextEntry = false
 		end
-	end
-	self.TextEntry.OnTextChanged = function (textEntry)
-		if not self:IsTextEntryVisible () then
-			return
+	)
+	self.TextEntry:AddEventListener ("MouseLeave",
+		function (_)
+			if self:ShouldHideTextEntry () then
+				self:HideTextEntry ()
+			end
 		end
-		self:SetText (textEntry:GetText ())
-	end
+	)
+	self.TextEntry:AddEventListener ("TextChanged",
+		function ()
+			if not self:IsTextEntryVisible () then
+				return
+			end
+			self:SetText (textEntry:GetText ())
+		end
+	)
 	
 	self.PreviousText = nil
 end

@@ -31,7 +31,7 @@ function PANEL:DataLayout (listView)
 	local height = self:GetTall ()
 	local x = 0
 	local w = listView:ColumnWidth (1)
-	local Columns = listView:GetColumns ()
+	local columns = listView:GetColumns ()
 	if self.Icon then
 		local image = Gooey.ImageCache:GetImage (self.Icon)
 		local spacing = (self:GetTall () - image:GetHeight ()) * 0.5
@@ -40,17 +40,20 @@ function PANEL:DataLayout (listView)
 		-- The offset of 4 is to correct for the padding applied to every column text label
 	end
 	for i = 1, #self.Columns do
-		if Columns [i]:GetType () == "Checkbox" then
+		if columns [i]:GetType () == "Checkbox" then
 			self.Columns [i]:SetPos (x + (listView:ColumnWidth (i) - 15) * 0.5, (height - 15) * 0.5)
 			self.Columns [i]:SetSize (15, 15)
 		else
 			self.Columns [i]:SetPos (x + 4, 0)
 		end
-		if Columns [i]:GetType () == "Text" then
+		if columns [i]:GetType () == "Text" then
 			self.Columns [i]:SetSize (w - 8, height)
 			self.Columns [i]:SetContentAlignment (self.ListView:GetColumn (i):GetAlignment ())
 		end
-		x = x + w
+		self.Columns [i]:SetVisible (columns [i]:IsVisible ())
+		if columns [i]:IsVisible () then
+			x = x + w
+		end
 		w = listView:ColumnWidth (i + 1)
 	end
 end

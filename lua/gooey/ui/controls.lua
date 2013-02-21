@@ -51,6 +51,9 @@ include ("undoredocontroller.lua")
 
 include ("vpanelcontainer.lua")
 
+-- Event Bases
+include ("mouseevents.lua")
+
 -- Control Bases
 include ("controls/gbasepanel.lua")
 include ("controls/gbasescrollbar.lua")
@@ -92,6 +95,7 @@ include ("controls/gstatusbarcombobox.lua")
 include ("controls/gstatusbarpanel.lua")
 include ("controls/gstatusbarcomboboxpanel.lua")
 include ("controls/gtabcontrol.lua")
+include ("controls/gtextentry.lua")
 include ("controls/gtoolbar.lua")
 include ("controls/gtooltip.lua")
 include ("controls/gtreeviewnode.lua")

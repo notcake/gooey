@@ -130,47 +130,11 @@ function PANEL:SetSizable (sizable)
 end
 
 -- Event handlers
-function PANEL:OnCursorMoved (x, y)
-	self:DispatchEvent ("MouseMove", 0, x, y)
-	if self.OnMouseMove then self:OnMouseMove (0, self:CursorPos ()) end
-end
+Gooey.CreateMouseEvents (PANEL)
 
 function PANEL:OnKeyCodePressed (keyCode)
 	return self:DispatchKeyboardAction (keyCode)
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
-
-function PANEL:OnMousePressed (mouseCode)
-	DFrame.OnMousePressed (self, mouseCode)
-	
-	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
-	if self.OnMouseDown then self:OnMouseDown (mouseCode, self:CursorPos ()) end
-end
-
-function PANEL:OnMouseReleased (mouseCode)
-	DFrame.OnMouseReleased (self, mouseCode)
-	
-	self:DispatchEvent ("MouseUp", mouseCode, self:CursorPos ())
-	if self.OnMouseUp then self:OnMouseUp (mouseCode, self:CursorPos ()) end
-	
-	if mouseCode == MOUSE_LEFT then
-		if SysTime () - self.LastLeftMouseButtonReleaseTime < 0.4 then
-			if self.OnDoubleClick then self:OnDoubleClick (mouseCode, self:CursorPos ()) end
-			self:DispatchEvent ("DoubleClick", self:CursorPos ())
-		else
-			if self.OnClick then self:OnClick (mouseCode, self:CursorPos ()) end
-			self:DispatchEvent ("Click", self:CursorPos ())
-		end
-		
-		self.LastLeftMouseButtonReleaseTime = SysTime ()
-	elseif mouseCode == MOUSE_RIGHT then
-		self:DispatchEvent ("RightClick", self:CursorPos ())
-	end
-end
-
-function PANEL:OnMouseWheeled (delta)
-	self:DispatchEvent ("MouseWheel", delta, self:CursorPos ())
-	if self.OnMouseWheel then self:OnMouseWheel (delta, self:CursorPos ()) end
-end
 
 Gooey.Register ("GFrame", PANEL, "DFrame")
