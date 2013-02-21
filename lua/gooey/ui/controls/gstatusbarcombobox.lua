@@ -10,6 +10,7 @@ local textArrowSpacing = 2
 local arrowWidth = 14
 function PANEL:Init ()
 	self.Label = vgui.Create ("DLabel", self)
+	self.Label:SetText ("")
 	self.Label:SetTextColor (GLib.Colors.Black)
 	self.Label:SetTextInset (4, 0)
 	self.Label:SetContentAlignment (4)
