@@ -48,6 +48,23 @@ function PANEL:Init ()
 		end
 	)
 	
+	self:AddEventListener ("MouseDown",
+		function (_, mouseCode, x, y)
+			if self:GetDraggable () and y < 24 then
+				self.Dragging = { x, y }
+				self:MouseCapture (true)
+				return
+			end
+		end
+	)
+	
+	self:AddEventListener ("MouseUp", "Dragging",
+		function (_)
+			self.Dragging = nil
+			self:MouseCapture (false)
+		end
+	)
+	
 	-- Double Clicks
 	self.LastLeftMouseButtonReleaseTime = 0
 end
