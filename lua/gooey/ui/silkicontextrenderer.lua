@@ -116,13 +116,14 @@ function self:ParseText (text)
 			}
 			spanStart = currentOffset + 1
 			currentOffset = currentOffset + 1
-		elseif character == "=" then
+		elseif character == ":" then
 			-- Check if this is a valid icon
-			local match = text:match ("^=([a-zA-Z0-9_]+)=", currentOffset)
+			local match = text:match ("^:([a-zA-Z0-9_]+):", currentOffset)
 			local matchLength = match and #match or 0
 			if match then
 				match = match:lower ()
-				if match == "gaybow" then match = "rainbow" end
+				if match == "gaybow" then match = "rainbow"
+				elseif match == "gay" then match = "rainbow" end
 				if not file.Exists ("materials/icon16/" .. match .. ".png", "GAME") then
 					match = nil
 				end
@@ -148,10 +149,10 @@ function self:ParseText (text)
 				spanStart = currentOffset
 			elseif not match then
 				-- Nope, not an icon
-				currentOffset = text:find ("[=\n\t]", currentOffset + 1) or (#text + 1)
+				currentOffset = text:find ("[:\n\t]", currentOffset + 1) or (#text + 1)
 			end
 		else
-			currentOffset = text:find ("[=\n\t]", currentOffset) or (#text + 1)
+			currentOffset = text:find ("[:\n\t]", currentOffset) or (#text + 1)
 		end
 	end
 	
