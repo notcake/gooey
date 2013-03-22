@@ -1,7 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init ()
-	self.Type = "Text"
+	self.Type = Gooey.ListView.ColumnType.Text
 	
 	self.Id = "Unknown"
 	self.Index = 0
@@ -37,6 +37,10 @@ end
 function PANEL:SetIndex (index)
 	self.Index = index
 	self:SetColumnID (index)
+end
+
+function PANEL:SetMaximumWidth (maximumWidth)
+	return self:SetMaxWidth (maximumWidth)
 end
 
 function PANEL:SetType (type)

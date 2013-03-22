@@ -1,5 +1,5 @@
 local self = {}
-Gooey.AlphaController = Gooey.MakeConstructor (self, Gooey.LerpController)
+Gooey.AlphaController = Gooey.MakeConstructor (self, Gooey.LiveLinearInterpolator)
 
 --[[
 	Events:
@@ -9,13 +9,12 @@ Gooey.AlphaController = Gooey.MakeConstructor (self, Gooey.LerpController)
 
 function self:ctor ()
 	self.Controls = {}
-	self.TickController = nil
 	
 	self:SetAlpha (255)
 	self:SetTargetAlpha (255)
 	self:SetFadeRate (1024)
 	
-	self:AddEventListener ("LerpCompleted",
+	self:AddEventListener ("InterpolationCompleted",
 		function ()
 			self:DispatchEvent ("FadeCompleted")
 		end

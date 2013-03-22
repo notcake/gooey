@@ -47,22 +47,13 @@ function PANEL:Init ()
 end
 
 function PANEL:AddColumn (id, material, position)
-	local column = nil
-	if self.m_bSortable then
-		column = vgui.Create ("GListViewColumn", self)
-	else
-		column = vgui.Create ("DListView_ColumnPlain", self)
-	end
-	column:SetName (id)
-	column:SetMaterial (material)
-	column:SetZPos (10)
+	local column = Gooey.ListView.Column (self, id)
 	
-	if iPosition then
-	else
-		local columnIndex = table.insert (self.Columns, column)
-		column:SetIndex (columnIndex)
+	position = position and math.min (#self.Columns + 1, position) or #self.Columns + 1
+	table.insert (self.Columns, position, column)
+	for i = position, #self.Columns do
+		self.Columns [i]:SetIndex (i)
 	end
-	column:SetId (id)
 	self.ColumnsById [id] = column
 	
 	self:InvalidateLayout ()
@@ -74,7 +65,7 @@ function PANEL:AddLine (...)
 	self:SetDirty (true)
 	self:InvalidateLayout ()
 
-	local line = vgui.Create ("GListViewItem", self.pnlCanvas)
+	local line = vgui.Create ("GListViewItemX", self.pnlCanvas)
 	local id = #self.Lines + 1
 	
 	self.Lines [id] = line
@@ -137,6 +128,12 @@ end
 
 function PANEL:GetColumns ()
 	return self.Columns
+end
+
+function PANEL:GetColumnWidth (columnIdOrIndex)
+	local column = self:GetColumn (columnIdOrIndex)
+	if not column then return end
+	return column:GetControl ():GetWide ()
 end
 
 function PANEL:GetContentBounds ()
@@ -275,6 +272,51 @@ function PANEL:SetSelectionMode (selectionMode)
 	self.SelectionController:SetSelectionMode (selectionMode)
 end
 
+-- Internal, do not call
+function PANEL:FixColumnsLayout()
+	if #self.Columns == 0 then return end
+
+	local totalWidth = 0
+	for _, column in pairs (self.Columns) do
+		totalWidth = totalWidth + column:GetControl ():GetWide()
+	end
+	
+	local extraWidth = self.pnlCanvas:GetWide () - totalWidth
+	local extraWidthPerColumn = math.floor (extraWidth / #self.Columns)
+	local remainder = extraWidth % extraWidthPerColumn
+	
+	for _, column in pairs (self.Columns) do
+		local targetWidth = column:GetControl ():GetWide () + extraWidthPerColumn
+		remainder = remainder + targetWidth - column:GetControl ():SetWidth (targetWidth)
+	end
+	
+	while remainder ~= 0 do
+		local remainderPerPanel = math.floor (remainder / #self.Columns)
+		
+		for _, column in pairs (self.Columns) do
+	
+			remainder = math.Approach (remainder, 0, remainderPerPanel)
+			
+			local targetWidth = column:GetControl ():GetWide () + remainderPerPanel
+			remainder = remainder + targetWidth - column:GetControl ():SetWidth (targetWidth)
+			
+			if remainder == 0 then break end
+		end
+		
+		remainder = math.Approach (remainder, 0, 1)
+	end
+		
+	-- Set the positions of the resized columns
+	local x = 0
+	for _, column in pairs (self.Columns) do
+		column:GetControl ():SetPos (x, 0)
+		x = x + column:GetControl ():GetWide ()
+		
+		column:GetControl ():SetTall (self:GetHeaderHeight ())
+		column:GetControl ():SetVisible (not self:GetHideHeaders () and column:IsVisible ())
+	end
+end
+
 -- Event handlers
 function PANEL:DoClick ()
 	if SysTime () - self.LastClickTime < 0.3 then
@@ -324,4 +366,27 @@ function PANEL:OnRemoved ()
 	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
 end
 
-Gooey.Register ("GListView", PANEL, "DListView")
+function PANEL:OnRequestResize (sizingColumn, size)
+	local rightColumn = nil
+	local passed = false
+	for _, column in ipairs (self.Columns) do
+		if passed then
+			rightColumn = column
+			break
+		end
+		
+		if sizingColumn == column then passed = true end
+	end
+	
+	if rightColumn then
+		local sizeChange = sizingColumn:GetControl ():GetWide () - size
+		rightColumn:GetControl ():SetWide (rightColumn:GetControl ():GetWide () + sizeChange )
+	end
+	
+	sizingColumn:GetControl ():SetWide (size)
+	self:SetDirty (true)
+	
+	self:InvalidateLayout ()
+end
+
+Gooey.Register ("GListViewX", PANEL, "DListView")

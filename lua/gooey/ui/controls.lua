@@ -1,6 +1,9 @@
 Gooey.UI = {}
 
 include ("orientation.lua")
+include ("horizontalalignment.lua")
+include ("verticalalignment.lua")
+
 include ("sizingmethod.lua")
 include ("splitcontainerpanel.lua")
 include ("tooltippositioningmode.lua")
@@ -35,7 +38,6 @@ include ("tooltipmanager.lua")
 include ("iclipboardtarget.lua")
 
 -- Effects
-include ("lerpcontroller.lua")
 include ("alphacontroller.lua")
 include ("tickprovider.lua")
 
@@ -56,7 +58,24 @@ include ("mouseevents.lua")
 
 -- Control Bases
 include ("controls/gbasepanel.lua")
+
+-- ListView
+Gooey.ListView = {}
+include ("controls/listview/glistview.lua")
+include ("controls/listview/glistviewcolumn.lua")
+include ("controls/listview/glistviewitem.lua")
+include ("controls/listview/column.lua")
+include ("controls/listview/columncollection.lua")
+include ("controls/listview/columntype.lua")
+include ("controls/glistview.lua")
+include ("controls/glistviewcolumn.lua")
+include ("controls/glistviewitem.lua")
+
+-- Scrolling
+include ("scrollableviewcontroller.lua")
 include ("controls/gbasescrollbar.lua")
+include ("controls/ghscrollbar.lua")
+include ("controls/gvscrollbar.lua")
 
 -- Controls
 include ("controls/gbutton.lua")
@@ -67,12 +86,8 @@ include ("controls/geditablelabel.lua")
 include ("controls/gframe.lua")
 include ("controls/ggraph.lua")
 include ("controls/ggroupbox.lua")
-include ("controls/ghscrollbar.lua")
 include ("controls/glabel.lua")
 include ("controls/glabelx.lua")
-include ("controls/glistview.lua")
-include ("controls/glistviewcolumn.lua")
-include ("controls/glistviewitem.lua")
 include ("controls/glistbox.lua")
 include ("controls/glistboxitem.lua")
 include ("controls/gmenu.lua")
@@ -100,7 +115,6 @@ include ("controls/gtoolbar.lua")
 include ("controls/gtooltip.lua")
 include ("controls/gtreeviewnode.lua")
 include ("controls/gtreeview.lua")
-include ("controls/gvscrollbar.lua")
 include ("controls/gworldview.lua")
 
 include ("controls/gvpanel.lua")

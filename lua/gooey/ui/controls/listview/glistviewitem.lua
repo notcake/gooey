@@ -30,7 +30,7 @@ function PANEL:DataLayout (listView)
 	self:ApplySchemeSettings ()
 	local height = self:GetTall ()
 	local x = 0
-	local w = listView:ColumnWidth (1)
+	local w = listView:GetColumnWidth (1)
 	local columns = listView:GetColumns ()
 	if self.Icon then
 		local image = Gooey.ImageCache:GetImage (self.Icon)
@@ -41,7 +41,7 @@ function PANEL:DataLayout (listView)
 	end
 	for i = 1, #self.Columns do
 		if columns [i]:GetType () == Gooey.ListView.ColumnType.Checkbox then
-			self.Columns [i]:SetPos (x + (listView:ColumnWidth (i) - 15) * 0.5, (height - 15) * 0.5)
+			self.Columns [i]:SetPos (x + (listView:GetColumnWidth (i) - 15) * 0.5, (height - 15) * 0.5)
 			self.Columns [i]:SetSize (15, 15)
 		else
 			self.Columns [i]:SetPos (x + 4, 0)
@@ -50,11 +50,11 @@ function PANEL:DataLayout (listView)
 			self.Columns [i]:SetSize (w - 8, height)
 			self.Columns [i]:SetContentAlignment (self.ListView:GetColumn (i):GetAlignment ())
 		end
-		self.Columns [i]:SetVisible (columns [i]:IsVisible ())
-		if columns [i]:IsVisible () then
+		self.Columns [i]:SetVisible (columns [i]:GetControl ():IsVisible ())
+		if columns [i]:GetControl ():IsVisible () then
 			x = x + w
 		end
-		w = listView:ColumnWidth (i + 1)
+		w = listView:GetColumnWidth (i + 1)
 	end
 end
 
@@ -178,4 +178,4 @@ function PANEL:OnRemoved ()
 	end
 end
 
-Gooey.Register ("GListViewItem", PANEL, "DListView_Line")
+Gooey.Register ("GListViewItemX", PANEL, "DListView_Line")

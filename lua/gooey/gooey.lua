@@ -35,6 +35,16 @@ if CLIENT then
 	
 	include ("clipboard.lua")
 	include ("rendercontext.lua")
+	
+	include ("interpolators/timeinterpolator.lua")
+	include ("interpolators/normalizedtimeinterpolator.lua")
+	include ("interpolators/linearinterpolator.lua")
+	include ("interpolators/accelerationdecelerationinterpolator.lua")
+	include ("interpolators/scaledtimeinterpolator.lua")
+	include ("interpolators/liveadditiveinterpolator.lua")
+	include ("interpolators/livelinearinterpolator.lua")
+	include ("interpolators/livesmoothinginterpolator.lua")
+	
 	include ("ui/controls.lua")
 end
 
