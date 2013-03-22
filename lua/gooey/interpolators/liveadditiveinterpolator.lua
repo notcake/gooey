@@ -5,6 +5,8 @@ Gooey.LiveAdditiveInterpolator = Gooey.MakeConstructor (self, Gooey.TimeInterpol
 	Events:
 		InterpolationCompleted ()
 			Fired when the interpolation has completed.
+		InterpolationStarted ()
+			Fired when interpolation has started.
 ]]
 
 function self:ctor ()
@@ -30,6 +32,10 @@ function self:AddInterpolator (timeInterpolator, startTime)
 	self.Interpolators [#self.Interpolators + 1] = timeInterpolator
 	self.InterpolatorStartTimes [#self.InterpolatorStartTimes + 1] = startTime
 	self.FinalValue = self.FinalValue + timeInterpolator:GetFinalValue ()
+	
+	if #self.Interpolators == 1 then
+		self:DispatchEvent ("InterpolationStarted")
+	end
 end
 
 function self:GetDuration ()
