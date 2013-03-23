@@ -28,7 +28,7 @@ function self:AddItem (...)
 	for i = 1, self:GetListView ():GetColumns ():GetColumnCount () do
 		local column = self:GetListView ():GetColumns ():GetColumn (i)
 		if column:GetType () == Gooey.ListView.ColumnType.Text then
-			listViewItem:SetColumnText (column:GetId (), tostring (values [i]) or "")
+			listViewItem:SetColumnText (column:GetId (), tostring (values [i] or ""))
 		elseif column:GetType () == Gooey.ListView.ColumnType.Checkbox then
 			listViewItem:SetCheckState (column:GetId (), values [i] and true or false)
 		end
@@ -59,6 +59,10 @@ end
 
 function self:GetItemCount ()
 	return #self.OrderedItems
+end
+
+function self:GetListView ()
+	return self.ListView
 end
 
 function self:RemoveItem (listViewItem)

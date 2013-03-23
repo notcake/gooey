@@ -5,6 +5,12 @@ Gooey.ListView.ColumnCollection = Gooey.MakeConstructor (self)
 	Events:
 		ColumnAdded (Column column)
 			Fired when a column has been added to this ColumnCollection.
+		ColumnAlignmentChanged (Column column, HorizontalAlignment alignment)
+			Fired when a column's alignment has changed.
+		ColumnRemoved (Column column)
+			Fired when a column has been removed from this ColumnCollection.
+		ColumnVisibleChanged (Column column, visible)
+			Fired when a column's visibility has changed.
 ]]
 
 function self:ctor (listView)
@@ -39,6 +45,10 @@ function self:GetColumnById (id)
 	return self.ColumnsById [id]
 end
 
+function self:GetColumnByIdOrIndex (idOrIndex)
+	return self.ColumnsById [idOrIndex] or self.OrderedColumns [idOrIndex]
+end
+
 function self:GetColumnCount ()
 	return #self.OrderedColumns
 end
@@ -58,8 +68,23 @@ end
 -- Internal, do not call
 function self:HookColumn (column)
 	if not column then return end
+	
+	column:AddEventListener ("AlignmentChanged", tostring (self),
+		function (_, alignment)
+			self:DispatchEvent ("ColumnAlignmentChanged", column, alignment)
+		end
+	)
+	
+	column:AddEventListener ("VisibleChanged", tostring (self),
+		function (_, visible)
+			self:DispatchEvent ("ColumnVisibleChanged", column, visible)
+		end
+	)
 end
 
 function self:UnhookColumn (column)
 	if not column then return end
+	
+	column:RemoveEventListener ("AlignmentChanged", tostring (self))
+	column:RemoveEventListener ("VisibleChanged",   tostring (self))
 end

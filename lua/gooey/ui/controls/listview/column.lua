@@ -3,6 +3,10 @@ Gooey.ListView.Column = Gooey.MakeConstructor (self)
 
 --[[
 	Events:
+		AlignmentChanged (HorizontalAlignment alignment)
+			Fired when this column's alignment has changed.
+		HeaderAlignmentChanged (HorizontalAlignment headerAlignment)
+			Fired when this column's header alignment has changed.
 		TextChanged (text)
 			Fired when this column's text has changed.
 		VisibleChanged (visible)
@@ -100,10 +104,13 @@ function self:GetText ()
 end
 
 function self:SetHeaderAlignment (headerAlignment)
-	if self.HeaderAlignment == headerAlignment then return end
+	if self.HeaderAlignment == headerAlignment then return self end
 	
 	self.HeaderAlignment = headerAlignment
 	self:UpdateHeaderAlignment ()
+	
+	self:DispatchEvent ("HeaderAlignmentChanged", self.HeaderAlignment)
+	return self
 end
 
 function self:SetText (text)
@@ -125,7 +132,10 @@ function self:GetType ()
 end
 
 function self:SetAlignment (alignment)
+	if self.Alignment == alignment then return end
+	
 	self.Alignment = alignment
+	self:DispatchEvent ("AlignmentChanged", self.Alignment)
 	return self
 end
 
@@ -147,6 +157,10 @@ end
 
 function self:GetMinimumWidth ()
 	return self.MinimumWidth
+end
+
+function self:GetWidth ()
+	return self.Header:GetWide ()
 end
 
 function self:SetIndex (index)

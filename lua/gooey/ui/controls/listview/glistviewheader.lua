@@ -18,6 +18,10 @@ function PANEL:Init ()
 	self.SizeGrips = {}
 end
 
+function PANEL:GetHeaderWidth ()
+	return self.HeaderWidth
+end
+
 function PANEL:Paint (w, h)
 	surface.SetDrawColor (GLib.Colors.LightGray)
 	surface.DrawRect (0, 1, w, h - 1)
@@ -90,15 +94,15 @@ function PANEL:LayoutHeaders ()
 		column:GetHeader ():SetTall (self:GetTall ())
 		
 		local sizeGrip = self:GetColumnSizeGrip (column, column:IsVisible ())
+		if sizeGrip then
+			sizeGrip:SetVisible (column:IsVisible ())
+		end
 		if column:IsVisible () then
 			x = x + column:GetHeader ():GetWide ()
 			sizeGrip:SetPos (x - sizeGrip:GetWide () / 2, 0)
 			sizeGrip:SetTall (self:GetTall ())
-		elseif sizeGrip then
-			sizeGrip:SetVisible (column:IsVisible ())
+			x = x - 1
 		end
-		
-		x = x - 1
 	end
 	x = x + 1
 	
@@ -162,12 +166,19 @@ function PANEL:HookColumn (column)
 			self:LayoutHeaders ()
 		end
 	)
+	
+	column:GetHeader ():AddEventListener ("VisibleChanged", tostring (self:GetTable ()),
+		function (_)
+			self:LayoutHeaders ()
+		end
+	)
 end
 
 function PANEL:UnhookColumn (column)
 	if not column then return end
 	
-	column:GetHeader ():RemoveEventListener ("SizeChanged", tostring (self:GetTable ()))
+	column:GetHeader ():RemoveEventListener ("SizeChanged",    tostring (self:GetTable ()))
+	column:GetHeader ():RemoveEventListener ("VisibleChanged", tostring (self:GetTable ()))
 end
 
 function PANEL:HookScrollableViewController (scrollableViewController)

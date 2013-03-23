@@ -30,6 +30,12 @@ function PANEL:Init ()
 		end
 	)
 	
+	self.Columns:AddEventListener ("ColumnAlignmentChanged",
+		function (_, column, alignment)
+			self:InvalidateSubItemLayout ()
+		end
+	)
+	
 	self.Columns:AddEventListener ("ColumnRemoved",
 		function (_, column)
 			self:InvalidateSubItemLayout ()
@@ -50,14 +56,16 @@ function PANEL:Init ()
 	
 	self.Items:AddEventListener ("ItemAdded",
 		function (_, listViewItem)
-			listViewItem:SetParent (self.ItemCanvas)
+			listViewItem:SetParent (self)
 			self:UpdateContentHeight ()
+			self:InvalidateVerticalItemLayout ()
 		end
 	)
 	
 	self.Items:AddEventListener ("ItemRemoved",
 		function (_, listViewItem)
 			self:UpdateContentHeight ()
+			self:InvalidateVerticalItemLayout ()
 			self.SelectionController:RemoveFromSelection (listViewItem)
 		end
 	)
@@ -149,6 +157,21 @@ function PANEL:PerformLayout ()
 	
 	if not self.VerticalItemLayoutValid then
 		self.VerticalItemLayoutValid = true
+		
+		local y = self:GetHeaderHeight ()
+		for listViewItem in self:GetItemEnumerator () do
+			listViewItem:SetPos (1, y)
+			listViewItem:SetTall (self:GetItemHeight ())
+			
+			if listViewItem:IsVisible () then
+				y = y + listViewItem:GetTall ()
+			end
+		end
+	end
+	
+	-- TODO: Only layout visible items
+	for listViewItem in self:GetItemEnumerator () do
+		listViewItem:LayoutSubItems (self:GetSubItemLayoutRevision ())
 	end
 end
 
@@ -157,16 +180,12 @@ function PANEL:AddColumn (id)
 	return self.Columns:AddColumn (id)
 end
 
-function PANEL:GetColumnComparator (id)
-	return self.ColumnComparators [id] or self.Comparator or self.DefaultComparator
+function PANEL:GetColumnCount ()
+	return self.Columns:GetCount ()
 end
 
 function PANEL:GetColumnEnumerator ()
 	return self.Columns:GetEnumerator ()
-end
-
-function PANEL:GetColumn (columnIdOrIndex)
-	return self.ColumnsById [columnIdOrIndex] or self.Columns [columnIdOrIndex]
 end
 
 function PANEL:GetColumns ()
@@ -185,6 +204,10 @@ function PANEL:GetHeaderWidth ()
 	return self.Header:GetHeaderWidth ()
 end
 
+function PANEL:RemoveColumn (column)
+	self.Columns:RemoveColumn (column)
+end
+
 function PANEL:SetHeaderHeight (headerHeight)
 	if self.HeaderHeight == headerHeight then return end
 	
@@ -193,29 +216,17 @@ function PANEL:SetHeaderHeight (headerHeight)
 end
 
 -- Items
-function PANEL:ClearSelection ()
-	self.SelectionController:ClearSelection ()
+function PANEL:AddItem (...)
+	return self.Items:AddItem (...)
 end
 
-function PANEL.DefaultComparator (a, b)
-	return a:GetText () < b:GetText ()
-end
-
-function PANEL:FindLine (text)
+function PANEL:FindItem (text)
 	for item in self:GetItemEnumerator () do
 		if item:GetColumnText (1) == text then
 			return item
 		end
 	end
 	return nil
-end
-
-function PANEL:GetContentBounds ()
-	local scrollbarWidth = 0
-	if self.VBar and self.VBar:IsVisible () then
-		scrollbarWidth = self.VBar:GetWide ()
-	end
-	return 1, self:GetHeaderHeight (), self:GetWide () - scrollbarWidth, self:GetTall () - 1
 end
 
 function PANEL:GetItemCount ()
@@ -234,6 +245,37 @@ function PANEL:GetItems ()
 	return self.Items
 end
 
+function PANEL:ItemFromPoint (x, y)
+	x, y = self:LocalToScreen (x, y)
+	for item in self:GetItemEnumerator () do
+		local px, py = item:LocalToScreen (0, 0)
+		local w, h = item:GetSize ()
+		if px <= x and x < px + w and
+		   py <= y and y < py + h then
+			return item
+		end
+	end
+	return nil
+end
+
+function PANEL:RemoveItem (listViewItem)
+	return self.Items:RemoveItem (listViewItem)
+end
+
+function PANEL:SetItemHeight (itemHeight)
+	if self.ItemHeight == itemHeight then return self end
+	
+	self.ItemHeight = itemHeight
+	self:InvalidateSubItemLayout ()
+	self:InvalidateVerticalItemLayout ()
+	return self
+end
+
+-- Selection
+function PANEL:ClearSelection ()
+	self.SelectionController:ClearSelection ()
+end
+
 function PANEL:GetSelectedItems ()
 	return self.SelectionController:GetSelectedItems ()
 end
@@ -250,27 +292,20 @@ function PANEL:GetSelectionMode ()
 	return self.SelectionController:GetSelectionMode ()
 end
 
-function PANEL:ItemFromPoint (x, y)
-	x, y = self:LocalToScreen (x, y)
-	for item in self:GetItemEnumerator () do
-		local px, py = item:LocalToScreen (0, 0)
-		local w, h = item:GetSize ()
-		if px <= x and x < px + w and
-		   py <= y and y < py + h then
-			return item
-		end
+function PANEL:SetSelectionMode (selectionMode)
+	self.SelectionController:SetSelectionMode (selectionMode)
+end
+
+-- Layout
+function PANEL:GetContentBounds ()
+	local scrollbarWidth = 0
+	if self.VBar and self.VBar:IsVisible () then
+		scrollbarWidth = self.VBar:GetWide ()
 	end
-	return nil
+	return 1, self:GetHeaderHeight (), self:GetWide () - scrollbarWidth, self:GetTall () - 1
 end
 
-function PANEL:SetItemHeight (itemHeight)
-	if self.ItemHeight == itemHeight then return self end
-	
-	self.ItemHeight = itemHeight
-	self:InvalidateVerticalItemLayout ()
-	return self
-end
-
+-- Sorting
 function PANEL:Sort (comparator)
 	if not comparator and self.LastSortedByColumn then
 		self:SortByColumn (self.LastSortColumn, self.LastSortDescending)
@@ -312,10 +347,6 @@ function PANEL:SortByColumn (columnIdOrIndex, descending)
 	
 	self:SetDirty (true)
 	self:InvalidateLayout ()
-end
-
-function PANEL:SetSelectionMode (selectionMode)
-	self.SelectionController:SetSelectionMode (selectionMode)
 end
 
 -- Event handlers
@@ -391,8 +422,13 @@ function PANEL:OnRequestResize (sizingColumn, size)
 end
 
 -- Internal, do not call
+function PANEL:GetSubItemLayoutRevision ()
+	return self.SubItemLayoutRevision
+end
+
 function PANEL:InvalidateSubItemLayout ()
 	self.SubItemLayoutRevision = self.SubItemLayoutRevision + 1
+	self:InvalidateLayout ()
 end
 
 function PANEL:InvalidateVerticalItemLayout ()

@@ -93,12 +93,16 @@ function PANEL:Scroll (delta)
 end
 
 function PANEL:SetContentSize (contentSize)
+	if self.ContentSize == contentSize then return self end
+	
 	self.ContentSize = contentSize
 	self:SetEnabled (self.ViewSize < self.ContentSize)
 	if self.ViewOffset + self.ViewSize > self.ContentSize then
 		self:SetViewOffset (self.ContentSize - self.ViewSize)
 	end
 	self:InvalidateLayout ()
+	
+	return self
 end
 
 function PANEL:SetViewOffset (viewOffset)
@@ -110,21 +114,27 @@ function PANEL:SetViewOffset (viewOffset)
 	if viewOffset <= 0 then
 		viewOffset = 0
 	end
-	if self.ViewOffset == viewOffset then return end
+	if self.ViewOffset == viewOffset then return self end
 	
 	self.ViewOffset = viewOffset
 	
 	self:DispatchEvent ("Scroll", self.ViewOffset)
 	self:InvalidateLayout ()
+	
+	return self
 end
 
 function PANEL:SetViewSize (viewSize)
+	if self.ViewSize == viewSize then return self end
+	
 	self.ViewSize = viewSize
 	self:SetEnabled (self.ViewSize < self.ContentSize)
 	if self.ViewOffset + self.ViewSize > self.ContentSize then
 		self:SetViewOffset (self.ContentSize - self.ViewSize)
 	end
 	self:InvalidateLayout ()
+	
+	return self
 end
 
 -- Internal, do not call
