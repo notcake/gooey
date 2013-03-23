@@ -37,6 +37,13 @@ function PANEL:GetScrollIncrement ()
 end
 
 function PANEL:Paint (w, h)
+	if self:GetSkin () and
+	   self:GetSkin ().tex and
+	   self:GetSkin ().tex.Scroller and
+	   not self:GetSkin ().tex.Scroller.LeftButton_Dead then
+		self:InitializeDisabledButtonTextures ()
+	end
+	
 	derma.SkinHook ("Paint", "Button" .. self:GetDirection (), self, w, h)
 end
 
@@ -52,6 +59,7 @@ function PANEL:SetScrollIncrement (increment)
 	self.ScrollIncrement = increment or 1
 end
 
+-- Event handlers
 function PANEL:Think ()
 	if self:IsPressed () then
 		if SysTime () >= self.NextIncrementTime then
@@ -61,6 +69,19 @@ function PANEL:Think ()
 			end
 		end
 	end
+end
+
+-- Internal, do not call
+function PANEL:InitializeDisabledButtonTextures ()
+	local _SKIN = _G.SKIN
+	SKIN = self:GetSkin ()
+	
+	SKIN.tex.Scroller.LeftButton_Dead  = GWEN.CreateTextureBorder (480,	272,	    15, 15, 2, 2, 2, 2)
+	SKIN.tex.Scroller.UpButton_Dead    = GWEN.CreateTextureBorder (480,	272 + 16,	15, 15, 2, 2, 2, 2)
+	SKIN.tex.Scroller.RightButton_Dead = GWEN.CreateTextureBorder (480,	272 + 32,	15, 15, 2, 2, 2, 2)
+	SKIN.tex.Scroller.DownButton_Dead  = GWEN.CreateTextureBorder (480,	272 + 48,	15, 15, 2, 2, 2, 2)
+	
+	_G.SKIN = _SKIN
 end
 
 Gooey.Register ("GScrollBarButton", PANEL, "GButton")

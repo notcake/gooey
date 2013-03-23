@@ -1,10 +1,17 @@
 local PANEL = {}
 
 function PANEL:Init ()
-	self.ListView = nil
-	
+	-- Control
 	self.LastClickTime = 0
-
+	
+	-- ListViewItem
+	self.ListView = nil
+	self.Id = 0
+	
+	-- Layout
+	self.LayoutRevision = 0
+	
+	-- SubItems
 	self.Icon = nil
 	
 	-- Selection
@@ -26,11 +33,37 @@ function PANEL:Init ()
 	)
 end
 
+-- ListViewItem
+function self:GetId ()
+	return self.Id
+end
+
+function self:GetListView ()
+	return self.ListView
+end
+
+function self:SetId (id)
+	self.Id = id
+end
+
+function self:SetListView (listView)
+	self.ListView = listView
+end
+
+-- Layout
+function self:LayoutItem (layoutRevision)
+	if self.LayoutRevision >= layoutRevision then return end
+	self.LayoutRevision = layoutRevision
+	
+	self:SetSize (self:GetListView ():GetHeaderWidth (), self:GetListView ():GetItemHeight ())
+end
+
+-- SubItems
 function PANEL:DataLayout (listView)
 	self:ApplySchemeSettings ()
 	local height = self:GetTall ()
 	local x = 0
-	local w = listView:GetColumnWidth (1)
+	local w = listView:ColumnWidth (1)
 	local columns = listView:GetColumns ()
 	if self.Icon then
 		local image = Gooey.ImageCache:GetImage (self.Icon)
@@ -41,7 +74,7 @@ function PANEL:DataLayout (listView)
 	end
 	for i = 1, #self.Columns do
 		if columns [i]:GetType () == Gooey.ListView.ColumnType.Checkbox then
-			self.Columns [i]:SetPos (x + (listView:GetColumnWidth (i) - 15) * 0.5, (height - 15) * 0.5)
+			self.Columns [i]:SetPos (x + (listView:ColumnWidth (i) - 15) * 0.5, (height - 15) * 0.5)
 			self.Columns [i]:SetSize (15, 15)
 		else
 			self.Columns [i]:SetPos (x + 4, 0)
@@ -50,11 +83,11 @@ function PANEL:DataLayout (listView)
 			self.Columns [i]:SetSize (w - 8, height)
 			self.Columns [i]:SetContentAlignment (self.ListView:GetColumn (i):GetAlignment ())
 		end
-		self.Columns [i]:SetVisible (columns [i]:GetControl ():IsVisible ())
-		if columns [i]:GetControl ():IsVisible () then
+		self.Columns [i]:SetVisible (columns [i]:IsVisible ())
+		if columns [i]:IsVisible () then
 			x = x + w
 		end
-		w = listView:GetColumnWidth (i + 1)
+		w = listView:ColumnWidth (i + 1)
 	end
 end
 
@@ -64,10 +97,6 @@ end
 
 function PANEL:GetIcon ()
 	return self.Icon
-end
-
-function PANEL:GetListView ()
-	return self.ListView
 end
 
 function PANEL:GetText (i)
@@ -149,10 +178,6 @@ function PANEL:SetColumnText (columnIdOrIndex, text)
 	self.Columns [columnIndex]:SetText (text)
 end
 
-function PANEL:SetListView (listView)
-	self.ListView = listView
-end
-
 -- Event handlers
 function PANEL:DoClick ()
 	self.ListView:DoClick (self)
@@ -174,8 +199,8 @@ function PANEL:OnRemoved ()
 	local listView = self:GetListView ()
 	if listView then
 		self:SetListView (nil)
-		listView:RemoveItem (self)
+		listView:GetItems ():RemoveItem (self)
 	end
 end
 
-Gooey.Register ("GListViewItemX", PANEL, "DListView_Line")
+Gooey.Register ("GListViewItem", PANEL, "GPanel")

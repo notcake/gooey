@@ -9,95 +9,192 @@ local PANEL = {}
 ]]
 
 function PANEL:Init ()
-	self.SelectionController = Gooey.SelectionController (self)
-	
 	self.LastClickTime = 0
 
 	self.Menu = nil
-	self.ShowIcons = true
 	
-	self:SetItemHeight (20)
-	
-	self.ColumnsById = {}
+	-- Columns
+	self.Columns = Gooey.ListView.ColumnCollection (self)
 	self.ColumnComparators = {}
 	
-	self.LastSortedByColumn = false
-	self.LastSortColumn = 1
-	self.LastSortDescending = false
+	self.Header = vgui.Create ("GListViewHeader", self)
+	self.Header:SetColumnCollection (self.Columns)
+	self.Header:SetZPos (10)
+	
+	self.HeaderHeight = 20
+	self.HeaderVisible = true
+	
+	self.Columns:AddEventListener ("ColumnAdded",
+		function (_, column)
+			self:InvalidateSubItemLayout ()
+		end
+	)
+	
+	self.Columns:AddEventListener ("ColumnRemoved",
+		function (_, column)
+			self:InvalidateSubItemLayout ()
+		end
+	)
+	
+	self.Header:AddEventListener ("HeaderWidthChanged",
+		function (_, headerWidth)
+			self.ScrollableViewController:SetContentWidth (headerWidth + 2)
+			self:InvalidateSubItemLayout ()
+		end
+	)
+	
+	-- Items
+	self.Items = Gooey.ListView.ItemCollection (self)
+	self.ItemHeight = 20
+	self.ShowIcons = true
+	
+	self.Items:AddEventListener ("ItemAdded",
+		function (_, listViewItem)
+			listViewItem:SetParent (self.ItemCanvas)
+			self:UpdateContentHeight ()
+		end
+	)
+	
+	self.Items:AddEventListener ("ItemRemoved",
+		function (_, listViewItem)
+			self:UpdateContentHeight ()
+			self.SelectionController:RemoveFromSelection (listViewItem)
+		end
+	)
+	
+	-- Selection
+	self.SelectionController = Gooey.SelectionController (self)
 	
 	self.SelectionController:AddEventListener ("SelectionChanged",
-		function (_, item)
-			self:DispatchEvent ("SelectionChanged", item)
+		function (_, listViewItem)
+			self:DispatchEvent ("SelectionChanged", listViewItem)
 		end
 	)
 	
 	self.SelectionController:AddEventListener ("SelectionCleared",
-		function (_, item)
-			self:DispatchEvent ("SelectionCleared", item)
+		function (_, listViewItem)
+			self:DispatchEvent ("SelectionCleared", listViewItem)
 		end
 	)
+	
+	-- Layout
+	self.SubItemLayoutRevision = 0
+	self.VerticalItemLayoutValid = true
+	
+	-- Scrolling
+	self.VScroll = vgui.Create ("GVScrollBar", self)
+	self.VScroll:SetZPos (20)
+	self.HScroll = vgui.Create ("GHScrollBar", self)
+	self.HScroll:SetZPos (20)
+	self.ScrollBarCorner = vgui.Create ("GScrollBarCorner", self)
+	self.ScrollableViewController = Gooey.ScrollableViewController ()
+	self.ScrollableViewController:SetHorizontalScrollBar (self.HScroll)
+	self.ScrollableViewController:SetVerticalScrollBar (self.VScroll)
+	self.ScrollableViewController:SetScrollBarCorner (self.ScrollBarCorner)
+	self.ScrollableViewController:SetViewSize (self:GetSize ())
+	
+	self.Header:SetScrollableViewController (self.ScrollableViewController)
+	
+	self.ScrollableViewController:AddEventListener ("ViewXChanged",
+		function (_, viewY)
+			self:InvalidateVerticalItemLayout ()
+		end
+	)
+	
+	self.ScrollableViewController:AddEventListener ("ViewYChanged",
+		function (_, viewY)
+			self:InvalidateVerticalItemLayout ()
+		end
+	)
+	
+	-- Sorting
+	self.LastSortedByColumn = false
+	self.LastSortColumn = 1
+	self.LastSortDescending = false
 	
 	self:AddEventListener ("EnabledChanged",
 		function (_, enabled)
-			for _, line in pairs (self.Lines) do
-				line:SetEnabled (enabled)
+			for listViewItem in self:GetItemEnumerator () do
+				listViewItem:SetEnabled (enabled)
 			end
+		end
+	)
+	
+	self:AddEventListener ("SizeChanged",
+		function (_, w, h)
+			self.ScrollableViewController:SetViewSize (w, h)
 		end
 	)
 end
 
-function PANEL:AddColumn (id, material, position)
-	local column = Gooey.ListView.Column (self, id)
-	
-	position = position and math.min (#self.Columns + 1, position) or #self.Columns + 1
-	table.insert (self.Columns, position, column)
-	for i = position, #self.Columns do
-		self.Columns [i]:SetIndex (i)
-	end
-	self.ColumnsById [id] = column
-	
-	self:InvalidateLayout ()
-	
-	return column
+-- Control
+function PANEL:Paint (w, h)
+	return derma.SkinHook ("Paint", "ListView", self, w, h)
 end
 
-function PANEL:AddLine (...)
-	self:SetDirty (true)
-	self:InvalidateLayout ()
-
-	local line = vgui.Create ("GListViewItemX", self.pnlCanvas)
-	local id = #self.Lines + 1
-	
-	self.Lines [id] = line
-	line:SetListView (self)
-	line:SetID (id)
-	line:SetTall (self.ItemHeight)
-	line:SetEnabled (self:IsEnabled ())
-
-	local values = {...}
-	for k, column in pairs (self.Columns) do
-		if column:GetType () == Gooey.ListView.ColumnType.Text then
-			line:SetColumnText (k, values [k] or "")
-		elseif column:GetType () == Gooey.ListView.ColumnType.Checkbox then
-			line:SetCheckState (k, values [k] or false)
-		end
-	end
-	
-	local sortId = #self.Sorted + 1
-	self.Sorted [sortId] = line
-	if sortId % 2 == 1 then
-		line:SetAltLine (true)
-	end
-
-	return line
+function PANEL:PaintOver ()
+	self.SelectionController:PaintOver (self)
 end
 
+function PANEL:PerformLayout ()
+	self.Header:SetPos (1, 0)
+	self.Header:SetSize (self:GetWide () - 2, self:GetHeaderHeight ())
+	
+	self.VScroll:SetPos (self:GetWide () - self.VScroll:GetWide (), 0)
+	self.VScroll:SetTall (self:GetTall () - (self.HScroll:IsVisible () and self.HScroll:GetTall () or 0))
+	self.HScroll:SetPos (0, self:GetTall () - self.HScroll:GetTall (), 0)
+	self.HScroll:SetWide (self:GetWide () - (self.VScroll:IsVisible () and self.VScroll:GetWide () or 0))
+	self.ScrollBarCorner:SetPos (self:GetWide () - self.ScrollBarCorner:GetWide (), self:GetTall () - self.ScrollBarCorner:GetTall ())
+	self.ScrollBarCorner:SetVisible (self.VScroll:IsVisible () and self.HScroll:IsVisible ())
+	
+	if not self.VerticalItemLayoutValid then
+		self.VerticalItemLayoutValid = true
+	end
+end
+
+-- Columns
+function PANEL:AddColumn (id)
+	return self.Columns:AddColumn (id)
+end
+
+function PANEL:GetColumnComparator (id)
+	return self.ColumnComparators [id] or self.Comparator or self.DefaultComparator
+end
+
+function PANEL:GetColumnEnumerator ()
+	return self.Columns:GetEnumerator ()
+end
+
+function PANEL:GetColumn (columnIdOrIndex)
+	return self.ColumnsById [columnIdOrIndex] or self.Columns [columnIdOrIndex]
+end
+
+function PANEL:GetColumns ()
+	return self.Columns
+end
+
+function PANEL:GetHeader ()
+	return self.Header
+end
+
+function PANEL:GetHeaderHeight ()
+	return self.HeaderHeight
+end
+
+function PANEL:GetHeaderWidth ()
+	return self.Header:GetHeaderWidth ()
+end
+
+function PANEL:SetHeaderHeight (headerHeight)
+	if self.HeaderHeight == headerHeight then return end
+	
+	self.HeaderHeight = headerHeight
+	self:UpdateContentHeight ()
+end
+
+-- Items
 function PANEL:ClearSelection ()
 	self.SelectionController:ClearSelection ()
-end
-
-function PANEL:ColumnIndexFromId (id)
-	return self.ColumnsById [id] and self.ColumnsById [id]:GetIndex () or nil
 end
 
 function PANEL.DefaultComparator (a, b)
@@ -105,35 +202,12 @@ function PANEL.DefaultComparator (a, b)
 end
 
 function PANEL:FindLine (text)
-	for _, line in pairs (self.Lines) do
-		if line:GetColumnText (1) == text then
-			return line
+	for item in self:GetItemEnumerator () do
+		if item:GetColumnText (1) == text then
+			return item
 		end
 	end
 	return nil
-end
-
-function PANEL:GetColumnComparator (id)
-	return self.ColumnComparators [id] or self.Comparator or self.DefaultComparator
-end
-
-function PANEL:GetColumn (columnIdOrIndex)
-	return self.ColumnsById [columnIdOrIndex] or self.Columns [columnIdOrIndex]
-end
-
-function PANEL:GetColumnHeight ()
-	local column = self.Columns [1]
-	return column and column:GetTall () or 0
-end
-
-function PANEL:GetColumns ()
-	return self.Columns
-end
-
-function PANEL:GetColumnWidth (columnIdOrIndex)
-	local column = self:GetColumn (columnIdOrIndex)
-	if not column then return end
-	return column:GetControl ():GetWide ()
 end
 
 function PANEL:GetContentBounds ()
@@ -141,27 +215,23 @@ function PANEL:GetContentBounds ()
 	if self.VBar and self.VBar:IsVisible () then
 		scrollbarWidth = self.VBar:GetWide ()
 	end
-	return 1, self:GetColumnHeight (), self:GetWide () - scrollbarWidth, self:GetTall () - 1
+	return 1, self:GetHeaderHeight (), self:GetWide () - scrollbarWidth, self:GetTall () - 1
 end
 
 function PANEL:GetItemCount ()
-	return #self.Sorted
+	return self.Items:GetItemCount ()
 end
 
 function PANEL:GetItemEnumerator ()
-	local next, tbl, key = pairs (self:GetItems ())
-	return function ()
-		key = next (tbl, key)
-		return tbl [key]
-	end
+	return self.Items:GetEnumerator ()
 end
 
 function PANEL:GetItemHeight ()
-	return self:GetDataHeight ()
+	return self.ItemHeight
 end
 
 function PANEL:GetItems ()
-	return self.Lines
+	return self.Items
 end
 
 function PANEL:GetSelectedItems ()
@@ -182,47 +252,23 @@ end
 
 function PANEL:ItemFromPoint (x, y)
 	x, y = self:LocalToScreen (x, y)
-	for _, item in pairs (self:GetItems ()) do
+	for item in self:GetItemEnumerator () do
 		local px, py = item:LocalToScreen (0, 0)
 		local w, h = item:GetSize ()
 		if px <= x and x < px + w and
-			py <= y and y < py + h then
+		   py <= y and y < py + h then
 			return item
 		end
 	end
 	return nil
 end
 
-function PANEL:PaintOver ()
-	self.SelectionController:PaintOver (self)
-end
-
-function PANEL:RemoveItem (listViewItem)
-	if not listViewItem or not listViewItem:IsValid () then return end
-	
-	if self.Lines [listViewItem:GetID ()] ~= listViewItem then return end
-	local selectedID = self:GetSortedID (listViewItem:GetID ())
-	self.Lines [listViewItem:GetID ()] = nil
-	table.remove (self.Sorted, selectedID)
-	
-	self.SelectionController:RemoveFromSelection (listViewItem)
-
-	self:SetDirty (true)
-	self:InvalidateLayout ()
-
-	listViewItem:Remove ()
-end
-
-function PANEL:RemoveLine (lineId)
-	Gooey.DeprecatedFunction ()
-end
-
-function PANEL:SetColumnComparator (id, comparator)
-	self.ColumnComparators [id] = comparator
-end
-
 function PANEL:SetItemHeight (itemHeight)
-	self:SetDataHeight (itemHeight)
+	if self.ItemHeight == itemHeight then return self end
+	
+	self.ItemHeight = itemHeight
+	self:InvalidateVerticalItemLayout ()
+	return self
 end
 
 function PANEL:Sort (comparator)
@@ -270,51 +316,6 @@ end
 
 function PANEL:SetSelectionMode (selectionMode)
 	self.SelectionController:SetSelectionMode (selectionMode)
-end
-
--- Internal, do not call
-function PANEL:FixColumnsLayout()
-	if #self.Columns == 0 then return end
-
-	local totalWidth = 0
-	for _, column in pairs (self.Columns) do
-		totalWidth = totalWidth + column:GetControl ():GetWide()
-	end
-	
-	local extraWidth = self.pnlCanvas:GetWide () - totalWidth
-	local extraWidthPerColumn = math.floor (extraWidth / #self.Columns)
-	local remainder = extraWidth % extraWidthPerColumn
-	
-	for _, column in pairs (self.Columns) do
-		local targetWidth = column:GetControl ():GetWide () + extraWidthPerColumn
-		remainder = remainder + targetWidth - column:GetControl ():SetWidth (targetWidth)
-	end
-	
-	while remainder ~= 0 do
-		local remainderPerPanel = math.floor (remainder / #self.Columns)
-		
-		for _, column in pairs (self.Columns) do
-	
-			remainder = math.Approach (remainder, 0, remainderPerPanel)
-			
-			local targetWidth = column:GetControl ():GetWide () + remainderPerPanel
-			remainder = remainder + targetWidth - column:GetControl ():SetWidth (targetWidth)
-			
-			if remainder == 0 then break end
-		end
-		
-		remainder = math.Approach (remainder, 0, 1)
-	end
-		
-	-- Set the positions of the resized columns
-	local x = 0
-	for _, column in pairs (self.Columns) do
-		column:GetControl ():SetPos (x, 0)
-		x = x + column:GetControl ():GetWide ()
-		
-		column:GetControl ():SetTall (self:GetHeaderHeight ())
-		column:GetControl ():SetVisible (not self:GetHideHeaders () and column:IsVisible ())
-	end
 end
 
 -- Event handlers
@@ -389,4 +390,18 @@ function PANEL:OnRequestResize (sizingColumn, size)
 	self:InvalidateLayout ()
 end
 
-Gooey.Register ("GListViewX", PANEL, "DListView")
+-- Internal, do not call
+function PANEL:InvalidateSubItemLayout ()
+	self.SubItemLayoutRevision = self.SubItemLayoutRevision + 1
+end
+
+function PANEL:InvalidateVerticalItemLayout ()
+	self.VerticalItemLayoutValid = false
+	self:InvalidateLayout ()
+end
+
+function PANEL:UpdateContentHeight ()
+	self.ScrollableViewController:SetContentHeight (self:GetHeaderHeight () + self.Items:GetItemCount () * self:GetItemHeight ())
+end
+
+Gooey.Register ("GListViewX", PANEL, "GPanel")

@@ -1,6 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init ()
+	self:SetSize (15, 15)
 end
 
 function PANEL:Paint (w, h)
