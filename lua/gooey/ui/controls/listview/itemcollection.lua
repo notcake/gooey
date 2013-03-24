@@ -3,6 +3,8 @@ Gooey.ListView.ItemCollection = Gooey.MakeConstructor (self)
 
 --[[
 	Events:
+		Cleared ()
+			Fired when this ItemCollection has been cleared.
 		ItemAdded (GListViewItem listViewItem)
 			Fired when a ListViewItem has been added.
 		ItemRemoved (GListViewItem listViewItem)
@@ -39,6 +41,18 @@ function self:AddItem (...)
 	self:DispatchEvent ("ItemAdded", listViewItem)
 	
 	return listViewItem
+end
+
+function self:Clear ()
+	for id, listViewItem in pairs (self.Items) do
+		self.Items [id] = nil
+		listViewItem:Remove ()
+		self:DispatchEvent ("ItemRemoved", listViewItem)
+	end
+	
+	self.OrderedItems = {}
+	
+	self:DispatchEvent ("Cleared")
 end
 
 function self:GetEnumerator ()

@@ -11,10 +11,16 @@ Gooey.ScrollableViewController = Gooey.MakeConstructor (self)
 			Fired when the content size has changed.
 		ViewHeightChanged (viewHeight)
 			Fired when the view height has changed.
-		ViewWidthChanged (viewWidth)
-			Fired when the view width has changed.
+		ViewPositionChanged (viewX, viewY)
+			Fired when the view position has changed.
 		ViewSizeChanged (viewWidth, viewHeight)
 			Fired when the view size has changed.
+		ViewWidthChanged (viewWidth)
+			Fired when the view width has changed.
+		ViewXChanged (viewX)
+			Fired when the view x-coordinate has changed.
+		ViewYChanged (viewY)
+			Fired when the view y-coordinate has changed.
 ]]
 
 function self:ctor ()
@@ -222,6 +228,7 @@ function self:SetViewX (viewX)
 	end
 	
 	self:DispatchEvent ("ViewXChanged", self.ViewX)
+	self:DispatchEvent ("ViewPositionChanged", self.ViewX, self.ViewY)
 	return self
 end
 
@@ -234,6 +241,7 @@ function self:SetViewY (viewY)
 	end
 	
 	self:DispatchEvent ("ViewYChanged", self.ViewY)
+	self:DispatchEvent ("ViewPositionChanged", self.ViewX, self.ViewY)
 	return self
 end
 

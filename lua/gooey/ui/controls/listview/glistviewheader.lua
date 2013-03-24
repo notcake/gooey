@@ -7,8 +7,7 @@ local PANEL = {}
 ]]
 
 function PANEL:Init ()
-	self.Canvas = vgui.Create ("GPanel", self)
-	self.Canvas.Paint = Gooey.NullCallback
+	self.Canvas = vgui.Create ("GContainer", self)
 	
 	self.HeaderWidth = 0
 	self.HeaderLayoutValid = true

@@ -7,6 +7,8 @@ local PANEL = {}
 	Events:
 		Scroll (viewOffset)
 			Fired when the scroll bar has been scrolled.
+		SmallIncrementChanged (smallIncrement)
+			Fired when the small increment has changed.
 ]]
 
 function PANEL:Init ()
@@ -16,6 +18,9 @@ function PANEL:Init ()
 	self.ViewSize = 1
 	
 	self.Grip = vgui.Create ("GScrollBarGrip", self)
+	
+	-- Button scrolling
+	self.SmallIncrement = 1
 	
 	-- Mouse click scrolling
 	self.NextMouseScrollTime = 0
@@ -62,6 +67,10 @@ function PANEL:GetScrollableTrackSize ()
 	return self:GetTrackSize () - self:GetGripSize ()
 end
 
+function PANEL:GetSmallIncrement ()
+	return self.SmallIncrement
+end
+
 function PANEL:GetThickness ()
 	Gooey.Error (self.ClassName .. ":GetThickness : Not implemented.")
 end
@@ -101,6 +110,15 @@ function PANEL:SetContentSize (contentSize)
 		self:SetViewOffset (self.ContentSize - self.ViewSize)
 	end
 	self:InvalidateLayout ()
+	
+	return self
+end
+
+function PANEL:SetSmallIncrement (smallIncrement)
+	if self.SmallIncrement == smallIncrement then return self end
+	
+	self.SmallIncrement = smallIncrement
+	self:DispatchEvent ("SmallIncrementChanged", self.SmallIncrement)
 	
 	return self
 end

@@ -6,6 +6,8 @@ local PANEL = {}
 	Events:
 		Scroll (viewOffset)
 			Fired when the scroll bar has been scrolled.
+		SmallIncrementChanged (smallIncrement)
+			Fired when the small increment has changed.
 ]]
 
 function PANEL:Init ()
@@ -21,12 +23,12 @@ function PANEL:Init ()
 	
 	self.UpButton = vgui.Create ("GScrollBarButton", self)
 	self.UpButton:SetScrollBar (self)
-	self.UpButton:SetScrollIncrement (-1)
+	self.UpButton:SetScrollIncrement (-self:GetSmallIncrement ())
 	self.UpButton:SetDirection ("Up")
 	
 	self.DownButton = vgui.Create ("GScrollBarButton", self)
 	self.DownButton:SetScrollBar (self)
-	self.DownButton:SetScrollIncrement (1)
+	self.DownButton:SetScrollIncrement (self:GetSmallIncrement ())
 	self.DownButton:SetDirection ("Down")
 	
 	self:SetTall (256)
@@ -57,6 +59,12 @@ function PANEL:Init ()
 			else
 				self:GetParent ():InvalidateLayout ()
 			end
+		end
+	)
+	self:AddEventListener ("SmallIncrementChanged",
+		function (_, smallIncrement)
+			self.UpButton:SetScrollIncrement (smallIncrement)
+			self.DownButton:SetScrollIncrement (smallIncrement)
 		end
 	)
 end

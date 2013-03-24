@@ -2,6 +2,8 @@ local PANEL = {}
 
 --[[
 	Events:
+		ItemHeightChanged (itemHeight)
+			Fired when the item height has changed.
 		SelectionChanged (item)
 			Fired when the selected item has changed.
 		SelectionCleared ()
@@ -45,18 +47,19 @@ function PANEL:Init ()
 	self.Header:AddEventListener ("HeaderWidthChanged",
 		function (_, headerWidth)
 			self.ScrollableViewController:SetContentWidth (headerWidth + 2)
+			self.ItemCanvas:SetWide (math.max (headerWidth, self:GetWide () - 2))
 			self:InvalidateSubItemLayout ()
 		end
 	)
 	
 	-- Items
 	self.Items = Gooey.ListView.ItemCollection (self)
-	self.ItemHeight = 20
+	self.ItemHeight = 0
 	self.ShowIcons = true
 	
 	self.Items:AddEventListener ("ItemAdded",
 		function (_, listViewItem)
-			listViewItem:SetParent (self)
+			listViewItem:SetParent (self.ItemCanvas)
 			self:UpdateContentHeight ()
 			self:InvalidateVerticalItemLayout ()
 		end
@@ -90,6 +93,9 @@ function PANEL:Init ()
 	self.VerticalItemLayoutValid = true
 	
 	-- Scrolling
+	self.ItemView = vgui.Create ("GContainer", self)
+	self.ItemCanvas = vgui.Create ("GContainer", self.ItemView)
+	
 	self.VScroll = vgui.Create ("GVScrollBar", self)
 	self.VScroll:SetZPos (20)
 	self.HScroll = vgui.Create ("GHScrollBar", self)
@@ -102,6 +108,12 @@ function PANEL:Init ()
 	self.ScrollableViewController:SetViewSize (self:GetSize ())
 	
 	self.Header:SetScrollableViewController (self.ScrollableViewController)
+	
+	self.ScrollableViewController:AddEventListener ("ViewPositionChanged",
+		function (_, viewX, viewY)
+			self.ItemCanvas:SetPos (-viewX, -viewY)
+		end
+	)
 	
 	self.ScrollableViewController:AddEventListener ("ViewXChanged",
 		function (_, viewY)
@@ -128,11 +140,20 @@ function PANEL:Init ()
 		end
 	)
 	
+	self:AddEventListener ("ItemHeightChanged",
+		function (_, itemHeight)
+			self.HScroll:SetSmallIncrement (itemHeight)
+			self.VScroll:SetSmallIncrement (itemHeight)
+		end
+	)
+	
 	self:AddEventListener ("SizeChanged",
 		function (_, w, h)
 			self.ScrollableViewController:SetViewSize (w, h)
 		end
 	)
+	
+	self:SetItemHeight (20)
 end
 
 -- Control
@@ -146,7 +167,10 @@ end
 
 function PANEL:PerformLayout ()
 	self.Header:SetPos (1, 0)
-	self.Header:SetSize (self:GetWide () - 2, self:GetHeaderHeight ())
+	self.Header:SetSize (self:GetWide () - 1 - (self.VScroll:IsVisible () and self.VScroll:GetWide () or 1), self:GetHeaderHeight ())
+	
+	self.ItemView:SetPos (1, self.Header:GetTall ())
+	self.ItemView:SetSize (self:GetWide () - 1 - (self.VScroll:IsVisible () and self.VScroll:GetWide () or 1), self:GetTall () - self:GetHeaderHeight () - (self.HScroll:IsVisible () and self.HScroll:GetTall () or 1))
 	
 	self.VScroll:SetPos (self:GetWide () - self.VScroll:GetWide (), 0)
 	self.VScroll:SetTall (self:GetTall () - (self.HScroll:IsVisible () and self.HScroll:GetTall () or 0))
@@ -158,9 +182,9 @@ function PANEL:PerformLayout ()
 	if not self.VerticalItemLayoutValid then
 		self.VerticalItemLayoutValid = true
 		
-		local y = self:GetHeaderHeight ()
+		local y = 0
 		for listViewItem in self:GetItemEnumerator () do
-			listViewItem:SetPos (1, y)
+			listViewItem:SetPos (0, y)
 			listViewItem:SetTall (self:GetItemHeight ())
 			
 			if listViewItem:IsVisible () then
@@ -220,6 +244,10 @@ function PANEL:AddItem (...)
 	return self.Items:AddItem (...)
 end
 
+function PANEL:Clear ()
+	self.Items:Clear ()
+end
+
 function PANEL:FindItem (text)
 	for item in self:GetItemEnumerator () do
 		if item:GetColumnText (1) == text then
@@ -268,6 +296,8 @@ function PANEL:SetItemHeight (itemHeight)
 	self.ItemHeight = itemHeight
 	self:InvalidateSubItemLayout ()
 	self:InvalidateVerticalItemLayout ()
+	self:DispatchEvent ("ItemHeightChanged", self.ItemHeight)
+	
 	return self
 end
 
@@ -438,6 +468,7 @@ end
 
 function PANEL:UpdateContentHeight ()
 	self.ScrollableViewController:SetContentHeight (self:GetHeaderHeight () + self.Items:GetItemCount () * self:GetItemHeight ())
+	self.ItemCanvas:SetTall (self.Items:GetItemCount () * self:GetItemHeight ())
 end
 
 Gooey.Register ("GListViewX", PANEL, "GPanel")
