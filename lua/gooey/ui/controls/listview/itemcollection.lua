@@ -97,3 +97,14 @@ function self:RemoveItem (listViewItem)
 	
 	self:DispatchEvent ("ItemRemoved", listViewItem)
 end
+
+function self:Sort (comparator, descending)
+	if not comparator then return end
+	
+	table.sort (self.OrderedItems,
+		function (a, b)
+			if descending then a, b = b, a end
+			return comparator (a, b, descending)
+		end
+	)
+end

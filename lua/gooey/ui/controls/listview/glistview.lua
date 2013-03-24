@@ -128,8 +128,10 @@ function PANEL:Init ()
 	)
 	
 	-- Sorting
+	self.Comparator = self.DefaultComparator
+	
 	self.LastSortedByColumn = false
-	self.LastSortColumn = 1
+	self.LastSortColumnId = nil
 	self.LastSortDescending = false
 	
 	self:AddEventListener ("EnabledChanged",
@@ -193,9 +195,18 @@ function PANEL:PerformLayout ()
 		end
 	end
 	
-	-- TODO: Only layout visible items
+	-- Layout visible items
+	local visibleStartY = self.ScrollableViewController:GetViewY ()
+	local visibleEndY = visibleStartY + self.ScrollableViewController:GetViewHeight ()
+	local x, y
 	for listViewItem in self:GetItemEnumerator () do
-		listViewItem:LayoutSubItems (self:GetSubItemLayoutRevision ())
+		x, y = listViewItem:GetPos ()
+		if y + listViewItem:GetTall () >= visibleStartY then
+			if y > visibleEndY then
+				break
+			end
+			listViewItem:LayoutSubItems (self:GetSubItemLayoutRevision ())
+		end
 	end
 end
 
@@ -336,47 +347,42 @@ function PANEL:GetContentBounds ()
 end
 
 -- Sorting
+function PANEL.DefaultComparator (a, b)
+	return a:GetText () < b:GetText ()
+end
+
+function PANEL:GetComparator ()
+	return self.Comparator
+end
+
+function PANEL:SetComparator (comparator)
+	self.Comparator = comparator or self.DefaultComparator
+end
+
 function PANEL:Sort (comparator)
 	if not comparator and self.LastSortedByColumn then
-		self:SortByColumn (self.LastSortColumn, self.LastSortDescending)
+		self:SortByColumn (self.LastSortColumnId, self.LastSortDescending)
 		return
 	end
-
-	comparator = comparator or self.Comparator or self.DefaultComparator
-	table.sort (self.Sorted,
-		function (a, b)
-			if a == nil then return false end
-			if b == nil then return true end
-			return comparator (a, b)
-		end
-	)
+	
+	self.Items:Sort (comparator or self:GetComparator ())
 	
 	self.LastSortedByColumn = false
 	
-	self:SetDirty (true)
-	self:InvalidateLayout ()
+	self:InvalidateVerticalItemLayout ()
 end
 
 function PANEL:SortByColumn (columnIdOrIndex, descending)
-	if type (columnIdOrIndex) == "number" then
-		columnIdOrIndex = self.Columns [columnIdOrIndex] and self.Columns [columnIdOrIndex]:GetId () or 1
-	end
-	local comparator = self:GetColumnComparator (columnIdOrIndex)
-
-	table.Copy (self.Sorted, self.Lines)
-	table.sort (self.Sorted,
-		function (a, b)
-			if descending then a, b = b, a end
-			return comparator (a, b, descending)
-		end
-	)
+	local column = self.Columns:GetColumnByIdOrIndex (columnIdOrIndex)
+	if not column then return end
+	
+	self.Items:Sort (column:GetComparator (), descending)
 	
 	self.LastSortedByColumn = true
-	self.LastSortColumn = columnIdOrIndex
+	self.LastSortColumnId = column:GetId ()
 	self.LastSortDescending = descending
 	
-	self:SetDirty (true)
-	self:InvalidateLayout ()
+	self:InvalidateVerticalItemLayout ()
 end
 
 -- Event handlers

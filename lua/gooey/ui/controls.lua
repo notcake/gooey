@@ -5,6 +5,7 @@ include ("horizontalalignment.lua")
 include ("verticalalignment.lua")
 
 include ("sizingmethod.lua")
+include ("sortorder.lua")
 include ("splitcontainerpanel.lua")
 include ("tooltippositioningmode.lua")
 
