@@ -10,6 +10,8 @@ function PANEL:Init ()
 	self.ListView = nil
 	self.Canvas = vgui.Create ("GContainer", self)
 	
+	self.FirstHeader = nil
+	self.LastHeader = nil
 	self.HeaderWidth = 0
 	self.HeaderLayoutValid = true
 	self.ScrollableViewController = nil
@@ -35,10 +37,17 @@ function PANEL:GetHeaderWidth ()
 end
 
 function PANEL:Paint (w, h)
-	surface.SetDrawColor (GLib.Colors.LightGray)
-	surface.DrawRect (0, 1, w, h - 1)
-	surface.SetDrawColor (GLib.Colors.Gray)
-	surface.DrawLine (0, h - 1, w, h - 1)
+	local headerWidth = self:GetHeaderWidth ()
+	local left  = self.Canvas:GetPos () + headerWidth
+	local right = w
+	local rectWidth = math.max (right - left + 1, 32)
+	
+	if headerWidth == 0 then
+		left = left - 1
+		rectWidth = rectWidth + 1
+	end
+	
+	self:GetSkin ().tex.Button (left, 0, rectWidth, h)
 end
 
 function PANEL:PerformLayout ()
@@ -98,12 +107,22 @@ function PANEL:GetColumnSizeGrip (column, create)
 	return self.SizeGrips [column]
 end
 
+function PANEL:GetFirstHeader ()
+	return self.FirstHeader
+end
+
+function PANEL:GetLastHeader ()
+	return self.LastHeader
+end
+
 function PANEL:InvalidateHeaderLayout ()
 	self.HeaderLayoutValid = false
 end
 
 function PANEL:LayoutHeaders ()
 	local x = 0
+	local firstHeader = nil
+	local lastHeader = nil
 	for column in self.ColumnCollection:GetEnumerator () do
 		column:GetHeader ():SetPos (x, 0)
 		column:GetHeader ():SetTall (self:GetTall ())
@@ -114,12 +133,17 @@ function PANEL:LayoutHeaders ()
 		end
 		if column:IsVisible () then
 			x = x + column:GetHeader ():GetWide ()
+			firstHeader = firstHeader or column:GetHeader ()
+			lastHeader = column:GetHeader ()
 			sizeGrip:SetPos (x - sizeGrip:GetWide () / 2, 0)
 			sizeGrip:SetTall (self:GetTall ())
 			x = x - 1
 		end
 	end
 	x = x + 1
+	
+	self:SetFirstHeader (firstHeader)
+	self:SetLastHeader (lastHeader)
 	
 	self.Canvas:SetPos (-self.ScrollableViewController:GetViewX (), 0)
 	self.Canvas:SetSize (math.max (self:GetWide (), x), self:GetTall ())
@@ -130,9 +154,18 @@ function PANEL:LayoutHeaders ()
 	end
 end
 
+function PANEL:SetFirstHeader (firstHeader)
+	self.FirstHeader = firstHeader
+end
+
+function PANEL:SetLastHeader (lastHeader)
+	self.LastHeader = lastHeader
+end
+
 function PANEL:OnColumnAdded (column)
 	if not column then return end
 	
+	column:GetHeader ():SetHeader (self)
 	column:GetHeader ():SetParent (self.Canvas)
 	self:InvalidateHeaderLayout ()
 	

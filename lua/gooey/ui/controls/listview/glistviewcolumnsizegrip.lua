@@ -13,7 +13,7 @@ function PANEL:Init ()
 		function (_, deltaX, deltaY)
 			local width = self.Column:GetHeader ():GetWide () + deltaX
 			width = math.max (0, self.Column:GetMinimumWidth (), width)
-			self.Column:GetHeader ():SetWide (width)
+			self.Column:SetWidth (width)
 			
 			local _, y = self:GetPos ()
 			self:SetPos (self.Column:GetHeader ():GetPos () + self.Column:GetHeader ():GetWide () - self:GetWide () / 2, y)
