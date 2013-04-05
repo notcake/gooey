@@ -373,9 +373,15 @@ function PANEL:OnMouseReleased (mouseCode)
 	elseif mouseCode == MOUSE_RIGHT then
 		self:DoRightClick (self:ItemFromPoint (self:CursorPos ()))
 		if self:GetSelectionMode () == Gooey.SelectionMode.Multiple then
-			if self.Menu then self.Menu:Open (self:GetSelectedItems ()) end
+			if self.Menu then
+				self.Menu:SetOwner (self)
+				self.Menu:Open (self:GetSelectedItems ())
+			end
 		else
-			if self.Menu then self.Menu:Open (self:GetSelectedItem ()) end
+			if self.Menu then
+				self.Menu:SetOwner (self)
+				self.Menu:Open (self:GetSelectedItem ())
+			end
 		end
 	end
 end

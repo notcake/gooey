@@ -172,7 +172,7 @@ function PANEL:SetDirectionalLight (direction, color)
 end
 
 function PANEL:Think ()
-	if self:HasFocus () or self.IsMouseDown or self.Hovered then
+	if self:IsFocused () or self.IsMouseDown or self.Hovered then
 		local scale = 10
 		if input.IsKeyDown (KEY_LCONTORL) then
 			scale = 5

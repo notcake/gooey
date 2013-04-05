@@ -19,11 +19,21 @@ function PANEL:Init ()
 			self:SetPos (self.Column:GetHeader ():GetPos () + self.Column:GetHeader ():GetWide () - self:GetWide () / 2, y)
 		end
 	)
+	
+	self:AddEventListener ("RightClick",
+		function (_)
+			if not self:GetListView ():GetHeaderMenu () then return end
+			self:GetListView ():GetHeaderMenu ():SetOwner (self:GetListView ())
+			self:GetListView ():GetHeaderMenu ():Open (self.Column)
+		end
+	)
+end
+
+function PANEL:GetListView ()
+	return self.Column:GetListView ()
 end
 
 function PANEL:Paint (w, h)
-	surface.SetDrawColor (Color (255, 0, 0, 128))
-	surface.DrawRect (0, 0, w, h)
 end
 
 function PANEL:SetColumn (column)

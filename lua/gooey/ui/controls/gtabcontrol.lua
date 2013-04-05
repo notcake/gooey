@@ -451,7 +451,7 @@ function PANEL:SetSelectedTabIndex (tabIndex)
 		self:EnsureTabVisible (self.SelectedTab)
 		
 		if self.SelectedTab:GetContents () then
-			self.SelectedTab:GetContents ():RequestFocus ()
+			self.SelectedTab:GetContents ():Focus ()
 		end
 	end
 	
@@ -598,6 +598,7 @@ function PANEL:OnMouseWheel (delta, x, y)
 		return
 	end
 	self:SetScrollOffset (self:GetScrollOffset () + delta * -20)
+	return true
 end
 
 function PANEL:OnRemoved ()

@@ -11,6 +11,8 @@ Gooey.ListView.Column = Gooey.MakeConstructor (self)
 			Fired when this column's text has changed.
 		VisibleChanged (visible)
 			Fired when this column's visibility has changed.
+		WidthChanged (width)
+			Fired when this column's width has changed.
 ]]
 
 function self:ctor (columnCollection, id)
@@ -32,16 +34,20 @@ function self:ctor (columnCollection, id)
 	
 	-- Positioning and Sizing
 	self.Index = 0
-	self.MinimumWidth = 128
-	self.MaximumWidth = 256
+	self.MinimumWidth = 32
+	self.MaximumWidth = math.huge
+	self.Width = 160
 	
 	-- Sorting
-	self.Comparator = self.DefaultComparator
+	self.Comparator = nil
+	self:SetComparator (nil)
 	
 	Gooey.EventProvider (self)
 	
 	self.Header = vgui.Create ("GListViewColumnHeader", self.ListView:GetHeader ())
 	self.Header:SetColumn (self)
+	self.Header:SetWide (self.Width)
+	
 	self:UpdateHeaderAlignment ()
 	self:HookHeader (self.Header)
 	self:SetId (id)
@@ -160,7 +166,7 @@ function self:GetMinimumWidth ()
 end
 
 function self:GetWidth ()
-	return self.Header:GetWide ()
+	return self.Width
 end
 
 function self:SetIndex (index)
@@ -178,17 +184,28 @@ function self:SetMinimumWidth (minimumWidth)
 	return self
 end
 
--- Sorting
-function self.DefaultComparator (a, b)
-	return a:GetText () < b:GetText ()
+function self:SetWidth (width)
+	width = math.max (width, self.MinimumWidth)
+	width = math.min (width, self.MaximumWidth)
+	if self.Width == width then return self end
+	
+	self.Width = width
+	self:DispatchEvent ("WidthChanged", self.Width)
+	
+	self.Header:SetWide (self.Width)
+	
+	return self
 end
 
+-- Sorting
 function self:GetComparator ()
 	return self.Comparator
 end
 
 function self:SetComparator (comparator)
-	self.Comparator = comparator or self.DefaultComparator
+	self.Comparator = comparator or function (a, b)
+		return a:GetText (self:GetId ()) < b:GetText (self:GetId ())
+	end
 end
 
 -- Internal, do not call
@@ -210,10 +227,16 @@ function self:HookHeader (header)
 			self:dtor ()
 		end
 	)
+	header:AddEventListener ("WidthChanged", tostring (self),
+		function (_, width)
+			self:SetWidth (width)
+		end
+	)
 end
 
 function self:UnhookHeader (header)
 	if not header then return end
 	
 	header:RemoveEventListener ("Removed", tostring (self))
+	header:RemoveEventListener ("WidthChanged", tostring (self))
 end

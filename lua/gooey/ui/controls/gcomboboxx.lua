@@ -10,7 +10,7 @@ function PANEL:Init ()
 			comboBox:Remove ()
 			return
 		end
-		if not self:HasFocus () and not self.Autocompletion:HasFocus () and not self.Autocompletion:IsHovered () and self.AutocompletionVisible then
+		if not self:IsFocused () and not self.Autocompletion:IsFocused () and not self.Autocompletion:IsHovered () and self.AutocompletionVisible then
 			self.Autocompletion:SetParent (self)
 			self.AutocompletionVisible = false
 			self.Autocompletion:SetVisible (false)
@@ -76,7 +76,7 @@ function PANEL:ShowAutocompletion ()
 end
 
 function PANEL:Think ()
-	if self:HasFocus () or self.Autocompletion:HasFocus () or self.Autocompletion:IsHovered () then
+	if self:IsFocused () or self.Autocompletion:IsFocused () or self.Autocompletion:IsHovered () then
 		if not self.AutocompletionVisible then
 			self:UpdateAutocompletion (self.LastShowable == false)
 		end

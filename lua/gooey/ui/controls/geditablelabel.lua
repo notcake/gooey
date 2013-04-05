@@ -81,7 +81,7 @@ function PANEL:SetText (text)
 end
 
 function PANEL:ShouldHideTextEntry ()
-	if self.Hovered or self.TextEntry.Hovered or self.TextEntry:HasFocus () then
+	if self.Hovered or self.TextEntry.Hovered or self.TextEntry:IsFocused () then
 		return false
 	end
 	if self.DoNotHideTextEntry then

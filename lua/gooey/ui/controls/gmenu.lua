@@ -130,7 +130,7 @@ function PANEL:Open (targetItem)
 	-- This fixes menu items somehow losing mouse focus as 
 	-- soon as a mouse press occurs when another panel has keyboard focus.
 	self:SetKeyboardInputEnabled (true)
-	self:RequestFocus ()
+	self:Focus ()
 end
 
 function PANEL:OpenSubMenu (item, menu)

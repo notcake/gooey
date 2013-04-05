@@ -16,6 +16,7 @@ function PANEL:Init ()
 	self.Label:SetContentAlignment (4)
 	
 	self.Menu = vgui.Create ("GMenu")
+	self.Menu:SetOwner (self)
 	self.MenuDownwards = true
 	self.MenuOpen = false
 	self.MenuCloseTime = 0

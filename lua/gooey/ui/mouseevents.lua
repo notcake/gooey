@@ -8,7 +8,7 @@ function Gooey.CreateMouseEvents (panel)
 	end
 
 	function panel:OnCursorMoved (x, y)
-		self:DispatchEvent ("MouseMove", 0, x, y)
+		self:DispatchEvent ("MouseMove", 0, self:CursorPos ())
 		
 		local mouseCode = 0
 		if input.IsMouseDown (MOUSE_LEFT)   then mouseCode = mouseCode + MOUSE_LEFT end
@@ -26,6 +26,12 @@ function Gooey.CreateMouseEvents (panel)
 	function panel:OnMousePressed (mouseCode)
 		self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
 		if self.OnMouseDown then self:OnMouseDown (mouseCode, self:CursorPos ()) end
+		
+		if self:CanFocus () and
+		   not self:IsFocused () and
+		   not vgui.FocusedHasParent (self) then
+			self:Focus ()
+		end
 		
 		if mouseCode == MOUSE_LEFT then
 			self.Depressed = true
@@ -55,7 +61,12 @@ function Gooey.CreateMouseEvents (panel)
 	end
 
 	function panel:OnMouseWheeled (delta)
-		self:DispatchEvent ("MouseWheel", delta, self:CursorPos ())
-		if self.OnMouseWheel then self:OnMouseWheel (delta, self:CursorPos ()) end
+		local handled = self:DispatchEvent ("MouseWheel", delta, self:CursorPos ())
+		if self.OnMouseWheel then handled = handled or self:OnMouseWheel (delta, self:CursorPos ()) end
+		if handled then return end
+		
+		if self:GetParent ().OnMouseWheeled then
+			self:GetParent ():OnMouseWheeled (delta)
+		end
 	end
 end

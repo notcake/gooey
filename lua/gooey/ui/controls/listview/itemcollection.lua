@@ -21,7 +21,7 @@ function self:ctor (listView)
 end
 
 function self:AddItem (...)
-	local listViewItem = vgui.Create ("GListViewItemX", self:GetListView ())
+	local listViewItem = vgui.Create ("GListViewItem", self:GetListView ())
 	local id = #self.Items + 1
 	listViewItem:SetListView (self:GetListView ())
 	listViewItem:SetId (id)
@@ -36,6 +36,7 @@ function self:AddItem (...)
 		end
 	end
 	
+	self.Items [id] = listViewItem
 	self.OrderedItems [#self.OrderedItems + 1] = listViewItem
 	
 	self:DispatchEvent ("ItemAdded", listViewItem)
@@ -98,13 +99,17 @@ function self:RemoveItem (listViewItem)
 	self:DispatchEvent ("ItemRemoved", listViewItem)
 end
 
-function self:Sort (comparator, descending)
+function self:Sort (comparator, sortOrder)
 	if not comparator then return end
+	sortOrder = sortOrder or Gooey.SortOrder.Ascending
 	
-	table.sort (self.OrderedItems,
-		function (a, b)
-			if descending then a, b = b, a end
-			return comparator (a, b, descending)
-		end
-	)
+	if sortOrder == Gooey.SortOrder.Ascending then
+		table.sort (self.OrderedItems, comparator)
+	elseif sortOrder == Gooey.SortOrder.Descending then
+		table.sort (self.OrderedItems,
+			function (a, b)
+				return comparator (b, a)
+			end
+		)
+	end
 end

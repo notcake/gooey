@@ -33,19 +33,20 @@ end
 
 -- Control
 function PANEL:Paint (w, h)
-	self:LayoutSubItems (self:GetListView ():GetSubItemLayoutRevision ())
-	
 	if self.BackgroundColor then
 		surface.SetDrawColor (self.BackgroundColor)
 		self:DrawFilledRect ()
 	end
 	
 	if self:IsSelected () then
-		local col = self:GetSkin ().combobox_selected
+		local col = self:GetSkin ().listview_selected
+		if not self:GetListView ():IsFocused () then
+			col = GLib.Colors.Silver
+		end
 		surface.SetDrawColor (col.r, col.g, col.b, col.a)
 		self:DrawFilledRect ()
 	elseif self:IsHovered () then
-		local col = self:GetSkin ().combobox_selected
+		local col = self:GetSkin ().listview_selected
 		surface.SetDrawColor (col.r, col.g, col.b, col.a * 0.25)
 		self:DrawFilledRect ()
 	end
@@ -228,4 +229,4 @@ function PANEL:LayoutSubItems (layoutRevision)
 	end
 end
 
-Gooey.Register ("GListViewItemX", PANEL, "GPanel")
+Gooey.Register ("GListViewItem", PANEL, "GPanel")

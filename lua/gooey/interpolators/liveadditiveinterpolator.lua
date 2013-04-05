@@ -7,6 +7,8 @@ Gooey.LiveAdditiveInterpolator = Gooey.MakeConstructor (self, Gooey.TimeInterpol
 			Fired when the interpolation has completed.
 		InterpolationStarted ()
 			Fired when interpolation has started.
+		ValueChanged (value)
+			Fired when the interpolated value has changed.
 ]]
 
 function self:ctor ()
@@ -18,6 +20,8 @@ function self:ctor ()
 	self.InterpolatorStartTimes = {}
 	
 	self.TargetValue = 0
+	
+	self.LastValue = nil
 	
 	Gooey.EventProvider (self)
 end
@@ -58,24 +62,33 @@ function self:GetValue (t)
 	t = t or SysTime ()
 	
 	local value = self.Offset
-	if #self.Interpolators == 0 then return value end
-	
-	for i = #self.Interpolators, 1, -1 do
-		local relativeTime = t - self.InterpolatorStartTimes [i]
-		value = value + self.Interpolators [i]:GetValue (relativeTime)
+	if #self.Interpolators > 0 then
+		for i = #self.Interpolators, 1, -1 do
+			local relativeTime = t - self.InterpolatorStartTimes [i]
+			value = value + self.Interpolators [i]:GetValue (relativeTime)
+			
+			if relativeTime > self.Interpolators [i]:GetDuration () then
+				self.Offset = self.Offset + self.Interpolators [i]:GetFinalValue ()
+				table.remove (self.Interpolators, i)
+				table.remove (self.InterpolatorStartTimes, i)
+			end
+		end
 		
-		if relativeTime > self.Interpolators [i]:GetDuration () then
-			self.Offset = self.Offset + self.Interpolators [i]:GetFinalValue ()
-			table.remove (self.Interpolators, i)
-			table.remove (self.InterpolatorStartTimes, i)
+		if #self.Interpolators == 0 then
+			self:DispatchEvent ("InterpolationCompleted")
 		end
 	end
 	
-	if #self.Interpolators == 0 then
-		self:DispatchEvent ("InterpolationCompleted")
+	if self.LastValue ~= value then
+		self.LastValue = value
+		self:DispatchEvent ("ValueChanged", self.LastValue)
 	end
 	
 	return value
+end
+
+function self:SetFinalValue (finalValue)
+	self:SetOffset (self:GetOffset () + finalValue - self:GetFinalValue ())
 end
 
 function self:SetOffset (offset)
@@ -83,6 +96,9 @@ function self:SetOffset (offset)
 	
 	self.FinalValue = self.FinalValue + offset - self.Offset
 	self.Offset = offset
+	
+	-- Cause the ValueChanged event to be fired.
+	self:GetValue (SysTime ())
 end
 
 function self:SetTickController (tickController)

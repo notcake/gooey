@@ -47,11 +47,6 @@ function PANEL:Init ()
 			end
 		end
 	)
-	self:AddEventListener ("MouseWheel",
-		function (_, delta, x, y)
-			self:Scroll (delta * -2)
-		end
-	)
 	self:AddEventListener ("Scroll",
 		function (_, viewOffset)
 			if self:GetParent ().OnVScroll then
@@ -63,10 +58,14 @@ function PANEL:Init ()
 	)
 	self:AddEventListener ("SmallIncrementChanged",
 		function (_, smallIncrement)
-			self.UpButton:SetScrollIncrement (smallIncrement)
+			self.UpButton:SetScrollIncrement (-smallIncrement)
 			self.DownButton:SetScrollIncrement (smallIncrement)
 		end
 	)
+end
+
+function PANEL:GetOrientation ()
+	return Gooey.Orientation.Vertical
 end
 
 function PANEL:GetThickness ()
@@ -91,18 +90,8 @@ function PANEL:PerformLayout ()
 	self.DownButton:SetPos (0, self:GetTall () - buttonSize)
 	self.DownButton:SetSize (buttonSize, buttonSize)
 	
-	self.Grip:SetPos (0, math.floor (self.UpButton:GetTall () + self.ViewOffset / (self.ContentSize - self.ViewSize) * self:GetScrollableTrackSize () + 0.5))
+	self.Grip:SetPos (0, math.floor (self.UpButton:GetTall () + self:GetInterpolatedViewOffset () / (self.ContentSize - self.ViewSize) * self:GetScrollableTrackSize () + 0.5))
 	self.Grip:SetSize (buttonSize, self:GetGripSize ())
-end
-
--- Event handlers
-function PANEL:Think ()
-	if self:IsPressed () then
-		if SysTime () >= self.NextMouseScrollTime then
-			local x, y = self:CursorPos ()
-			self:ScrollToMouse (y)
-		end
-	end
 end
 
 Gooey.Register ("GVScrollBar", PANEL, "GBaseScrollBar")

@@ -9,6 +9,7 @@ function PANEL:ctor (text)
 	self.Height = 24
 	
 	self.DropDownMenu = vgui.Create ("GMenu")
+	self.DropDownMenu:SetOwner (self)
 	self.DropDownMenuOpen = false
 	self.DropDownCloseTime = 0
 	self.DropDownMenu:AddEventListener ("MenuClosed",

@@ -69,6 +69,32 @@ function PANEL:Init ()
 	self.LastLeftMouseButtonReleaseTime = 0
 end
 
+-- Based off SKIN:PaintFrame () in skins/default.lua
+function PANEL:Paint (w, h)
+	if self.m_bPaintShadow then
+		surface.DisableClipping (true)
+		self:GetSkin ().tex.Shadow (-4, -4, w + 10, h + 10)
+		surface.DisableClipping (false)
+	end
+	
+	if self:IsActive () then
+		self:GetSkin ().tex.Window.Normal (0, 0, w, h)
+	else
+		self:GetSkin ().tex.Window.Inactive (0, 0, w, h)
+	end
+end
+
+function PANEL:IsActive ()
+	if self:IsFocused () then return true end
+	
+	local focusedPanel = vgui.GetKeyboardFocus ()
+	while focusedPanel and focusedPanel:IsValid () do
+		if self:Contains (focusedPanel) then return true end
+		focusedPanel = focusedPanel.GetOwner and focusedPanel:GetOwner ()
+	end
+	return false
+end
+
 -- Size Control
 function PANEL:IsMaximized ()
 	return self.Maximized

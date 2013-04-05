@@ -9,6 +9,12 @@ Gooey.ScrollableViewController = Gooey.MakeConstructor (self)
 			Fired when the content width has changed.
 		ContentSizeChanged (contentWidth, contentHeight)
 			Fired when the content size has changed.
+		InterpolatedViewPositionChanged (interpolatedViewX, interpolatedViewY)
+			Fired when the interpolated view position has changed.
+		InterpolatedViewXChanged (interpolatedViewX)
+			Fired when the interpolated view x-coordinate has changed.
+		InterpolatedViewYChanged (interpolatedViewY)
+			Fired when the interpolated view y-coordinate has changed.
 		ViewHeightChanged (viewHeight)
 			Fired when the view height has changed.
 		ViewPositionChanged (viewX, viewY)
@@ -29,6 +35,8 @@ function self:ctor ()
 	
 	self.ViewWidth  = 0
 	self.ViewHeight = 0
+	self.ViewWidthWithScrollBars  = nil
+	self.ViewHeightWithScrollBars = nil
 	
 	self.ViewX = 0
 	self.ViewY = 0
@@ -36,6 +44,9 @@ function self:ctor ()
 	self.VerticalScrollBar   = nil
 	self.HorizontalScrollBar = nil
 	self.ScrollBarCorner     = nil
+	
+	self.AutoHideVerticalScrollBar   = true
+	self.AutoHideHorizontalScrollBar = true
 	
 	Gooey.EventProvider (self)
 end
@@ -51,23 +62,37 @@ function self:GetContentWidth ()
 	return self.ContentWidth
 end
 
-function self:GetHorizontalScrollBar ()
-	return self.HorizontalScrollBar
+function self:GetInterpolatedViewX ()
+	if self.HorizontalScrollBar then
+		return self.HorizontalScrollBar:GetInterpolatedViewOffset ()
+	end
+	return self.ViewX
 end
 
-function self:GetScrollBarCorner ()
-	return self.ScrollBarCorner
-end
-
-function self:GetVerticalScrollBar ()
-	return self.VerticalScrollBar
+function self:GetInterpolatedViewY ()
+	if self.VerticalScrollBar then
+		return self.VerticalScrollBar:GetInterpolatedViewOffset ()
+	end
+	return self.ViewY
 end
 
 function self:GetViewHeight ()
 	return self.ViewHeight
 end
 
+function self:GetViewHeightWithScrollBars ()
+	if self.ViewHeightWithScrollBars then return self.ViewHeightWithScrollBars end
+	if self.HorizontalScrollBar then return self.ViewHeight - self.HorizontalScrollBar:GetTall () end
+	return self.ViewHeight
+end
+
 function self:GetViewWidth ()
+	return self.ViewWidth
+end
+
+function self:GetViewWidthWithScrollBars ()
+	if self.ViewWidthWithScrollBars then return self.ViewWidthWithScrollBars end
+	if self.VerticalScrollBar then return self.ViewWidth - self.VerticalScrollBar:GetWide () end
 	return self.ViewWidth
 end
 
@@ -79,6 +104,16 @@ function self:GetViewY ()
 	return self.ViewY
 end
 
+function self:IsHorizontalScrollBarVisible ()
+	if not self.HorizontalScrollBar then return end
+	return self.HorizontalScrollBar:IsVisible ()
+end
+
+function self:IsVerticalScrollBarVisible ()
+	if not self.VerticalScrollBar then return end
+	return self.VerticalScrollBar:IsVisible ()
+end
+
 function self:SetContentHeight (contentHeight)
 	if self.ContentHeight == contentHeight then return self end
 	
@@ -86,8 +121,8 @@ function self:SetContentHeight (contentHeight)
 	
 	if self.VerticalScrollBar then
 		self.VerticalScrollBar:SetContentSize (self.ContentHeight)
-		self.VerticalScrollBar:SetVisible (self.VerticalScrollBar:IsEnabled ())
 	end
+	self:UpdateScrollBarViewSize ()
 	
 	self:DispatchEvent ("ContentHeightChanged", self.ContentHeight)
 	self:DispatchEvent ("ContentSizeChanged", self.ContentWidth, self.ContentHeight)
@@ -105,12 +140,11 @@ function self:SetContentSize (contentWidth, contentHeight)
 	
 	if self.HorizontalScrollBar then
 		self.HorizontalScrollBar:SetContentSize (self.ContentWidth)
-		self.HorizontalScrollBar:SetVisible (self.HorizontalScrollBar:IsEnabled ())
 	end
 	if self.VerticalScrollBar then
 		self.VerticalScrollBar:SetContentSize (self.ContentHeight)
-		self.VerticalScrollBar:SetVisible (self.VerticalScrollBar:IsEnabled ())
 	end
+	self:UpdateScrollBarViewSize ()
 	
 	self:DispatchEvent ("ContentWidthChanged", self.ContentWidth)
 	self:DispatchEvent ("ContentHeightChanged", self.ContentHeight)
@@ -124,8 +158,8 @@ function self:SetContentWidth (contentWidth)
 	
 	if self.HorizontalScrollBar then
 		self.HorizontalScrollBar:SetContentSize (self.ContentWidth)
-		self.HorizontalScrollBar:SetVisible (self.HorizontalScrollBar:IsEnabled ())
 	end
+	self:UpdateScrollBarViewSize ()
 	
 	self:DispatchEvent ("ContentWidthChanged", self.ContentWidth)
 	self:DispatchEvent ("ContentSizeChanged", self.ContentWidth, self.ContentHeight)
@@ -137,36 +171,52 @@ function self:SetViewHeight (viewHeight)
 	
 	self.ViewHeight = viewHeight
 	
-	if self.VerticalScrollBar then
-		self.VerticalScrollBar:SetViewSize (self.ViewHeight)
-		self.VerticalScrollBar:SetVisible (self.VerticalScrollBar:IsEnabled ())
-	end
+	self:UpdateScrollBarViewSize ()
 	
 	self:DispatchEvent ("ViewHeightChanged", self.ViewHeight)
 	self:DispatchEvent ("ViewSizeChanged", self.ViewWidth, self.ViewHeight)
 	return self
 end
 
+function self:SetViewHeightWithScrollBars (viewHeightWithScrollBars)
+	if self.ViewHeightWithScrollBars == viewHeightWithScrollBars then return self end
+	
+	self.ViewHeightWithScrollBars = viewHeightWithScrollBars
+	
+	self:UpdateScrollBarViewSize ()
+	
+	return self
+end
+
 function self:SetViewSize (viewWidth, viewHeight)
 	if self.ViewWidth  == viewWidth and
 	   self.ViewHeight == viewHeight then
-		return
+		return self
 	end
 	
 	self.ViewWidth  = viewWidth
 	self.ViewHeight = viewHeight
 	
-	if self.HorizontalScrollBar then
-		self.HorizontalScrollBar:SetViewSize (self.ViewWidth)
-		self.HorizontalScrollBar:SetVisible (self.HorizontalScrollBar:IsEnabled ())
-	end
-	if self.VerticalScrollBar then
-		self.VerticalScrollBar:SetViewSize (self.ViewHeight)
-	end
+	self:UpdateScrollBarViewSize ()
 	
 	self:DispatchEvent ("ViewWidthChanged", self.ViewWidth)
 	self:DispatchEvent ("ViewHeightChanged", self.ViewHeight)
 	self:DispatchEvent ("ViewSizeChanged", self.ViewWidth, self.ViewHeight)
+	return self
+end
+
+function self:SetViewSizeWithScrollBars (viewWidthWithScrollBars, viewHeightWithScrollBars)
+	if self.ViewWidthWithScrollBars  == viewWidthWithScrollBars and
+	   self.ViewHeightWithScrollBars == viewHeightWithScrollBars then
+		return
+	end
+	
+	self.ViewWidthWithScrollBars  = viewWidthWithScrollBars
+	self.ViewHeightWithScrollBars = viewHeightWithScrollBars
+	
+	self:UpdateScrollBarViewSize ()
+	
+	return self
 end
 
 function self:SetViewWidth (viewWidth)
@@ -174,47 +224,19 @@ function self:SetViewWidth (viewWidth)
 	
 	self.ViewWidth = viewWidth
 	
-	if self.HorizontalScrollBar then
-		self.HorizontalScrollBar:SetViewSize (self.ViewWidth)
-		self.HorizontalScrollBar:SetVisible (self.HorizontalScrollBar:IsEnabled ())
-	end
+	self:UpdateScrollBarViewSize ()
 	
 	self:DispatchEvent ("ViewWidthChanged", self.ViewWidth)
 	self:DispatchEvent ("ViewSizeChanged", self.ViewWidth, self.ViewHeight)
 	return self
 end
 
-function self:SetHorizontalScrollBar (horizontalScrollBar)
-	self:UnhookHorizontalScrollBar (self.HorizontalScrollBar)
-	self.HorizontalScrollBar = horizontalScrollBar
+function self:SetViewWidthWithScrollBars (viewWidthWithScrollBars)
+	if self.ViewWidthWithScrollBars == viewWidthWithScrollBars then return self end
 	
-	if self.HorizontalScrollBar then
-		self.HorizontalScrollBar:SetContentSize (self:GetContentWidth ())
-		self.HorizontalScrollBar:SetViewSize (self:GetViewWidth ())
-		self.HorizontalScrollBar:SetViewOffset (self:GetViewX ())
-		self.HorizontalScrollBar:SetVisible (self.HorizontalScrollBar:IsEnabled ())
-		self:HookHorizontalScrollBar (self.HorizontalScrollBar)
-	end
+	self.ViewWidthWithScrollBars = viewWidthWithScrollBars
 	
-	return self
-end
-
-function self:SetScrollBarCorner (scrollBarCorner)
-	self.ScrollBarCorner = scrollBarCorner
-	return self
-end
-
-function self:SetVerticalScrollBar (verticalScrollBar)
-	self:UnhookVerticalScrollBar (self.VerticalScrollBar)
-	self.VerticalScrollBar = verticalScrollBar
-	
-	if self.VerticalScrollBar then
-		self.VerticalScrollBar:SetContentSize (self:GetContentHeight ())
-		self.VerticalScrollBar:SetViewSize (self:GetViewHeight ())
-		self.VerticalScrollBar:SetViewOffset (self:GetViewY ())
-		self.VerticalScrollBar:SetVisible (self.VerticalScrollBar:IsEnabled ())
-		self:HookVerticalScrollBar (self.VerticalScrollBar)
-	end
+	self:UpdateScrollBarViewSize ()
 	
 	return self
 end
@@ -245,13 +267,96 @@ function self:SetViewY (viewY)
 	return self
 end
 
+-- Controls
+function self:GetHorizontalScrollBar ()
+	return self.HorizontalScrollBar
+end
+
+function self:GetScrollBarCorner ()
+	return self.ScrollBarCorner
+end
+
+function self:GetVerticalScrollBar ()
+	return self.VerticalScrollBar
+end
+
+function self:SetAutoHideHorizontalScrollBar (autoHideHorizontalScrollBar)
+	if self.AutoHideHorizontalScrollBar == autoHideHorizontalScrollBar then return self end
+	
+	self.AutoHideHorizontalScrollBar = autoHideHorizontalScrollBar
+	self:UpdateHorizontalScrollBarVisibility ()
+	return self
+end
+
+function self:SetAutoHideVerticalScrollBar (autoHideVerticalScrollBar)
+	if self.AutoHideVerticalScrollBar == autoHideHVerticalScrollBar then return self end
+	
+	self.AutoHideVerticalScrollBar = autoHideVerticalScrollBar
+	self:UpdateVerticalScrollBarVisibility ()
+	return self
+end
+
+function self:SetHorizontalScrollBar (horizontalScrollBar)
+	self:UnhookHorizontalScrollBar (self.HorizontalScrollBar)
+	self.HorizontalScrollBar = horizontalScrollBar
+	
+	if self.HorizontalScrollBar then
+		self.HorizontalScrollBar:SetContentSize (self:GetContentWidth ())
+		self.HorizontalScrollBar:SetViewSize (self:GetViewWidth ())
+		self.HorizontalScrollBar:SetViewOffset (self:GetViewX ())
+		self:UpdateHorizontalScrollBarVisibility ()
+		self:HookHorizontalScrollBar (self.HorizontalScrollBar)
+	end
+	
+	return self
+end
+
+function self:SetScrollBarCorner (scrollBarCorner)
+	self.ScrollBarCorner = scrollBarCorner
+	return self
+end
+
+function self:SetVerticalScrollBar (verticalScrollBar)
+	self:UnhookVerticalScrollBar (self.VerticalScrollBar)
+	self.VerticalScrollBar = verticalScrollBar
+	
+	if self.VerticalScrollBar then
+		self.VerticalScrollBar:SetContentSize (self:GetContentHeight ())
+		self.VerticalScrollBar:SetViewSize (self:GetViewHeight ())
+		self.VerticalScrollBar:SetViewOffset (self:GetViewY ())
+		self:UpdateVerticalScrollBarVisibility ()
+		self:HookVerticalScrollBar (self.VerticalScrollBar)
+	end
+	
+	return self
+end
+
+function self:ShouldAutoHideHorizontalScrollBar ()
+	return self.AutoHideHorizontalScrollBar
+end
+
+function self:ShouldAutoHideVerticalScrollBar ()
+	return self.AutoHideVerticalScrollBar
+end
+
 -- Internal, do not call
 function self:HookHorizontalScrollBar (horizontalScrollBar)
 	if not horizontalScrollBar then return end
 	
+	horizontalScrollBar:AddEventListener ("InterpolatedScroll", tostring (self),
+		function (_, interpolatedViewX)
+			self:DispatchEvent ("InterpolatedViewXChanged", interpolatedViewX)
+			self:DispatchEvent ("InterpolatedViewPositionChanged", interpolatedViewX, self:GetInterpolatedViewY ())
+		end
+	)
+	horizontalScrollBar:AddEventListener ("Removed", tostring (self),
+		function (_)
+			self:SetHorizontalScrollBar (nil)
+		end
+	)
 	horizontalScrollBar:AddEventListener ("Scroll", tostring (self),
 		function (_, viewX)
-			self:SetViewX (viewX)
+			self:SetViewX (horizontalScrollBar:GetViewOffset ())
 		end
 	)
 end
@@ -259,15 +364,28 @@ end
 function self:UnhookHorizontalScrollBar (horizontalScrollBar)
 	if not horizontalScrollBar then return end
 	
-	horizontalScrollBar:RemoveEventListener ("Scroll", tostring (self))
+	horizontalScrollBar:RemoveEventListener ("InterpolatedScroll", tostring (self))
+	horizontalScrollBar:RemoveEventListener ("Removed",            tostring (self))
+	horizontalScrollBar:RemoveEventListener ("Scroll",             tostring (self))
 end
 
 function self:HookVerticalScrollBar (verticalScrollBar)
 	if not verticalScrollBar then return end
 	
+	verticalScrollBar:AddEventListener ("InterpolatedScroll", tostring (self),
+		function (_, interpolatedViewY)
+			self:DispatchEvent ("InterpolatedViewYChanged", interpolatedViewY)
+			self:DispatchEvent ("InterpolatedViewPositionChanged", self:GetInterpolatedViewX (), interpolatedViewY)
+		end
+	)
+	verticalScrollBar:AddEventListener ("Removed", tostring (self),
+		function (_)
+			self:SetVerticalScrollBar (nil)
+		end
+	)
 	verticalScrollBar:AddEventListener ("Scroll", tostring (self),
 		function (_, viewY)
-			self:SetViewY (viewY)
+			self:SetViewY (verticalScrollBar:GetViewOffset ())
 		end
 	)
 end
@@ -275,5 +393,55 @@ end
 function self:UnhookVerticalScrollBar (verticalScrollBar)
 	if not verticalScrollBar then return end
 	
-	verticalScrollBar:RemoveEventListener ("Scroll", tostring (self))
+	verticalScrollBar:RemoveEventListener ("InterpolatedScroll", tostring (self))
+	verticalScrollBar:RemoveEventListener ("Removed",            tostring (self))
+	verticalScrollBar:RemoveEventListener ("Scroll",             tostring (self))
+end
+
+function self:UpdateHorizontalScrollBarVisibility ()
+	if not self.HorizontalScrollBar then return end
+	
+	if self:ShouldAutoHideHorizontalScrollBar () then
+		self.HorizontalScrollBar:SetVisible (self.HorizontalScrollBar:IsEnabled ())
+	else
+		self.HorizontalScrollBar:SetVisible (true)
+	end
+	
+	if self.ScrollBarCorner then
+		self.ScrollBarCorner:SetVisible (self:IsVerticalScrollBarVisible () and self:IsHorizontalScrollBarVisible ())
+	end
+end
+
+function self:UpdateVerticalScrollBarVisibility ()
+	if not self.VerticalScrollBar then return end
+	
+	if self:ShouldAutoHideVerticalScrollBar () then
+		self.VerticalScrollBar:SetVisible (self.VerticalScrollBar:IsEnabled ())
+	else
+		self.VerticalScrollBar:SetVisible (true)
+	end
+	
+	if self.ScrollBarCorner then
+		self.ScrollBarCorner:SetVisible (self:IsVerticalScrollBarVisible () and self:IsHorizontalScrollBarVisible ())
+	end
+end
+
+function self:UpdateScrollBarViewSize ()
+	local verticalScrollBarNeeded = self.ViewHeight < self.ContentHeight
+	local realViewWidth = verticalScrollBarNeeded and self:GetViewWidthWithScrollBars () or self.ViewWidth
+	
+	local horizontalScrollBarNeeded = realViewWidth < self.ContentWidth
+	local realViewHeight = horizontalScrollBarNeeded and self:GetViewHeightWithScrollBars () or self.ViewHeight
+	
+	verticalScrollBarNeeded = self.ViewHeight < self.ContentHeight
+	realViewWidth = verticalScrollBarNeeded and self:GetViewWidthWithScrollBars () or self.ViewWidth
+	
+	if self.VerticalScrollBar then
+		self.VerticalScrollBar:SetViewSize (realViewHeight)
+		self:UpdateVerticalScrollBarVisibility ()
+	end
+	if self.HorizontalScrollBar then
+		self.HorizontalScrollBar:SetViewSize (realViewWidth)
+		self:UpdateHorizontalScrollBarVisibility ()
+	end
 end

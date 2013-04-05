@@ -58,10 +58,14 @@ function PANEL:Init ()
 	)
 	self:AddEventListener ("SmallIncrementChanged",
 		function (_, smallIncrement)
-			self.LeftButton:SetScrollIncrement (smallIncrement)
+			self.LeftButton:SetScrollIncrement (-smallIncrement)
 			self.RightButton:SetScrollIncrement (smallIncrement)
 		end
 	)
+end
+
+function PANEL:GetOrientation ()
+	return Gooey.Orientation.Horizontal
 end
 
 function PANEL:GetThickness ()
@@ -86,18 +90,8 @@ function PANEL:PerformLayout ()
 	self.RightButton:SetPos (self:GetWide () - buttonSize, 0)
 	self.RightButton:SetSize (buttonSize, buttonSize)
 	
-	self.Grip:SetPos (math.floor (self.LeftButton:GetWide () + self.ViewOffset / (self.ContentSize - self.ViewSize) * self:GetScrollableTrackSize () + 0.5), 0)
+	self.Grip:SetPos (math.floor (self.LeftButton:GetWide () + self:GetInterpolatedViewOffset () / (self.ContentSize - self.ViewSize) * self:GetScrollableTrackSize () + 0.5), 0)
 	self.Grip:SetSize (self:GetGripSize (), buttonSize)
-end
-
--- Event handlers
-function PANEL:Think ()
-	if self:IsPressed () then
-		if SysTime () >= self.NextMouseScrollTime then
-			local x, y = self:CursorPos ()
-			self:ScrollToMouse (x)
-		end
-	end
 end
 
 Gooey.Register ("GHScrollBar", PANEL, "GBaseScrollBar")

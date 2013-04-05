@@ -8,6 +8,16 @@ function PANEL:Init ()
 	self:SetAllowNonAsciiCharacters (true)
 end
 
+-- Compatibility with Derma skin's PaintTextEntry
+function PANEL:HasFocus ()
+	return self:IsFocused ()
+end
+
+-- Compatibility with spawn menu hooks
+function PANEL:HasParent (control)
+	return debug.getregistry ().Panel.HasParent (self, control)
+end
+
 function PANEL:GetText ()
 	return debug.getregistry ().Panel.GetText (self)
 end

@@ -16,7 +16,7 @@ function PANEL:Init ()
 		function (_, mouseCode)
 			if mouseCode == MOUSE_LEFT then
 				if self.ScrollBar then
-					self.ScrollBar:Scroll (self:GetScrollIncrement ())
+					self.ScrollBar:ScrollAnimated (self:GetScrollIncrement ())
 					self.NextIncrementTime = SysTime () + self.FirstIncrementInterval
 				end
 			end

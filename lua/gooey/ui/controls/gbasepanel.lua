@@ -1,6 +1,9 @@
 local self = {}
 Gooey.BasePanel = self
 
+Gooey.LastFocusRequestPanel = nil
+Gooey.LastFocusRequestTime  = 0
+
 --[[
 	Events:
 		ActionChanged (actionName)
@@ -13,6 +16,12 @@ Gooey.BasePanel = self
 			Fired when this panel has been enabled or disabled.
 		FontChanged (font)
 			Fired when this panel's font has changed.
+		GotFocus ()
+			Fired when this panel has acquired keyboard focus.
+		HeightChanged (height)
+			Fired when this panel's height has changed.
+		LostFocus ()
+			Fired when this panel has lost keyboard focus.
 		OwnerChanged (Panel oldOwner, Panel owner)
 			Fired when this panel's owner has changed.
 		ParentChanged (Panel oldParent, Panel parent)
@@ -27,21 +36,29 @@ Gooey.BasePanel = self
 			Fired when this panel's text has changed.
 		VisibleChanged (visible)
 			Fired when this panel's visibility has changed.
+		WidthChanged (width)
+			Fired when this panel's width has changed.
 ]]
 
 function self:_ctor ()
 	if self.BasePanelInitialized then return end
 	self.BasePanelInitialized = true
 	
+	-- Control
 	self.Owner = nil
 	
 	self.Enabled = true
 	self.Pressed = false
 	
+	-- Focus
+	self.Focusable = false
+	self.Focused = false
+	
 	-- Colors
 	self.BackgroundColor = nil
 	self.TextColor = nil
 	
+	-- Text
 	self.Text = self:GetText ()
 	self.Font = nil
 	
@@ -62,12 +79,21 @@ function self:_ctor ()
 	Gooey.EventProvider (self)
 end
 
-function self:CancelFade ()
-	self.FadingOut = false
+-- Control
+function self:Contains (control)
+	if not control then return false end
+	if not control:IsValid () then return false end
+	
+	local parent = control:GetParent ()
+	while parent and parent:IsValid () do
+		if parent == self then return true end
+		parent = parent:GetParent ()
+	end
+	return false
 end
 
-function self:Create (class)
-	return vgui.Create (class, self)
+function self:Create (class, parent)
+	return vgui.Create (class, parent or self)
 end
 
 function self:CreateLabel (text)
@@ -76,115 +102,8 @@ function self:CreateLabel (text)
 	return label
 end
 
-function self:DispatchAction (actionName, ...)
-	local actionMap, control = self:GetActionMap ()
-	if not actionMap then return false end
-	return actionMap:Execute (actionName, control, ...)
-end
-
-function self:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
-	if ctrl  == nil then ctrl    = input.IsKeyDown (KEY_LCONTROL) or input.IsKeyDown (KEY_RCONTROL) end
-	if shift == nil then shift   = input.IsKeyDown (KEY_LSHIFT)   or input.IsKeyDown (KEY_RSHIFT)   end
-	if alt   == nil then alt     = input.IsKeyDown (KEY_LALT)     or input.IsKeyDown (KEY_RALT)     end
-	
-	local keyHandled = false
-	local keyboardMap = self:GetKeyboardMap ()
-	if keyboardMap then
-		keyHandled = keyboardMap:Execute (self, keyCode, ctrl, shift, alt)
-	end
-	
-	if not keyHandled then
-		local parent = self:GetParent ()
-		while parent and parent:IsValid () do
-			if type (parent.DispatchKeyboardAction) == "function" then
-				return parent:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
-			end
-			parent = parent:GetParent ()
-		end
-	end
-	
-	return keyHandled
-end
-
-function self:FadeOut ()
-	if not self:IsVisible () then return end
-	
-	self.FadingOut = true
-	self.FadeEndTime = SysTime () + self:GetAlpha () / 255 * self.FadeDuration
-	self:FadeThink ()
-end
-
-function self:GetAction ()
-	return self.Action
-end
-
-function self:GetActionMap ()
-	if self.ActionMap then
-		return self.ActionMap, self
-	end
-	
-	local actionMap, control = nil, nil
-	if self:GetOwner () and type (self:GetOwner ().GetActionMap) == "function" then
-		actionMap, control = self:GetOwner ():GetActionMap ()
-	end
-	if actionMap then return actionMap, control end
-	
-	local parent = self:GetParent ()
-	while parent and parent:IsValid () do
-		if type (parent.GetActionMap) == "function" then
-			actionMap, control = parent:GetActionMap ()
-			if actionMap then return actionMap, control end
-		end
-		if type (parent.GetOwner) == "function" then
-			local owner = parent:GetOwner ()
-			if owner and owner:IsValid () and type (owner.GetActionMap) == "function" then
-				actionMap, control = owner:GetActionMap ()
-				if actionMap then return actionMap, control end
-			end
-		end
-		parent = parent:GetParent ()
-	end
-	
-	return nil, nil
-end
-
-function self:GetBackgroundColor ()
-	if not self.BackgroundColor then
-		self.BackgroundColor = self.m_Skin.control_color or GLib.Colors.DarkGray
-	end
-	return self.BackgroundColor
-end
-
-function self:GetFont ()
-	return self.Font or debug.getregistry ().Panel.GetFont (self)
-end
-
-function self:GetKeyboardMap ()
-	return self.KeyboardMap
-end
-
 function self:GetOwner ()
 	return self.Owner
-end
-
-function self:GetText ()
-	return self.Text or debug.getregistry ().Panel.GetText (self)
-end
-
-function self:GetTextColor ()
-	return self.TextColor or GLib.Colors.Black
-end
-
-function self:GetToolTipController ()
-	if not self.ToolTipController then
-		self.ToolTipController = Gooey.ToolTipController (self)
-		self.ToolTipController:SetEnabled (false)
-	end
-	return self.ToolTipController
-end
-
-function self:GetToolTipText ()
-	return self.ToolTipText or ""
 end
 
 function self:IsEnabled ()
@@ -224,35 +143,6 @@ function self:Remove ()
 	debug.getregistry ().Panel.Remove (self)
 end
 
-function self:RunAction (...)
-	if not self:GetAction () then return end
-	self:DispatchAction (self:GetAction (), ...)
-end
-
-function self:SetAction (action)
-	if self.Action == action then return self end
-	
-	self.Action = action
-	self:DispatchEvent ("ActionChanged", self.Action)
-	
-	return self
-end
-
-function self:SetActionMap (actionMap)
-	if self.ActionMap == actionMap then return self end
-	
-	self.ActionMap = actionMap
-	self:DispatchEvent ("ActionMapChanged", self.ActionMap)
-	
-	return self
-end
-
-function self:SetBackgroundColor (color)
-	self.BackgroundColor = color
-	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
-	return self
-end
-
 function self:SetEnabled (enabled)
 	if self.Enabled == enabled then return self end
 	
@@ -263,27 +153,14 @@ function self:SetEnabled (enabled)
 	return self
 end
 
-function self:SetFont (font)
-	if self:GetFont () == font then return end
-	
-	self.Font = font
-	self.m_FontName = font
-	debug.getregistry ().Panel.SetFontInternal (self, font)
-	self:DispatchEvent ("FontChanged", font)
-	return self
-end
-
 function self:SetHeight (height)
 	if self:GetTall () == height then return self end
 	
 	debug.getregistry ().Panel.SetTall (self, height)
+	self:DispatchEvent ("HeightChanged", self:GetTall ())
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 	
 	return self
-end
-
-function self:SetKeyboardMap (keyboardMap)
-	self.KeyboardMap = keyboardMap
 end
 
 function self:SetOwner (owner)
@@ -322,6 +199,8 @@ function self:SetSize (width, height, ...)
 	if self:GetWide () == width and self:GetTall () == height then return self end
 	
 	debug.getregistry ().Panel.SetSize (self, width, height)
+	self:DispatchEvent ("WidthChanged", self:GetWide ())
+	self:DispatchEvent ("HeightChanged", self:GetTall ())
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 	
 	return self
@@ -329,14 +208,79 @@ end
 
 self.SetTall = self.SetHeight
 
-function self:SetText (text)
-	if self.Text == text then return self end
+function self:SetWide (width)
+	if self:GetWide () == width then return self end
 	
-	self.Text = text
-	debug.getregistry ().Panel.SetText (self, text)
+	debug.getregistry ().Panel.SetWide (self, width)
+	self:DispatchEvent ("WidthChanged", self:GetWide ())
+	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 	
-	self:DispatchEvent ("TextChanged", self.Text)
+	return self
+end
+
+self.SetWidth = self.SetWide
+
+-- Focus
+function self:CanFocus ()
+	return self.Focusable
+end
+
+function self:ContainsFocus ()
+	if self:IsFocused () then return true end
 	
+	local focusedPanel = vgui.GetKeyboardFocus ()
+	while focusedPanel and focusedPanel:IsValid () do
+		if self == focusedPanel or
+		   self:Contains (focusedPanel) then
+			return true
+		end
+		focusedPanel = focusedPanel.GetOwner and focusedPanel:GetOwner ()
+	end
+	return false
+end
+
+function self:Focus ()
+	debug.getregistry ().Panel.RequestFocus (self)
+	
+	Gooey.LastFocusRequestPanel = self
+	Gooey.LastFocusRequestTime  = CurTime ()
+end
+
+function self:IsFocused ()
+	if self.Focused then return true end
+	if self == Gooey.LastFocusRequestPanel and
+	   Gooey.LastFocusRequestTime == CurTime () then
+		return true
+	end
+	
+	local focusedPanel = vgui.GetKeyboardFocus ()
+	while focusedPanel and focusedPanel:IsValid () do
+		if self == focusedPanel then return true end
+		focusedPanel = focusedPanel.GetOwner and focusedPanel:GetOwner ()
+	end
+	return false
+end
+
+function self:SetCanFocus (canFocus)
+	self.Focusable = canFocus
+	return self
+end
+
+-- Colors
+function self:GetBackgroundColor ()
+	if not self.BackgroundColor then
+		self.BackgroundColor = self.m_Skin.control_color or GLib.Colors.DarkGray
+	end
+	return self.BackgroundColor
+end
+
+function self:GetTextColor ()
+	return self.TextColor or GLib.Colors.Black
+end
+
+function self:SetBackgroundColor (color)
+	self.BackgroundColor = color
+	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
 	return self
 end
 
@@ -363,6 +307,62 @@ function self:SetTextColor (color)
 	return self
 end
 
+-- Text
+function self:GetFont ()
+	return self.Font or debug.getregistry ().Panel.GetFont (self)
+end
+
+function self:GetText ()
+	return self.Text or debug.getregistry ().Panel.GetText (self)
+end
+
+function self:SetFont (font)
+	if self:GetFont () == font then return end
+	
+	self.Font = font
+	self.m_FontName = font
+	debug.getregistry ().Panel.SetFontInternal (self, font)
+	self:DispatchEvent ("FontChanged", font)
+	return self
+end
+
+function self:SetText (text)
+	if self.Text == text then return self end
+	
+	self.Text = text
+	debug.getregistry ().Panel.SetText (self, text)
+	
+	self:DispatchEvent ("TextChanged", self.Text)
+	
+	return self
+end
+
+-- Fade effects
+function self:CancelFade ()
+	self.FadingOut = false
+end
+
+function self:FadeOut ()
+	if not self:IsVisible () then return end
+	
+	self.FadingOut = true
+	self.FadeEndTime = SysTime () + self:GetAlpha () / 255 * self.FadeDuration
+	self:FadeThink ()
+end
+
+-- ToolTip
+function self:GetToolTipController ()
+	if not self.ToolTipController then
+		self.ToolTipController = Gooey.ToolTipController (self)
+		self.ToolTipController:SetEnabled (false)
+	end
+	return self.ToolTipController
+end
+
+function self:GetToolTipText ()
+	return self.ToolTipText or ""
+end
+
 function self:SetToolTipText (text)
 	if self.ToolTipText == text then return self end
 	
@@ -375,6 +375,103 @@ function self:SetToolTipText (text)
 	return self
 end
 
+-- Actions
+function self:DispatchAction (actionName, ...)
+	local actionMap, control = self:GetActionMap ()
+	if not actionMap then return false end
+	return actionMap:Execute (actionName, control, ...)
+end
+
+function self:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
+	if ctrl  == nil then ctrl    = input.IsKeyDown (KEY_LCONTROL) or input.IsKeyDown (KEY_RCONTROL) end
+	if shift == nil then shift   = input.IsKeyDown (KEY_LSHIFT)   or input.IsKeyDown (KEY_RSHIFT)   end
+	if alt   == nil then alt     = input.IsKeyDown (KEY_LALT)     or input.IsKeyDown (KEY_RALT)     end
+	
+	local keyHandled = false
+	local keyboardMap = self:GetKeyboardMap ()
+	if keyboardMap then
+		keyHandled = keyboardMap:Execute (self, keyCode, ctrl, shift, alt)
+	end
+	
+	if not keyHandled then
+		local parent = self:GetParent ()
+		while parent and parent:IsValid () do
+			if type (parent.DispatchKeyboardAction) == "function" then
+				return parent:DispatchKeyboardAction (keyCode, ctrl, shift, alt)
+			end
+			parent = parent:GetParent ()
+		end
+	end
+	
+	return keyHandled
+end
+
+function self:GetAction ()
+	return self.Action
+end
+
+function self:GetActionMap ()
+	if self.ActionMap then
+		return self.ActionMap, self
+	end
+	
+	local actionMap, control = nil, nil
+	if self:GetOwner () and type (self:GetOwner ().GetActionMap) == "function" then
+		actionMap, control = self:GetOwner ():GetActionMap ()
+	end
+	if actionMap then return actionMap, control end
+	
+	local parent = self:GetParent ()
+	while parent and parent:IsValid () do
+		if type (parent.GetActionMap) == "function" then
+			actionMap, control = parent:GetActionMap ()
+			if actionMap then return actionMap, control end
+		end
+		if type (parent.GetOwner) == "function" then
+			local owner = parent:GetOwner ()
+			if owner and owner:IsValid () and type (owner.GetActionMap) == "function" then
+				actionMap, control = owner:GetActionMap ()
+				if actionMap then return actionMap, control end
+			end
+		end
+		parent = parent:GetParent ()
+	end
+	
+	return nil, nil
+end
+
+function self:GetKeyboardMap ()
+	return self.KeyboardMap
+end
+
+function self:RunAction (...)
+	if not self:GetAction () then return end
+	self:DispatchAction (self:GetAction (), ...)
+end
+
+function self:SetAction (action)
+	if self.Action == action then return self end
+	
+	self.Action = action
+	self:DispatchEvent ("ActionChanged", self.Action)
+	
+	return self
+end
+
+function self:SetActionMap (actionMap)
+	if self.ActionMap == actionMap then return self end
+	
+	self.ActionMap = actionMap
+	self:DispatchEvent ("ActionMapChanged", self.ActionMap)
+	
+	return self
+end
+
+function self:SetKeyboardMap (keyboardMap)
+	self.KeyboardMap = keyboardMap
+	return self
+end
+
 function self:SetVisible (visible)
 	if self:IsVisible () == visible then return self end
 	
@@ -384,18 +481,20 @@ function self:SetVisible (visible)
 	return self
 end
 
-function self:SetWide (width)
-	if self:GetWide () == width then return self end
+-- Event handlers
+function self:OnFocusChanged (focused)
+	self.Focused = focused
 	
-	debug.getregistry ().Panel.SetWide (self, width)
-	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
-	
-	return self
+	if focused then
+		self:DispatchEvent ("GotFocus")
+		if self.OnGotFocus then self:OnGotFocus () end
+	else
+		self:DispatchEvent ("LostFocus")
+		if self.OnLostFocus then self:OnLostFocus () end
+	end
 end
 
-self.SetWidth = self.SetWide
-
--- Internal
+-- Internal, do not call
 function self:FadeThink ()
 	if not self.FadingOut then return end
 	
@@ -433,6 +532,9 @@ function self:IsDisabled ()
 	return not self:IsEnabled ()
 end
 
-self.GetColor = Gooey.DeprecatedFunction
-self.SetColor = Gooey.DeprecatedFunction
-self.SetDisabled = Gooey.DeprecatedFunction
+self.GetColor     = Gooey.DeprecatedFunction
+self.HasFocus     = Gooey.DeprecatedFunction
+self.HasParent    = Gooey.DeprecatedFunction
+self.RequestFocus = Gooey.DeprecatedFunction
+self.SetColor     = Gooey.DeprecatedFunction
+self.SetDisabled  = Gooey.DeprecatedFunction

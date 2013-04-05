@@ -7,6 +7,8 @@ Gooey.SelectionController = Gooey.MakeConstructor (self)
 		Shift: Add to selection
 
 	Events:
+		ScrollRequested (deltaOffset)
+			Fired when the view should be scrolled.
 		SelectionChanged (item)
 			Fired when the latest selected item has been changed.
 		SelectionCleared ()

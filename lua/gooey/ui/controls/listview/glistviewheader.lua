@@ -7,6 +7,7 @@ local PANEL = {}
 ]]
 
 function PANEL:Init ()
+	self.ListView = nil
 	self.Canvas = vgui.Create ("GContainer", self)
 	
 	self.HeaderWidth = 0
@@ -15,6 +16,18 @@ function PANEL:Init ()
 	
 	self.ColumnCollection = nil
 	self.SizeGrips = {}
+	
+	self:AddEventListener ("RightClick",
+		function (_)
+			if not self.ListView:GetHeaderMenu () then return end
+			self.ListView:GetHeaderMenu ():SetOwner (self.ListView)
+			self.ListView:GetHeaderMenu ():Open ()
+		end
+	)
+end
+
+function PANEL:GetListView ()
+	return self.ListView
 end
 
 function PANEL:GetHeaderWidth ()
@@ -32,7 +45,7 @@ function PANEL:PerformLayout ()
 	if not self.HeaderLayoutValid then
 		self:LayoutHeaders ()
 	end
-	self.Canvas:SetPos (-self.ScrollableViewController:GetViewX (), 0)
+	self.Canvas:SetPos (-self.ScrollableViewController:GetInterpolatedViewX (), 0)
 end
 
 function PANEL:SetColumnCollection (columnCollection)
@@ -55,13 +68,16 @@ function PANEL:SetColumnCollection (columnCollection)
 	end
 end
 
+function PANEL:SetListView (listView)
+	self.ListView = listView
+end
+
 function PANEL:SetScrollableViewController (scrollableViewController)
 	self:UnhookScrollableViewController (self.ScrollableViewController)
 	self.ScrollableViewController = scrollableViewController
 	self:HookScrollableViewController (self.ScrollableViewController)
 end
 
--- Event handlers
 function PANEL:OnRemoved ()
 	self:SetColumnCollection (nil)
 end
@@ -160,6 +176,17 @@ end
 function PANEL:HookColumn (column)
 	if not column then return end
 	
+	column:GetHeader ():AddEventListener ("Click", tostring (self:GetTable ()),
+		function (_)
+			local sortOrder = Gooey.SortOrder.Ascending
+			if self:GetListView ():GetSortColumnId () == column:GetId () and
+			   self:GetListView ():GetSortOrder () == Gooey.SortOrder.Ascending then
+				sortOrder = Gooey.SortOrder.Descending
+			end
+			self:GetListView ():SortByColumn (column:GetId (), sortOrder)
+		end
+	)
+	
 	column:GetHeader ():AddEventListener ("SizeChanged", tostring (self:GetTable ()),
 		function (_)
 			self:LayoutHeaders ()
@@ -176,6 +203,7 @@ end
 function PANEL:UnhookColumn (column)
 	if not column then return end
 	
+	column:GetHeader ():RemoveEventListener ("Click",          tostring (self:GetTable ()))
 	column:GetHeader ():RemoveEventListener ("SizeChanged",    tostring (self:GetTable ()))
 	column:GetHeader ():RemoveEventListener ("VisibleChanged", tostring (self:GetTable ()))
 end

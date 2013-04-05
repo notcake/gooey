@@ -22,7 +22,7 @@ function PANEL:Init ()
 				if not self.CloseButton:IsHovered () then
 					self.Tab:Select ()
 				end
-				self.Tab:RequestFocus ()
+				self.Tab:Focus ()
 			end
 		end
 	)
@@ -37,6 +37,7 @@ function PANEL:Init ()
 	self:AddEventListener ("RightClick",
 		function (_)
 			if self.Tab:GetContextMenu () then
+				self.Tab:GetContextMenu ():SetOwner (self)
 				self.Tab:GetContextMenu ():Open (self.Tab)
 			end
 		end
@@ -208,12 +209,6 @@ function PANEL:SetText (text)
 	self.Tab:DispatchEvent ("TextChanged", text)
 	
 	self:InvalidateLayout ()
-end
-
--- Event handlers
-function PANEL:OnMouseWheel (delta, x, y)
-	if not self:GetTabControl () then return end
-	self:GetTabControl ():OnMouseWheeled (delta)
 end
 
 Gooey.Register ("GTabHeader", PANEL, "GPanel")

@@ -146,12 +146,14 @@ function self:Paint (renderContext)
 		control = self.Controls [i]
 		if control:IsVisible () then
 			renderContext:SetRelativeViewPort (control:GetLeft (), control:GetTop ())
+			surface.DisableClipping (true)
 			control:Paint (renderContext)
 		end
 	end
 	
 	renderContext:PopViewPort ()
 	render.SetScissorRect (0, 0, ScrW (), ScrH (), false)
+	surface.DisableClipping (false)
 end
 
 function self:SetHoveredControl (control)

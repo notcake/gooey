@@ -33,6 +33,11 @@ function self:ctor ()
 	Gooey.EventProvider (self)
 end
 
+function self:Focus ()
+	if not self.Contents then return end
+	self.Contents:Focus ()
+end
+
 function self:GetContents ()
 	return self.Contents
 end
@@ -108,11 +113,6 @@ function self:Remove ()
 	end
 	
 	self:DispatchEvent ("Removed")
-end
-
-function self:RequestFocus ()
-	if not self.Contents then return end
-	self.Contents:RequestFocus ()
 end
 
 function self:Select ()

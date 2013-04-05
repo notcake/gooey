@@ -146,6 +146,7 @@ end
 
 function PANEL:DoRightClick (node)
 	if self.Menu then
+		self.Menu:SetOwner (self)
 		self.Menu:Open (node)
 	end
 	self:DispatchEvent ("RightClick", node)
