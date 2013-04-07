@@ -5,6 +5,16 @@ function self:ctor ()
 	self.Keys = {}
 end
 
+function self:Clone ()
+	local keyboardMap = Gooey.KeyboardMap ()
+	for key, handlers in pairs (self.Keys) do
+		for _, handler in ipairs (handlers) do
+			keyboardMap:Register (key, handler)
+		end
+	end
+	return keyboardMap
+end
+
 function self:Execute (control, key, ctrl, shift, alt)
 	if not self.Keys [key] then return false end
 	
