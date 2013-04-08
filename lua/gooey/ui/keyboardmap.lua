@@ -29,6 +29,15 @@ function self:Execute (control, key, ctrl, shift, alt)
 		if handled == nil then handled = true end
 		if handled then break end
 	end
+	
+	if handled and key == KEY_ESCAPE then
+		if gui.IsGameUIVisible () then
+			gui.HideGameUI ()
+		else
+			gui.ActivateGameUI ()
+		end
+	end
+	
 	return handled or false
 end
 
