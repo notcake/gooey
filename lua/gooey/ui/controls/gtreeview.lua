@@ -146,8 +146,7 @@ end
 
 function PANEL:DoRightClick (node)
 	if self.Menu then
-		self.Menu:SetOwner (self)
-		self.Menu:Open (node)
+		self.Menu:Show (self, node)
 	end
 	self:DispatchEvent ("RightClick", node)
 end
@@ -160,7 +159,7 @@ function PANEL:OnMouseReleased (mouseCode)
 end
 
 function PANEL:OnRemoved ()
-	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
+	if self.Menu and self.Menu:IsValid () then self.Menu:dtor () end
 end
 
 Gooey.Register ("GTreeView", PANEL, "DTree") 

@@ -505,13 +505,11 @@ function PANEL:OnMouseReleased (mouseCode)
 		self:DoRightClick ()
 		if self:GetSelectionMode () == Gooey.SelectionMode.Multiple then
 			if self.Menu then
-				self.Menu:SetOwner (self)
-				self.Menu:Open (self:GetSelectedItems ())
+				self.Menu:Show (self, self:GetSelectedItems ())
 			end
 		else
 			if self.Menu then
-				self.Menu:SetOwner (self)
-				self.Menu:Open (self:GetSelectedItem ())
+				self.Menu:Show (self, self:GetSelectedItem ())
 			end
 		end
 	end
@@ -527,8 +525,8 @@ function PANEL:OnMouseWheel (delta)
 end
 
 function PANEL:OnRemoved ()
-	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
-	if self.HeaderMenu and self.HeaderMenu:IsValid () then self.HeaderMenu:Remove () end
+	if self.Menu and self.Menu:IsValid () then self.Menu:dtor () end
+	if self.HeaderMenu and self.HeaderMenu:IsValid () then self.HeaderMenu:dtor () end
 end
 
 -- Internal, do not call

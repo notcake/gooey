@@ -1,13 +1,11 @@
 local PANEL = {}
 
---[[
-	Events:
-		CheckedChanged (checked)
-			Fired when this menu item's check state has changed.
-]]
-
 function PANEL:Init ()
+	self.Id = nil
 	self.ContainingMenu = nil
+	
+	self.Item = nil
+	
 	self.Checked = false
 	self.Icon = nil
 	
@@ -38,8 +36,24 @@ function PANEL:GetContainingMenu ()
 	return self.ContainingMenu
 end
 
+function PANEL:GetId ()
+	return self.Id
+end
+
+function PANEL:GetItem ()
+	return self.Item
+end
+
 function PANEL:IsChecked ()
 	return self.Checked
+end
+
+function PANEL:IsItem ()
+	return true
+end
+
+function PANEL:IsSeparator ()
+	return false
 end
 
 function PANEL:Paint (w, h)
@@ -50,7 +64,18 @@ function PANEL:Paint (w, h)
 		surface.DrawOutlinedRect (2, 2, w - 4, h - 4)
 	end
 	
+	local subMenu = self:GetItem ():GetSubMenu ()
+	local activeMenu = self:GetContainingMenu ():GetActiveSubMenu ()
+	if not self.Hovered and
+	   self:GetContainingMenu ():GetHoveredItem () == nil and
+	   activeMenu and activeMenu:GetMenu () == subMenu then
+		self:GetSkin ().tex.MenuBG_Hover (0, 0, w, h)
+	end
 	derma.SkinHook ("Paint", "MenuOption", self, w, h)
+	
+	if self:GetItem ():GetSubMenu () then
+		self:GetSkin ().tex.Menu.RightArrow (w - 15 - 4, 0.5 * (h - 15), 15, 15)
+	end
 	
 	surface.SetFont ("DermaDefault")
 	if self:IsEnabled () then
@@ -76,9 +101,15 @@ function PANEL:SetChecked (checked)
 	return self
 end
 
+function PANEL:SetContainingMenu (menu)
+	self.ContainingMenu = menu
+end
+
 function PANEL:SetIcon (icon)
 	if not icon then
-		self.Icon:Remove ()
+		if self.Icon and self.Icon:IsValid () then
+			self.Icon:Remove ()
+		end
 		self.Icon = nil
 		return
 	end
@@ -93,11 +124,47 @@ function PANEL:SetIcon (icon)
 	return self
 end
 
-function PANEL:SetContainingMenu (menu)
-	self.ContainingMenu = menu
+function PANEL:SetId (id)
+	self.Id = id
+	return self
+end
+
+function PANEL:SetItem (menuItem)
+	self.Item = menuItem
 end
 
 -- Event handlers
+function PANEL:OnActionChanged (action)
+	if not self:GetAction () then
+		self:SetEnabled (self:GetItem ():IsEnabled ())
+		return
+	end
+	
+	local actionMap, control = self:GetActionMap ()
+	if actionMap then
+		local action = actionMap:GetAction (self:GetAction (), control)
+		self:SetEnabled (self:GetItem ():IsEnabled () and action and action:CanRun (control) or false)
+		if action then
+			if action:GetIcon () then
+				item:SetIcon (action:GetIcon ())
+			end
+			if action:IsToggleAction () then
+				item:SetChecked (action:IsToggled ())
+			end
+		end
+	end
+end
+
+function PANEL:OnCursorEntered ()
+	self:GetContainingMenu ():SetHoveredItem (self)
+end
+
+function PANEL:OnCursorExited ()
+	if self:GetContainingMenu ():GetHoveredItem () == self then
+		self:GetContainingMenu ():SetHoveredItem (nil)
+	end
+end
+
 function PANEL:OnMousePressed (mouseCode)
 	if not self:IsEnabled () then
 		return false

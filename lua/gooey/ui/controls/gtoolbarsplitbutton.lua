@@ -8,8 +8,8 @@ function PANEL:ctor (text)
 	self.Width = 36
 	self.Height = 24
 	
-	self.DropDownMenu = vgui.Create ("GMenu")
-	self.DropDownMenu:SetOwner (self)
+	self.DropDownMenu = Gooey.Menu ()
+	self.DropDownMenuAlignment = Gooey.VerticalAlignment.Top
 	self.DropDownMenuOpen = false
 	self.DropDownCloseTime = 0
 	self.DropDownMenu:AddEventListener ("MenuClosed",
@@ -27,12 +27,16 @@ function PANEL:ctor (text)
 			if x < buttonWidth then
 				self:SetPressed (true)
 			elseif self:IsEnabled () then
-				if not self.DropDownMenu or not self.DropDownMenu:IsValid () then return end
+				if not self.DropDownMenu then return end
 				if self.DropDownCloseTime ~= CurTime () then
 					self.DropDownMenuOpen = true
 					self:DispatchEvent ("DropDownOpening", self.DropDownMenu)
-					self.DropDownMenu:Open ()
-					self.DropDownMenu:SetPos (self:LocalToScreen (0, self.Height - 1))
+					
+					local x, y = self:LocalToScreen (0, 1)
+					local w = self:GetWidth ()
+					local h = self:GetHeight () - 2
+					local menu = self.DropDownMenu:Show (self, x, y, w, h, Gooey.Orientation.Vertical)
+					self.DropDownMenuAlignment = menu:GetAnchorVerticalAlignment ()
 				end
 			end
 		end
@@ -59,14 +63,17 @@ function PANEL:Paint (renderContext)
 	local buttonWidth = self.Height
 	local rightWidth = self.Width - self.Height
 	
+	local roundTops    = not self.DropDownMenuOpen or self.DropDownMenuAlignment == Gooey.VerticalAlignment.Top
+	local roundBottoms = not self.DropDownMenuOpen or self.DropDownMenuAlignment == Gooey.VerticalAlignment.Bottom
+	
 	if self:IsEnabled () and (self:IsHovered () or self.DropDownMenuOpen) then
 		-- Enabled and hovered
 		if self:IsPressed () then
-			draw.RoundedBoxEx (4, 0, 0, self.Width,     self.Height,     GLib.Colors.Gray,      true, true, not self.DropDownMenuOpen, not self.DropDownMenuOpen)
-			draw.RoundedBoxEx (4, 1, 1, self.Width - 2, self.Height - 2, GLib.Colors.DarkGray,  true, true, not self.DropDownMenuOpen, not self.DropDownMenuOpen)
+			draw.RoundedBoxEx (4, 0, 0, self.Width,     self.Height,     GLib.Colors.Gray,      roundTops, roundTops, roundBottoms, roundBottoms)
+			draw.RoundedBoxEx (4, 1, 1, self.Width - 2, self.Height - 2, GLib.Colors.DarkGray,  roundTops, roundTops, roundBottoms, roundBottoms)
 		else
-			draw.RoundedBoxEx (4, 0, 0, self.Width,     self.Height,     GLib.Colors.Gray,      true, true, not self.DropDownMenuOpen, not self.DropDownMenuOpen)
-			draw.RoundedBoxEx (4, 1, 1, self.Width - 2, self.Height - 2, GLib.Colors.LightGray, true, true, not self.DropDownMenuOpen, not self.DropDownMenuOpen)
+			draw.RoundedBoxEx (4, 0, 0, self.Width,     self.Height,     GLib.Colors.Gray,      roundTops, roundTops, roundBottoms, roundBottoms)
+			draw.RoundedBoxEx (4, 1, 1, self.Width - 2, self.Height - 2, GLib.Colors.LightGray, roundTops, roundTops, roundBottoms, roundBottoms)
 		end
 		surface.SetDrawColor (GLib.Colors.Gray)
 		surface.DrawLine (buttonWidth, 0, buttonWidth, self.Height)
@@ -74,8 +81,8 @@ function PANEL:Paint (renderContext)
 	
 	local dropDownArrowColor = self:IsEnabled () and GLib.Colors.Black or GLib.Colors.Gray
 	if self.DropDownMenuOpen then
-		draw.RoundedBoxEx (4, buttonWidth,     0, rightWidth,     self.Height,     GLib.Colors.Gray,     false, true, false, not self.DropDownMenuOpen)
-		draw.RoundedBoxEx (4, buttonWidth + 1, 1, rightWidth - 2, self.Height - 2, GLib.Colors.DarkGray, false, true, false, not self.DropDownMenuOpen)
+		draw.RoundedBoxEx (4, buttonWidth,     0, rightWidth,     self.Height,     GLib.Colors.Gray,     false, roundTops, false, roundBottoms)
+		draw.RoundedBoxEx (4, buttonWidth + 1, 1, rightWidth - 2, self.Height - 2, GLib.Colors.DarkGray, false, roundTops, false, roundBottoms)
 		Gooey.Glyphs.Draw ("down", renderContext, dropDownArrowColor, self.Height + 1, 1, rightWidth, self.Height)
 	else
 		Gooey.Glyphs.Draw ("down", renderContext, dropDownArrowColor, self.Height    , 0, rightWidth, self.Height)
@@ -106,5 +113,5 @@ end
 
 -- Event handlers
 function PANEL:OnRemoved ()
-	self.DropDownMenu:Remove ()
+	self.DropDownMenu:dtor ()
 end

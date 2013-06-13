@@ -454,6 +454,7 @@ function self:SetAction (action)
 	
 	self.Action = action
 	self:DispatchEvent ("ActionChanged", self.Action)
+	if self.OnActionChanged then self:OnActionChanged (self.Action) end
 	
 	return self
 end

@@ -15,16 +15,13 @@ function PANEL:Init ()
 	self.Label:SetTextInset (4, 0)
 	self.Label:SetContentAlignment (4)
 	
-	self.Menu = vgui.Create ("GMenu")
-	self.Menu:SetOwner (self)
+	self.Menu = Gooey.Menu ()
 	self.MenuDownwards = true
 	self.MenuOpen = false
 	self.MenuCloseTime = 0
 	self.Menu:AddEventListener ("MenuOpening",
 		function ()
 			self:DispatchEvent ("MenuOpening", self.Menu)
-			self.Menu:PerformLayout ()
-			self:PositionMenu ()
 		end
 	)
 	self.Menu:AddEventListener ("MenuClosed",
@@ -43,9 +40,12 @@ function PANEL:Init ()
 				self.Label:SetPos (1, 1)
 				
 				if self.MenuCloseTime ~= CurTime () then
-					if not self.Menu or not self.Menu:IsValid () then return end
+					if not self.Menu then return end
 					self.MenuOpen = true
-					self.Menu:Open ()
+					
+					local x, y = self:LocalToScreen (0, 1)
+					local menu = self.Menu:Show (self, x, y, self:GetWide (), self:GetTall () - 2, Gooey.Orientation.Vertical)
+					self.MenuDownwards = menu:GetAnchorVerticalAlignment () == Gooey.VerticalAlignment.Top
 				end
 			end
 		end
@@ -117,24 +117,9 @@ function PANEL:PerformLayout ()
 	self.Label:SetSize (self:GetWide () - textArrowSpacing - arrowWidth, self:GetTall ())
 end
 
-function PANEL:PositionMenu ()
-	if not self.Menu or not self.Menu:IsValid () then return end
-	
-	local menuHeight = self.Menu:GetTall ()
-	local x, y = self:LocalToScreen (0, self:GetTall () - 1)
-	
-	if y + menuHeight > ScrH () then
-		x, y = self:LocalToScreen (0, 0 - menuHeight + 1)
-		self.MenuDownwards = false
-	else
-		self.MenuDownwards = true
-	end
-	self.Menu:SetPos (x, y)
-end
-
 -- Event handlers
 function PANEL:OnRemoved ()
-	self.Menu:Remove ()
+	self.Menu:dtor ()
 end
 
 Gooey.Register ("GStatusBarComboBox", PANEL, "GPanel")

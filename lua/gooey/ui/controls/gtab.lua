@@ -107,7 +107,7 @@ function self:Remove ()
 	
 	if self.ContextMenu then
 		if self.OwnsContextMenu then
-			self.ContextMenu:Remove ()
+			self.ContextMenu:dtor ()
 		end
 		self.ContextMenu = nil
 	end
@@ -140,7 +140,7 @@ end
 function self:SetContextMenu (contextMenu, giveOwnership)
 	if self.ContextMenu then
 		if self.OwnsContextMenu then
-			self.ContextMenu:Remove ()
+			self.ContextMenu:dtor ()
 		end
 		self.ContextMenu = nil
 	end

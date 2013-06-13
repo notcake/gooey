@@ -37,8 +37,7 @@ function PANEL:Init ()
 	self:AddEventListener ("RightClick",
 		function (_)
 			if self.Tab:GetContextMenu () then
-				self.Tab:GetContextMenu ():SetOwner (self)
-				self.Tab:GetContextMenu ():Open (self.Tab)
+				self.Tab:GetContextMenu ():Show (self, self.Tab)
 			end
 		end
 	)

@@ -19,9 +19,8 @@ function PANEL:Init ()
 				return
 			end
 			
-			local x, y = self:LocalToScreen (0, self:GetTall () - 1)
-			self:GetMenu ():Open ()
-			self:GetMenu ():SetPos (x, y)
+			local x, y = self:LocalToScreen (0, 1)
+			self:GetMenu ():Show (self, x, y, self:GetWide (), self:GetTall () - 2, Gooey.Orientation.Vertical)
 		end
 	)
 	
@@ -35,9 +34,8 @@ function PANEL:Init ()
 			
 			self:GetMenuStrip ():CloseMenus ()
 			
-			local x, y = self:LocalToScreen (0, self:GetTall () - 1)
-			self:GetMenu ():Open ()
-			self:GetMenu ():SetPos (x, y)
+			local x, y = self:LocalToScreen (0, 1)
+			self:GetMenu ():Show (self, x, y, self:GetWide (), self:GetTall () - 2, Gooey.Orientation.Vertical)
 		end
 	)
 	
@@ -50,8 +48,6 @@ function PANEL:Init ()
 end
 
 function PANEL:GetMenu ()
-	if not self.Menu then return nil end
-	if not self.Menu:IsValid () then return nil end
 	return self.Menu
 end
 
@@ -111,33 +107,19 @@ end
 
 -- Internal, do not call
 function PANEL:HookMenu (menu)
-	if not menu or not menu:IsValid () then return end
-	
-	menu:AddEventListener ("EnabledChanged", tostring (self:GetTable ()),
-		function (_, enabled)
-			self:SetEnabled (enabled)
-		end
-	)
+	if not menu then return end
 	
 	menu:AddEventListener ("MenuClosed",
 		function (_)
 			menu.CloseTime = CurTime ()
 		end
 	)
-	
-	menu:AddEventListener ("TextChanged", tostring (self:GetTable ()),
-		function (_, text)
-			self:SetText (text)
-		end
-	)
 end
 
 function PANEL:UnhookMenu (menu)
-	if not menu or not menu:IsValid () then return end
+	if not menu then return end
 	
-	menu:RemoveEventListener ("EnabledChanged", tostring (self:GetTable ()))
 	menu:RemoveEventListener ("MenuClosed",     tostring (self:GetTable ()))
-	menu:RemoveEventListener ("TextChanged",    tostring (self:GetTable ()))
 end
 
 Gooey.Register ("GMenuStripItem", PANEL, "GPanel")

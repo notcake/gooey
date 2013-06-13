@@ -22,8 +22,7 @@ function PANEL:Init ()
 	self:AddEventListener ("RightClick",
 		function (_)
 			if not self.ListView:GetHeaderMenu () then return end
-			self.ListView:GetHeaderMenu ():SetOwner (self.ListView)
-			self.ListView:GetHeaderMenu ():Open ()
+			self.ListView:GetHeaderMenu ():Show (self.ListView)
 		end
 	)
 end

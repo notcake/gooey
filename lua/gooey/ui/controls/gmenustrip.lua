@@ -27,10 +27,7 @@ end
 function PANEL:AddMenu (id)
 	if self.Menus [id] then return self.Menus [id] end
 	
-	local menu = vgui.Create ("GMenu")
-	menu:SetOwner (self)
-	menu:SetText (id)
-	menu.Id = id
+	local menu = Gooey.Menu ()
 	self.Menus [id] = menu
 	
 	menu:AddEventListener ("MenuClosed",
@@ -115,7 +112,7 @@ end
 -- Event handlers
 function PANEL:OnRemoved ()
 	for _, menu in pairs (self.Menus) do
-		menu:Remove ()
+		menu:dtor ()
 	end
 end
 
