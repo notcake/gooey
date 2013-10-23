@@ -135,6 +135,10 @@ function PANEL:GetItemEnumerator ()
 	end
 end
 
+function PANEL:GetMenu ()
+	return self.Menu
+end
+
 function PANEL:GetScrollOffset ()
 	if not self.VBar then return 0 end
 	return self.VBar:GetScroll ()
@@ -292,6 +296,10 @@ function PANEL:SetItemID (item, id)
 	item:SetID (id)
 end
 
+function PANEL:SetMenu (menu)
+	self.Menu = menu
+end
+
 function PANEL:SetScrollOffset (scrollOffset)
 	if scrollOffset + self:GetTall () > self.pnlCanvas:GetTall () then
 		scrollOffset = self.pnlCanvas:GetTall () - self:GetTall ()
@@ -347,7 +355,6 @@ function PANEL:DoClick (item)
 		self:DispatchEvent ("Click", self:ItemFromPoint (self:CursorPos ()))
 		self.LastClickTime = SysTime ()
 	end
-	self:DispatchEvent ("Click", item)
 end
 
 function PANEL:DoDoubleClick ()
@@ -382,6 +389,10 @@ function PANEL:OnMouseReleased (mouseCode)
 			end
 		end
 	end
+end
+
+function PANEL:OnRemoved ()
+	if self.Menu then self.Menu:dtor () end
 end
 
 function PANEL:OnVScroll (scrollOffset)

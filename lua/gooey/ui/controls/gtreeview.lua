@@ -159,7 +159,7 @@ function PANEL:OnMouseReleased (mouseCode)
 end
 
 function PANEL:OnRemoved ()
-	if self.Menu and self.Menu:IsValid () then self.Menu:dtor () end
+	if self.Menu then self.Menu:dtor () end
 end
 
 Gooey.Register ("GTreeView", PANEL, "DTree") 

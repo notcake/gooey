@@ -525,8 +525,8 @@ function PANEL:OnMouseWheel (delta)
 end
 
 function PANEL:OnRemoved ()
-	if self.Menu and self.Menu:IsValid () then self.Menu:dtor () end
-	if self.HeaderMenu and self.HeaderMenu:IsValid () then self.HeaderMenu:dtor () end
+	if self.Menu then self.Menu:dtor () end
+	if self.HeaderMenu then self.HeaderMenu:dtor () end
 end
 
 -- Internal, do not call

@@ -131,7 +131,13 @@ end
 function self:Remove ()
 	if self:IsMarkedForDeletion () then return end
 	
-	if self.OnRemoved then self:OnRemoved () end
+	-- Call OnRemoved for base classes
+	local classTable = self
+	while classTable do
+		if classTable.OnRemoved then classTable.OnRemoved (self) end
+		classTable = classTable.BaseClass
+	end
+	
 	self:DispatchEvent ("Removed")
 	
 	for _, v in ipairs (self:GetChildren ()) do
