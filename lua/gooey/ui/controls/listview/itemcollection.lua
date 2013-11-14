@@ -25,6 +25,7 @@ function self:AddItem (...)
 	local id = #self.Items + 1
 	listViewItem:SetListView (self:GetListView ())
 	listViewItem:SetId (id)
+	listViewItem:SetEnabled (self:GetListView ():IsEnabled ())
 	
 	local values = {...}
 	for i = 1, self:GetListView ():GetColumns ():GetColumnCount () do
