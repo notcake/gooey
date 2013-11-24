@@ -26,6 +26,12 @@ include ("toggleaction.lua")
 include ("booleancontroller.lua")
 include ("visibilitycontroller.lua")
 
+-- Bindings
+include ("keybinds.lua")
+
+-- Mouse
+include ("mousemonitor.lua")
+
 -- Keyboard
 include ("keyboardmap.lua")
 include ("keyboardmonitor.lua")
