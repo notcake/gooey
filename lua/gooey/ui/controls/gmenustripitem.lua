@@ -119,7 +119,7 @@ end
 function PANEL:UnhookMenu (menu)
 	if not menu then return end
 	
-	menu:RemoveEventListener ("MenuClosed",     tostring (self:GetTable ()))
+	menu:RemoveEventListener ("MenuClosed",     self:GetHashCode ())
 end
 
 Gooey.Register ("GMenuStripItem", PANEL, "GPanel")

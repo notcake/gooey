@@ -47,14 +47,14 @@ self.SetValue = self.SetVisible
 function self:HookControl (control)
 	if not control then return end
 	
-	control:AddEventListener ("VisibleChanged", tostring (self),
+	control:AddEventListener ("VisibleChanged", self:GetHashCode (),
 		function (_, visible)
 			self:DispatchEvent ("ValueChanged",   visible)
 			self:DispatchEvent ("VisibleChanged", visible)
 		end
 	)
 	
-	control:AddEventListener ("Removed", tostring (self),
+	control:AddEventListener ("Removed", self:GetHashCode (),
 		function (_)
 			self:SetControl (nil)
 		end
@@ -64,6 +64,6 @@ end
 function self:UnhookControl (control)
 	if not control then return end
 	
-	control:RemoveEventListener ("VisibleChanged", tostring (self))
-	control:RemoveEventListener ("Removed", tostring (self))
+	control:RemoveEventListener ("VisibleChanged", self:GetHashCode ())
+	control:RemoveEventListener ("Removed", self:GetHashCode ())
 end

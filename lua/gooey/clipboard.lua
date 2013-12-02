@@ -38,7 +38,7 @@ function self:ctor ()
 	
 	self:CreateTextEntry ()
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self),
+	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end

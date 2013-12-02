@@ -20,7 +20,7 @@ function PANEL:ctor (text)
 		end
 	)
 	
-	self:AddEventListener ("MouseDown", tostring (self),
+	self:AddEventListener ("MouseDown", self:GetHashCode (),
 		function (_, mouseCode, x, y)
 			local buttonWidth = self.Height
 			local rightWidth = self.Width - self.Height

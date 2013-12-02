@@ -222,12 +222,12 @@ end
 function self:HookHeader (header)
 	if not header then return end
 	
-	header:AddEventListener ("Removed", tostring (self),
+	header:AddEventListener ("Removed", self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end
 	)
-	header:AddEventListener ("WidthChanged", tostring (self),
+	header:AddEventListener ("WidthChanged", self:GetHashCode (),
 		function (_, width)
 			self:SetWidth (width)
 		end
@@ -237,6 +237,6 @@ end
 function self:UnhookHeader (header)
 	if not header then return end
 	
-	header:RemoveEventListener ("Removed", tostring (self))
-	header:RemoveEventListener ("WidthChanged", tostring (self))
+	header:RemoveEventListener ("Removed", self:GetHashCode ())
+	header:RemoveEventListener ("WidthChanged", self:GetHashCode ())
 end

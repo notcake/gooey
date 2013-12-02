@@ -32,7 +32,7 @@ function PANEL:Init ()
 		end
 	)
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()),
+	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
 		function ()
 			self:Remove ()
 		end
@@ -84,7 +84,7 @@ end
 function PANEL:OnRemoved ()
 	self.Callback (nil)
 
-	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 Gooey.Register ("GSimpleButtonDialog", PANEL, "GFrame")

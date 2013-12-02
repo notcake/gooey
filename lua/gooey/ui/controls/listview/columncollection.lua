@@ -69,13 +69,13 @@ end
 function self:HookColumn (column)
 	if not column then return end
 	
-	column:AddEventListener ("AlignmentChanged", tostring (self),
+	column:AddEventListener ("AlignmentChanged", self:GetHashCode (),
 		function (_, alignment)
 			self:DispatchEvent ("ColumnAlignmentChanged", column, alignment)
 		end
 	)
 	
-	column:AddEventListener ("VisibleChanged", tostring (self),
+	column:AddEventListener ("VisibleChanged", self:GetHashCode (),
 		function (_, visible)
 			self:DispatchEvent ("ColumnVisibleChanged", column, visible)
 		end
@@ -85,6 +85,6 @@ end
 function self:UnhookColumn (column)
 	if not column then return end
 	
-	column:RemoveEventListener ("AlignmentChanged", tostring (self))
-	column:RemoveEventListener ("VisibleChanged",   tostring (self))
+	column:RemoveEventListener ("AlignmentChanged", self:GetHashCode ())
+	column:RemoveEventListener ("VisibleChanged",   self:GetHashCode ())
 end

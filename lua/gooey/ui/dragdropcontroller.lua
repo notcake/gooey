@@ -48,8 +48,8 @@ function self:EndDrag ()
 		self.HoveredPanel.DropTarget:DragDrop (self)
 	end
 	
-	Gooey.RemoveRenderHook (Gooey.RenderType.DragDropPreview, "Gooey.DragDropController." .. tostring (self))
-	hook.Remove ("PreRender", "Gooey.DragDropController." .. tostring (self))
+	Gooey.RemoveRenderHook (Gooey.RenderType.DragDropPreview, "Gooey.DragDropController." .. self:GetHashCode ())
+	hook.Remove ("PreRender", "Gooey.DragDropController." .. self:GetHashCode ())
 	self:SetHoveredPanel (nil)
 end
 
@@ -112,7 +112,7 @@ function self:StartDrag (type, object)
 	self.ObjectType = type   or self.Control.ClassName
 	self.Object     = object or self.Control
 	
-	Gooey.AddRenderHook (Gooey.RenderType.DragDropPreview, "Gooey.DragDropController." .. tostring (self),
+	Gooey.AddRenderHook (Gooey.RenderType.DragDropPreview, "Gooey.DragDropController." .. self:GetHashCode (),
 		function ()
 			if self.HoveredPanel and self.HoveredPanel.DropTarget then
 				self.HoveredPanel.DropTarget.DropRenderer (self.HoveredPanel.DropTarget, gui.MousePos ())
@@ -121,7 +121,7 @@ function self:StartDrag (type, object)
 		end
 	)
 	
-	hook.Add ("PreRender", "Gooey.DragDropController." .. tostring (self),
+	hook.Add ("PreRender", "Gooey.DragDropController." .. self:GetHashCode (),
 		function ()
 			if not input.IsMouseDown (MOUSE_LEFT) then
 				self:EndDrag ()
@@ -225,7 +225,7 @@ end
 function self:HookControl (control)
 	if not control then return end
 	
-	control:AddEventListener ("Removed", tostring (self),
+	control:AddEventListener ("Removed", self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end
@@ -235,7 +235,7 @@ end
 function self:UnhookControl (control)
 	if not control then return end
 	
-	control:RemoveEventListener ("Removed", tostring (self))
+	control:RemoveEventListener ("Removed", self:GetHashCode ())
 end
 
 -- Event handlers

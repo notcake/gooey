@@ -67,13 +67,13 @@ end
 
 function self:SetUndoRedoStack (undoRedoStack)
 	if self.UndoRedoStack then
-		self.UndoRedoStack:RemoveEventListener ("StackChanged", tostring (self))
+		self.UndoRedoStack:RemoveEventListener ("StackChanged", self:GetHashCode ())
 	end
 	
 	self.UndoRedoStack = undoRedoStack
 	
 	if self.UndoRedoStack then
-		self.UndoRedoStack:AddEventListener ("StackChanged", tostring (self), self.StackChanged)
+		self.UndoRedoStack:AddEventListener ("StackChanged", self:GetHashCode (), self.StackChanged)
 	end
 	
 	self:UpdateButtonState ()

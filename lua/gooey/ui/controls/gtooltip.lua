@@ -20,12 +20,12 @@ function PANEL:Init ()
 			if visible then
 				self:Show ()
 			else
-				Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()))
+				Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. self:GetHashCode ())
 			end
 		end
 	)
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()),
+	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
 		function ()
 			self:Remove ()
 		end
@@ -73,7 +73,7 @@ function PANEL:Show ()
 	self:SetKeyboardInputEnabled (false)
 	self:SetMouseInputEnabled (false)
 	
-	Gooey.AddRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()),
+	Gooey.AddRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. self:GetHashCode (),
 		function ()
 			if not self:IsValid ()   then return end
 			if not self:IsVisible () then return end
@@ -88,8 +88,8 @@ end
 
 -- Event handlers
 function PANEL:OnRemoved ()
-	Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. tostring (self:GetTable ()))
-	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. self:GetHashCode ())
+	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 Gooey.Register ("GToolTip", PANEL, "GPanel")

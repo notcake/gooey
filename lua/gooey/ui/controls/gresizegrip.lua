@@ -32,10 +32,10 @@ function PANEL:Init ()
 	self:AddEventListener ("ParentChanged",
 		function (_, oldParent, parent)
 			if oldParent and oldParent:IsValid () then
-				oldParent:RemoveEventListener ("SizeChanged", tostring (self:GetTable ()))
+				oldParent:RemoveEventListener ("SizeChanged", self:GetHashCode ())
 			end
 			if parent and parent:IsValid () then
-				parent:AddEventListener ("SizeChanged", tostring (self:GetTable ()),
+				parent:AddEventListener ("SizeChanged", self:GetHashCode (),
 					function ()
 						self:PerformLayout ()
 					end

@@ -51,9 +51,9 @@ function self:ctor (control)
 	
 	Gooey.EventProvider (self)
 	
-	control:AddEventListener ("MouseDown", tostring (self), function (_, mouseCode, x, y) self:MouseDown (_, mouseCode, x, y) end)
-	control:AddEventListener ("MouseUp",   tostring (self), function (_, mouseCode, x, y) self:MouseUp   (_, mouseCode, x, y) end)
-	control:AddEventListener ("MouseMove", tostring (self), function (_, mouseCode, x, y) self:MouseMove (_, mouseCode, x, y) end)
+	control:AddEventListener ("MouseDown", self:GetHashCode (), function (_, mouseCode, x, y) self:MouseDown (_, mouseCode, x, y) end)
+	control:AddEventListener ("MouseUp",   self:GetHashCode (), function (_, mouseCode, x, y) self:MouseUp   (_, mouseCode, x, y) end)
+	control:AddEventListener ("MouseMove", self:GetHashCode (), function (_, mouseCode, x, y) self:MouseMove (_, mouseCode, x, y) end)
 end
 
 function self:AddToSelection (item)

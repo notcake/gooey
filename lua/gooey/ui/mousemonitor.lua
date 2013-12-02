@@ -15,13 +15,13 @@ function self:ctor ()
 	
 	Gooey.EventProvider (self)
 	
-	hook.Add ("Think", "Gooey.MouseMonitor." .. tostring (self),
+	hook.Add ("Think", "Gooey.MouseMonitor." .. self:GetHashCode (),
 		function ()
 			self:Tick ()
 		end
 	)
 	
-	Gooey:AddEventListener ("Unloaded", "Gooey.MouseMonitor." .. tostring (self),
+	Gooey:AddEventListener ("Unloaded", "Gooey.MouseMonitor." .. self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end
@@ -29,8 +29,8 @@ function self:ctor ()
 end
 
 function self:dtor ()
-	hook.Remove ("Think", "Gooey.MouseMonitor." .. tostring (self))
-	Gooey:RemoveEventListener ("Unloaded", "Gooey.MouseMonitor." .. tostring (self))
+	hook.Remove ("Think", "Gooey.MouseMonitor." .. self:GetHashCode ())
+	Gooey:RemoveEventListener ("Unloaded", "Gooey.MouseMonitor." .. self:GetHashCode ())
 end
 
 function self:IsButtonDown (button)

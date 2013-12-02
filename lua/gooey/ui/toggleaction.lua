@@ -75,12 +75,12 @@ function self:HookBooleanController (booleanController)
 	
 	booleanController:AddEventListener ("ValueChanged",
 		function (_, value)
-			self:DispatchEvent ("ToggleChanged", tostring (self), self:IsToggled ())
+			self:DispatchEvent ("ToggleChanged", self:GetHashCode (), self:IsToggled ())
 		end
 	)
 end
 function self:UnhookBooleanController (booleanController)
 	if not booleanController then return end
 	
-	booleanController:RemoveEventListener ("ValueChanged", tostring (self))
+	booleanController:RemoveEventListener ("ValueChanged", self:GetHashCode ())
 end

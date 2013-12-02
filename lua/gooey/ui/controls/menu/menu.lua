@@ -183,7 +183,7 @@ end
 function self:HookItem (menuItem)
 	if not menuItem then return end
 	
-	menuItem:AddEventListener ("Removed", tostring (self),
+	menuItem:AddEventListener ("Removed", self:GetHashCode (),
 		function ()
 			for i = 1, #self.Items do
 				if self.Items [i] == menuItem then
@@ -204,5 +204,5 @@ end
 function self:UnhookItem (menuItem)
 	if not menuItem then return end
 	
-	menuItem:RemoveEventListener ("Removed", tostring (self))
+	menuItem:RemoveEventListener ("Removed", self:GetHashCode ())
 end

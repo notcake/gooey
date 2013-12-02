@@ -74,17 +74,17 @@ function self:SetControl (control)
 	self:EndDrag ()
 	
 	if self.Control then
-		self.Control:RemoveEventListener ("MouseDown", tostring (self))
-		self.Control:RemoveEventListener ("MouseMove", tostring (self))
-		self.Control:RemoveEventListener ("MouseUp",   tostring (self))
+		self.Control:RemoveEventListener ("MouseDown", self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseMove", self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseUp",   self:GetHashCode ())
 	end
 	
 	self.Control = control
 	
 	if self.Control then
-		self.Control:AddEventListener ("MouseDown", tostring (self), self.MouseDown)
-		self.Control:AddEventListener ("MouseMove", tostring (self), self.MouseMove)
-		self.Control:AddEventListener ("MouseUp",   tostring (self), self.MouseUp)
+		self.Control:AddEventListener ("MouseDown", self:GetHashCode (), self.MouseDown)
+		self.Control:AddEventListener ("MouseMove", self:GetHashCode (), self.MouseMove)
+		self.Control:AddEventListener ("MouseUp",   self:GetHashCode (), self.MouseUp)
 	end
 end
 

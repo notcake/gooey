@@ -65,7 +65,7 @@ function PANEL:Init ()
 	
 	Gooey.EventProvider (self)
 	
-	self:AddEventListener ("MouseLeave", tostring (self),
+	self:AddEventListener ("MouseLeave", self:GetHashCode (),
 		function (_)
 			if self:IsPressed () and not self:HasMouseCapture () then
 				self:SetPressed (false)
@@ -73,7 +73,7 @@ function PANEL:Init ()
 		end
 	)
 	
-	self:AddEventListener ("MouseDown", tostring (self),
+	self:AddEventListener ("MouseDown", self:GetHashCode (),
 		function (_, mouseCode, x, y)
 			if mouseCode == MOUSE_LEFT then
 				self:SetPressed (true)
@@ -84,7 +84,7 @@ function PANEL:Init ()
 		end
 	)
 	
-	self:AddEventListener ("MouseUp", tostring (self),
+	self:AddEventListener ("MouseUp", self:GetHashCode (),
 		function (_, mouseCode, x, y)
 			if mouseCode == MOUSE_LEFT then
 				if self:IsPressed () then

@@ -343,18 +343,18 @@ end
 function self:HookHorizontalScrollBar (horizontalScrollBar)
 	if not horizontalScrollBar then return end
 	
-	horizontalScrollBar:AddEventListener ("InterpolatedScroll", tostring (self),
+	horizontalScrollBar:AddEventListener ("InterpolatedScroll", self:GetHashCode (),
 		function (_, interpolatedViewX)
 			self:DispatchEvent ("InterpolatedViewXChanged", interpolatedViewX)
 			self:DispatchEvent ("InterpolatedViewPositionChanged", interpolatedViewX, self:GetInterpolatedViewY ())
 		end
 	)
-	horizontalScrollBar:AddEventListener ("Removed", tostring (self),
+	horizontalScrollBar:AddEventListener ("Removed", self:GetHashCode (),
 		function (_)
 			self:SetHorizontalScrollBar (nil)
 		end
 	)
-	horizontalScrollBar:AddEventListener ("Scroll", tostring (self),
+	horizontalScrollBar:AddEventListener ("Scroll", self:GetHashCode (),
 		function (_, viewX)
 			self:SetViewX (horizontalScrollBar:GetViewOffset ())
 		end
@@ -364,26 +364,26 @@ end
 function self:UnhookHorizontalScrollBar (horizontalScrollBar)
 	if not horizontalScrollBar then return end
 	
-	horizontalScrollBar:RemoveEventListener ("InterpolatedScroll", tostring (self))
-	horizontalScrollBar:RemoveEventListener ("Removed",            tostring (self))
-	horizontalScrollBar:RemoveEventListener ("Scroll",             tostring (self))
+	horizontalScrollBar:RemoveEventListener ("InterpolatedScroll", self:GetHashCode ())
+	horizontalScrollBar:RemoveEventListener ("Removed",            self:GetHashCode ())
+	horizontalScrollBar:RemoveEventListener ("Scroll",             self:GetHashCode ())
 end
 
 function self:HookVerticalScrollBar (verticalScrollBar)
 	if not verticalScrollBar then return end
 	
-	verticalScrollBar:AddEventListener ("InterpolatedScroll", tostring (self),
+	verticalScrollBar:AddEventListener ("InterpolatedScroll", self:GetHashCode (),
 		function (_, interpolatedViewY)
 			self:DispatchEvent ("InterpolatedViewYChanged", interpolatedViewY)
 			self:DispatchEvent ("InterpolatedViewPositionChanged", self:GetInterpolatedViewX (), interpolatedViewY)
 		end
 	)
-	verticalScrollBar:AddEventListener ("Removed", tostring (self),
+	verticalScrollBar:AddEventListener ("Removed", self:GetHashCode (),
 		function (_)
 			self:SetVerticalScrollBar (nil)
 		end
 	)
-	verticalScrollBar:AddEventListener ("Scroll", tostring (self),
+	verticalScrollBar:AddEventListener ("Scroll", self:GetHashCode (),
 		function (_, viewY)
 			self:SetViewY (verticalScrollBar:GetViewOffset ())
 		end
@@ -393,9 +393,9 @@ end
 function self:UnhookVerticalScrollBar (verticalScrollBar)
 	if not verticalScrollBar then return end
 	
-	verticalScrollBar:RemoveEventListener ("InterpolatedScroll", tostring (self))
-	verticalScrollBar:RemoveEventListener ("Removed",            tostring (self))
-	verticalScrollBar:RemoveEventListener ("Scroll",             tostring (self))
+	verticalScrollBar:RemoveEventListener ("InterpolatedScroll", self:GetHashCode ())
+	verticalScrollBar:RemoveEventListener ("Removed",            self:GetHashCode ())
+	verticalScrollBar:RemoveEventListener ("Scroll",             self:GetHashCode ())
 end
 
 function self:UpdateHorizontalScrollBarVisibility ()

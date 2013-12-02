@@ -37,7 +37,7 @@ function PANEL:AddCustomPanel (contents, class)
 	panel:SetSizingMethod (Gooey.SizingMethod.ExpandToFit)
 	panel:SetBackgroundColor (self:GetBackgroundColor ())
 	
-	panel:AddEventListener ("VisibleChanged", tostring (self:GetTable ()),
+	panel:AddEventListener ("VisibleChanged", self:GetHashCode (),
 		function ()
 			self:InvalidateLayout ()
 		end

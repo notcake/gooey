@@ -38,13 +38,13 @@ end
 
 function self:SetSavable (savable)
 	if self.Savable then
-		self.Savable:RemoveEventListener ("CanSaveChanged", tostring (self))
+		self.Savable:RemoveEventListener ("CanSaveChanged", self:GetHashCode ())
 	end
 	
 	self.Savable = savable
 	
 	if self.Savable then
-		self.Savable:AddEventListener ("CanSaveChanged", tostring (self), self.CanSaveChanged)
+		self.Savable:AddEventListener ("CanSaveChanged", self:GetHashCode (), self.CanSaveChanged)
 	end
 	
 	self:UpdateButtonState ()

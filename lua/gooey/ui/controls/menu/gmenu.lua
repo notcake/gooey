@@ -33,7 +33,7 @@ function PANEL:Init ()
 	
 	self:SetDeleteSelf (false)
 	
-	Gooey:AddEventListener ("Unloaded", tostring (self:GetTable ()),
+	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
 		function ()
 			self:Remove ()
 		end
@@ -254,7 +254,7 @@ function PANEL:OnRemoved ()
 	
 	self:SetMenu (nil)
 	
-	Gooey:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 function PANEL:Think ()
@@ -342,12 +342,12 @@ function PANEL:AddMenuItem (menuItem)
 	
 	if not control then return end
 	
-	GLib.BindProperty (control, menuItem, "Enabled", tostring (self:GetTable ()))
-	GLib.BindProperty (control, menuItem, "Visible", tostring (self:GetTable ()))
+	GLib.BindProperty (control, menuItem, "Enabled", self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Visible", self:GetHashCode ())
 	
 	self.ItemControls [menuItem] = control
 	
-	control:AddEventListener ("Click", tostring (self:GetTable ()),
+	control:AddEventListener ("Click", self:GetHashCode (),
 		function (_, targetItem)
 			menuItem:DispatchEvent ("Click", targetItem)
 		end
@@ -360,10 +360,10 @@ function PANEL:AddButton (menuItem)
 	control:SetContainingMenu (self)
 	control:SetItem (menuItem)
 	
-	GLib.BindProperty (control, menuItem, "Action",  tostring (self:GetTable ()))
-	GLib.BindProperty (control, menuItem, "Checked", tostring (self:GetTable ()))
-	GLib.BindProperty (control, menuItem, "Icon",    tostring (self:GetTable ()))
-	GLib.BindProperty (control, menuItem, "Text",    tostring (self:GetTable ()))
+	GLib.BindProperty (control, menuItem, "Action",  self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Checked", self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Icon",    self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Text",    self:GetHashCode ())
 	
 	self:AddPanel (control)
 	
@@ -397,20 +397,20 @@ end
 function PANEL:UnhookMenuItem (menuItem)
 	local control = self.ItemControls [menuItem]
 	
-	menuItem:RemoveEventListener ("Click", tostring (self:GetTable ()))
+	menuItem:RemoveEventListener ("Click", self:GetHashCode ())
 	
-	GLib.UnbindProperty (control, menuItem, "Enabled", tostring (self:GetTable ()))
-	GLib.UnbindProperty (control, menuItem, "Visible", tostring (self:GetTable ()))
-	GLib.UnbindProperty (control, menuItem, "Action",  tostring (self:GetTable ()))
-	GLib.UnbindProperty (control, menuItem, "Checked", tostring (self:GetTable ()))
-	GLib.UnbindProperty (control, menuItem, "Icon",    tostring (self:GetTable ()))
-	GLib.UnbindProperty (control, menuItem, "Text",    tostring (self:GetTable ()))
+	GLib.UnbindProperty (control, menuItem, "Enabled", self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Visible", self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Action",  self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Checked", self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Icon",    self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Text",    self:GetHashCode ())
 end
 
 function PANEL:HookMenu (menu)
 	if not menu then return end
 	
-	menu:AddEventListener ("Cleared", tostring (self:GetTable ()),
+	menu:AddEventListener ("Cleared", self:GetHashCode (),
 		function (_)
 			for control in self:GetEnumerator () do
 				self:UnhookMenuItem (control.Item)
@@ -420,13 +420,13 @@ function PANEL:HookMenu (menu)
 		end
 	)
 	
-	menu:AddEventListener ("ItemAdded", tostring (self:GetTable ()),
+	menu:AddEventListener ("ItemAdded", self:GetHashCode (),
 		function (_, menuItem)
 			self:AddMenuItem (menuItem)
 		end
 	)
 	
-	menu:AddEventListener ("ItemRemoved", tostring (self:GetTable ()),
+	menu:AddEventListener ("ItemRemoved", self:GetHashCode (),
 		function (_, menuItem)
 			self:RemoveMenuItem (menuItem)
 		end
@@ -436,9 +436,9 @@ end
 function PANEL:UnhookMenu (menu)
 	if not menu then return end
 	
-	menu:RemoveEventListener ("Cleared",     tostring (self:GetTable ()))
-	menu:RemoveEventListener ("ItemAdded",   tostring (self:GetTable ()))
-	menu:RemoveEventListener ("ItemRemoved", tostring (self:GetTable ()))
+	menu:RemoveEventListener ("Cleared",     self:GetHashCode ())
+	menu:RemoveEventListener ("ItemAdded",   self:GetHashCode ())
+	menu:RemoveEventListener ("ItemRemoved", self:GetHashCode ())
 end
 
 Gooey.Register ("GMenu", PANEL, "DMenu")
