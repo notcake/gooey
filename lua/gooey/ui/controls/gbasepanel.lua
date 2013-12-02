@@ -79,6 +79,15 @@ function self:_ctor ()
 	Gooey.EventProvider (self)
 end
 
+-- Identity
+function self:GetHashCode ()
+	if not self.__HashCode then
+		self.__HashCode = string.sub (tostring (self:GetTable ()), -8)
+	end
+	
+	return self.__HashCode
+end
+
 -- Control
 function self:Contains (control)
 	if not control then return false end
