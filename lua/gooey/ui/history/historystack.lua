@@ -1,5 +1,5 @@
 local self = {}
-Gooey.HistoryStack = Gooey.MakeConstructor (self)
+Gooey.HistoryStack = Gooey.MakeConstructor (self, Gooey.IHistoryStack)
 
 --[[
 	Events:
@@ -18,10 +18,10 @@ Gooey.HistoryStack = Gooey.MakeConstructor (self)
 function self:ctor ()
 	self.PreviousStack = Gooey.Containers.Stack ()
 	self.NextStack     = Gooey.Containers.Stack ()
-	
-	Gooey.EventProvider (self)
+	self.CurrentItem   = nil
 end
 
+-- IHistoryStack
 function self:CanMoveForward ()
 	return self.NextStack.Count > 0
 end
@@ -36,6 +36,10 @@ function self:Clear ()
 	
 	self:DispatchEvent ("StackChanged")
 	self:DispatchEvent ("StackCleared")
+end
+
+function self:GetCurrentItem ()
+	return self.CurrentItem
 end
 
 function self:GetNextDescription ()
@@ -63,10 +67,13 @@ function self:GetPreviousStack ()
 end
 
 function self:Push (historyItem)
-	self.PreviousStack:Push (historyItem)
+	if self:GetCurrentItem () then
+		self.PreviousStack:Push (self:GetCurrentItem ())
+	end
+	self.CurrentItem = historyItem
 	self.NextStack:Clear ()
 	
-	self:DispatchEvent ("ItemPushed", self.PreviousStack.Top)
+	self:DispatchEvent ("ItemPushed", self.CurrentItem)
 	self:DispatchEvent ("StackChanged")
 end
 
@@ -75,10 +82,11 @@ function self:MoveForward (count)
 	for i = 1, count do
 		if self.NextStack.Count == 0 then return end
 		
+		self.PreviousStack:Push (self.CurrentItem)
 		self.NextStack.Top:Redo ()
-		self.PreviousStack:Push (self.NextStack:Pop ())
+		self.CurrentItem = self.NextStack:Pop ()
 		
-		self:DispatchEvent ("ItemRedone", self.PreviousStack.Top)
+		self:DispatchEvent ("MovedForward", self.CurrentItem)
 		self:DispatchEvent ("StackChanged")
 	end
 end
@@ -88,10 +96,11 @@ function self:MoveBack (count)
 	for i = 1, count do
 		if self.PreviousStack.Count == 0 then return end
 		
+		self.NextStack:Push (self.CurrentItem)
 		self.PreviousStack.Top:Undo ()
-		self.NextStack:Push (self.PreviousStack:Pop ())
+		self.CurrentItem = self.PreviousStack:Pop ()
 		
-		self:DispatchEvent ("ItemUndone", self.NextStack.Top)
+		self:DispatchEvent ("MovedBack", self.CurrentItem)
 		self:DispatchEvent ("StackChanged")
 	end
 end

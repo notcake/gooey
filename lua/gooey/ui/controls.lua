@@ -58,6 +58,8 @@ include ("clipboardcontroller.lua")
 include ("savecontroller.lua")
 
 -- History
+include ("history/ihistorystack.lua")
+
 include ("history/historyitem.lua")
 include ("history/historystack.lua")
 include ("history/historycontroller.lua")

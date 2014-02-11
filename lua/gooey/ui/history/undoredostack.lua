@@ -21,6 +21,7 @@ function self:ctor ()
 			self:DispatchEvent ("ItemRedone", historyItem)
 		end
 	)
+	
 	self:AddEventListener ("MovedBack",
 		function (_, historyItem)
 			self:DispatchEvent ("ItemUndone", historyItem)
@@ -28,6 +29,44 @@ function self:ctor ()
 	)
 end
 
+-- IHistoryStack
+function self:Push (historyItem)
+	self.PreviousStack:Push (historyItem)
+	self.NextStack:Clear ()
+	
+	self:DispatchEvent ("ItemPushed", self.PreviousStack.Top)
+	self:DispatchEvent ("StackChanged")
+end
+
+function self:MoveForward (count)
+	count = count or 1
+	for i = 1, count do
+		if self.NextStack.Count == 0 then return end
+		
+		self.NextStack.Top:Redo ()
+		self.PreviousStack:Push (self.NextStack:Pop ())
+		
+		self:DispatchEvent ("ItemRedone", self.PreviousStack.Top)
+		self:DispatchEvent ("MovedForward", self.PreviousStack.Top)
+		self:DispatchEvent ("StackChanged")
+	end
+end
+
+function self:MoveBack (count)
+	count = count or 1
+	for i = 1, count do
+		if self.PreviousStack.Count == 0 then return end
+		
+		self.PreviousStack.Top:Undo ()
+		self.NextStack:Push (self.PreviousStack:Pop ())
+		
+		self:DispatchEvent ("ItemUndone", self.NextStack.Top)
+		self:DispatchEvent ("MovedBack", self.NextStack.Top)
+		self:DispatchEvent ("StackChanged")
+	end
+end
+
+-- UndoRedoStack
 function self:CanRedo ()
 	return self:CanMoveForward ()
 end
