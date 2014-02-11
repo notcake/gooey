@@ -465,13 +465,24 @@ function PANEL:DoClick ()
 		self:DoDoubleClick ()
 		self.LastClickTime = 0
 	else
-		self:DispatchEvent ("Click", self:ItemFromPoint (self:CursorPos ()))
+		local listViewItem = self:ItemFromPoint (self:CursorPos ())
+		self:DispatchEvent ("Click", listViewItem)
+		
+		if listViewItem then
+			listViewItem:DispatchEvent ("Click")
+		end
+		
 		self.LastClickTime = SysTime ()
 	end
 end
 
 function PANEL:DoDoubleClick ()
-	self:DispatchEvent ("DoubleClick", self:ItemFromPoint (self:CursorPos ()))
+	local listViewItem = self:ItemFromPoint (self:CursorPos ())
+	self:DispatchEvent ("DoubleClick", listViewItem)
+	
+	if listViewItem then
+		listViewItem:DispatchEvent ("DoubleClick")
+	end
 end
 
 function PANEL:DoRightClick ()

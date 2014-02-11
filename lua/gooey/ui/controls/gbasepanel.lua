@@ -1,6 +1,8 @@
 local self = {}
 Gooey.BasePanel = self
 
+GLib.Lua.NameCache:Index (self, "Gooey.BasePanel")
+
 Gooey.LastFocusRequestPanel = nil
 Gooey.LastFocusRequestTime  = 0
 
@@ -113,6 +115,14 @@ end
 
 function self:GetOwner ()
 	return self.Owner
+end
+
+function self:GetWidth ()
+	return self:GetWide ()
+end
+
+function self:GetHeight ()
+	return self:GetTall ()
 end
 
 function self:IsEnabled ()

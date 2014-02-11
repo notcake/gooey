@@ -13,6 +13,10 @@ Gooey.VPanel = Gooey.MakeConstructor (PANEL)
 			Fired when this panel has been enabled or disabled.
 		OwnerChanged (Panel oldOwner, Panel owner)
 			Fired when this panel's owner has changed.
+		ParentChanged (Panel oldParent, Panel parent)
+			Fired when this panel's parent has changed.
+		PositionChanged (x, y)
+			Fired when this panel's position has changed.
 		Removed ()
 			Fired when this panel has been removed.
 		TextChanged (text)
@@ -341,7 +345,12 @@ function PANEL:SetId (id)
 end
 
 function PANEL:SetLeft (x)
+	if self.X == x then return self end
+	
 	self.X = x
+	
+	self:DispatchEvent ("PositionChanged", self.X, self.Y)
+	
 	return self
 end
 
@@ -357,13 +366,24 @@ function PANEL:SetOwner (owner)
 end
 
 function PANEL:SetParent (parent)
+	if self.Parent == parent then return self end
+	
+	local oldParent = self.Parent
 	self.Parent = parent
+	
+	self:DispatchEvent ("ParentChanged", oldParent, self.Parent)
+	
 	return self
 end
 
 function PANEL:SetPos (x, y)
+	if self.X == x and self.Y == y then return self end
+	
 	self.X = x
 	self.Y = y
+	
+	self:DispatchEvent ("PositionChanged", self.X, self.Y)
+	
 	return self
 end
 
@@ -415,7 +435,12 @@ function PANEL:SetToolTipText (text)
 end
 
 function PANEL:SetTop (y)
+	if self.Y == y then return self end
+	
 	self.Y = y
+	
+	self:DispatchEvent ("PositionChanged", self.X, self.Y)
+	
 	return self
 end
 

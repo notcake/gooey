@@ -23,6 +23,15 @@ function PANEL:AddButton (text, callback)
 	return button
 end
 
+function PANEL:AddComboBox ()
+	local comboBox = Gooey.ToolbarComboBox ()
+	self.VPanelContainer:AddControl (comboBox)
+	
+	self.Items [#self.Items + 1] = comboBox
+	
+	return comboBox:GetComboBox ()
+end
+
 function PANEL:AddSeparator ()
 	local separator = Gooey.ToolbarSeparator ()
 	self.VPanelContainer:AddControl (separator)
