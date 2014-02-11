@@ -114,6 +114,12 @@ function self:IsValid ()
 	return true
 end
 
+function self:IsVisible ()
+	if not self.Control then return false end
+	
+	return self.Control:IsVisible ()
+end
+
 function self:LocalToScreen (x, y)
 	return self.Control:LocalToScreen (x, y)
 end
