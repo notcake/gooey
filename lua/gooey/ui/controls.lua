@@ -56,7 +56,15 @@ include ("silkicontextrenderer.lua")
 include ("buttoncontroller.lua")
 include ("clipboardcontroller.lua")
 include ("savecontroller.lua")
-include ("undoredocontroller.lua")
+
+-- History
+include ("history/historyitem.lua")
+include ("history/historystack.lua")
+include ("history/historycontroller.lua")
+
+include ("history/undoredoitem.lua")
+include ("history/undoredostack.lua")
+include ("history/undoredocontroller.lua")
 
 include ("vpanelcontainer.lua")
 
