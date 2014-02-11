@@ -33,6 +33,7 @@ end
 function self:Clear ()
 	self.PreviousStack:Clear ()
 	self.NextStack    :Clear ()
+	self.CurrentItem = nil
 	
 	self:DispatchEvent ("StackChanged")
 	self:DispatchEvent ("StackCleared")
