@@ -34,6 +34,30 @@ function self:dtor ()
 	end
 end
 
+function self:Clone (menuItem)
+	menuItem = menuItem or Gooey.MenuItem ()
+	
+	-- BaseMenuItem
+	menuItem:SetId (self:GetId ())
+	menuItem:SetEnabled (self:IsEnabled ())
+	menuItem:SetVisible (self:IsVisible ())
+	
+	-- MenuItem
+	menuItem:SetText (self:GetText ())
+	menuItem:SetChecked (self:IsChecked ())
+	menuItem:SetIcon (self:GetIcon ())
+	
+	menuItem:SetSubMenu (self:GetSubMenu () and self:GetSubMenu ():Clone () or nil)
+	
+	-- Events
+	self:GetEventProvider ():Clone (menuItem)
+	self:GetEventProvider ():Clone (menuItem:GetEventProvider ())
+	
+	menuItem:SetAction (self:GetAction ())
+	
+	return menuItem
+end
+
 function self:CreateSubMenu ()
 	if not self.SubMenu then
 		self:SetSubMenu (Gooey.Menu ())

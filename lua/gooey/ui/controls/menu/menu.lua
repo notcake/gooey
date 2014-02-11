@@ -35,14 +35,24 @@ function self:dtor ()
 	end
 end
 
+function self:AddBaseMenuItem (baseMenuItem)
+	baseMenuItem:SetParent (self)
+	
+	self.Items [#self.Items + 1] = baseMenuItem
+	if baseMenuItem:GetId () then
+		self.ItemsById [baseMenuItem:GetId ()] = baseMenuItem
+	end
+	
+	self:HookItem (baseMenuItem)
+	self:DispatchEvent ("ItemAdded", baseMenuItem)
+	
+	return self
+end
+
 function self:AddItem (id, callback)
 	local menuItem = Gooey.MenuItem ()
-	menuItem:SetParent (self)
 	menuItem:SetId (id)
 	menuItem:SetText (id)
-	
-	self.Items [#self.Items + 1] = menuItem
-	self.ItemsById [id] = menuItem
 	
 	if callback then
 		menuItem:AddEventListener ("Click",
@@ -52,24 +62,16 @@ function self:AddItem (id, callback)
 		)
 	end
 	
-	self:HookItem (menuItem)
-	self:DispatchEvent ("ItemAdded", menuItem)
+	self:AddBaseMenuItem (menuItem)
 	
 	return menuItem
 end
 
 function self:AddSeparator (id)
 	local menuItem = Gooey.MenuSeparator ()
-	menuItem:SetParent (self)
 	menuItem:SetId (id)
 	
-	self.Items [#self.Items + 1] = menuItem
-	if id then
-		self.ItemsById [id] = menuItem
-	end
-	
-	self:HookItem (menuItem)
-	self:DispatchEvent ("ItemAdded", menuItem)
+	self:AddBaseMenuItem (menuItem)
 	
 	return menuItem
 end
@@ -79,6 +81,22 @@ function self:Clear ()
 	self.ItemsById = {}
 	
 	self:DispatchEvent ("Cleared")
+end
+
+function self:Clone (menu)
+	menu = menu or Gooey.Menu ()
+	
+	-- Items
+	for menuItem in self:GetEnumerator () do
+		menu:AddBaseMenuItem (menuItem:Clone ())
+	end
+	
+	menu:SetWidth (self:GetWidth ())
+	
+	-- Events
+	self:GetEventProvider ():Clone (menu)
+	
+	return menu
 end
 
 function self:GetEnumerator ()

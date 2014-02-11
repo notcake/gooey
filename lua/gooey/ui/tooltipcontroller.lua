@@ -84,6 +84,8 @@ function self:HideToolTip ()
 		self.Control:RemoveEventListener ("Removed",        "Gooey.ToolTipController")
 		self.Control:RemoveEventListener ("VisibleChanged", "Gooey.ToolTipController")
 	end
+	
+	hook.Remove ("Think", "Gooey.ToolTipController.CheckValidity")
 end
 
 function self:IsEnabled ()
@@ -175,6 +177,25 @@ function self:ShowToolTip (text)
 			end
 		)
 	end
+	
+	hook.Add ("Think", "Gooey.ToolTipController.CheckValidity",
+		function ()
+			if self.Manual then return end
+			if not self.Control then return end
+			
+			-- Check recursive visibility
+			local visible = true
+			local parent = self.Control:GetParent ()
+			while parent do
+				visible = visible and parent:IsVisible ()
+				parent = parent:GetParent ()
+			end
+			
+			if not visible then
+				self:HideToolTip ()
+			end
+		end
+	)
 	
 	if self.PositioningMode ~= Gooey.ToolTipPositioningMode.Custom then
 		local x, y, w, h = 0, 0, 0, 0
