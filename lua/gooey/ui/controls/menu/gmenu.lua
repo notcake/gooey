@@ -175,8 +175,9 @@ function PANEL:PerformLayout ()
 		w = math.max (w, control:GetWide ())
     end
 	
-	self:SetWide (w)
-	
+	-- Enforce fixed width
+	w = self.Menu:GetWidth () or w
+	self:SetWidth (w)
 	for control in self:GetEnumerator () do
 		control:SetWide (w)
 		control:SetPos (0, h)
@@ -187,8 +188,10 @@ function PANEL:PerformLayout ()
 		end
 	end
 	
-	self:SetTall (h)
+	self:SetHeight (h)
 	self:Reanchor ()
+	
+	DScrollPanel.PerformLayout (self)
 end
 
 function PANEL:SetAnchorOrientation (anchorOrientation)
@@ -431,14 +434,21 @@ function PANEL:HookMenu (menu)
 			self:RemoveMenuItem (menuItem)
 		end
 	)
+	
+	menu:AddEventListener ("WidthChanged", self:GetHashCode (),
+		function (_, width)
+			self:PerformLayout ()
+		end
+	)
 end
 
 function PANEL:UnhookMenu (menu)
 	if not menu then return end
 	
-	menu:RemoveEventListener ("Cleared",     self:GetHashCode ())
-	menu:RemoveEventListener ("ItemAdded",   self:GetHashCode ())
-	menu:RemoveEventListener ("ItemRemoved", self:GetHashCode ())
+	menu:RemoveEventListener ("Cleared",      self:GetHashCode ())
+	menu:RemoveEventListener ("ItemAdded",    self:GetHashCode ())
+	menu:RemoveEventListener ("ItemRemoved",  self:GetHashCode ())
+	menu:RemoveEventListener ("WidthChanged", self:GetHashCode ())
 end
 
 Gooey.Register ("GMenu", PANEL, "DMenu")

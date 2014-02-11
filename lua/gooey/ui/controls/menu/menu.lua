@@ -13,6 +13,8 @@ Gooey.Menu = Gooey.MakeConstructor (self)
 			Fired when this menu has been closed.
 		MenuOpening (Object targetItem)
 			Fired when this menu is opening.
+		WidthChanged (width)
+			Fired when this menu's fixed width has changed.
 ]]
 
 function self:ctor ()
@@ -20,6 +22,8 @@ function self:ctor ()
 	self.ItemsById = {}
 	
 	self.Control = nil
+	
+	self.Width = nil
 	
 	Gooey.EventProvider (self)
 end
@@ -89,6 +93,10 @@ function self:GetItemById (id)
 	return self.ItemsById [id]
 end
 
+function self:GetWidth ()
+	return self.Width
+end
+
 function self:Hide ()
 	if not self.Control then return end
 	if not self.Control:IsValid () then return end
@@ -112,6 +120,14 @@ function self:SetTargetItem (targetItem)
 	if not self.Control:IsValid () then return end
 	
 	self.Control:SetTargetItem (targetItem)
+end
+
+function self:SetWidth (width)
+	if self.Width == width then return end
+	
+	self.Width = width
+	
+	self:DispatchEvent ("WidthChanged", width)
 end
 
 function self:Show (control, ...)

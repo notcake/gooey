@@ -16,6 +16,8 @@ function self:ctor (comboBox, id, text)
 	self.Id = id
 	self.Text = text
 	
+	self.MenuItem = nil
+	
 	Gooey.EventProvider (self)
 end
 
@@ -25,6 +27,10 @@ end
 
 function self:GetId ()
 	return self.Id or self:GetHashCode ()
+end
+
+function self:GetMenuItem ()
+	return self.MenuItem
 end
 
 function self:GetText ()
@@ -39,12 +45,46 @@ function self:SetId (id)
 	self.Id = id
 end
 
+function self:SetMenuItem (menuItem)
+	if self.MenuItem == menuItem then return self end
+	
+	self:UnhookMenuItem (self.MenuItem)
+	self.MenuItem = menuItem
+	self:HookMenuItem (self.MenuItem)
+	
+	if self.MenuItem then
+		self.MenuItem:SetText (self:GetText ())
+	end
+	
+	return self
+end
+
 function self:SetText (text)
 	if self.Text == text then return self end
 	
 	self.Text = text
+	if self.MenuItem then
+		self.MenuItem:SetText (self.Text)
+	end
 	
 	self:DispatchEvent ("TextChanged", text)
 	
 	return self
+end
+
+-- Internal, do not call
+function self:HookMenuItem (menuItem)
+	if not menuItem then return end
+	
+	menuItem:AddEventListener ("Click", self:GetHashCode (),
+		function ()
+			self:Select ()
+		end
+	)
+end
+
+function self:UnhookMenuItem (menuItem)
+	if not menuItem then return end
+	
+	menuItem:RemoveEventListener ("Click", self:GetHashCode ())
 end
