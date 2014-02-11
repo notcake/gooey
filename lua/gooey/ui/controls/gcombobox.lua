@@ -144,6 +144,10 @@ function PANEL:OnSelect (index, text, comboBoxItem)
 	self:SetSelectedItem (comboBoxItem)
 end
 
+function PANEL:Paint (w, h)
+	derma.SkinHook ("Paint", "ComboBox", self, w, h)
+end
+
 function PANEL:PerformLayout ()
 	self.DropButton:SetSize (15, 15)
 	self.DropButton:AlignRight (4)

@@ -19,6 +19,22 @@ function self:ctor (comboBox, id, text)
 	self.MenuItem = nil
 	
 	Gooey.EventProvider (self)
+	
+	self:AddEventListener ("Deselected",
+		function ()
+			if not self.MenuItem then return end
+			
+			self.MenuItem:SetChecked (false)
+		end
+	)
+	
+	self:AddEventListener ("Selected",
+		function ()
+			if not self.MenuItem then return end
+			
+			self.MenuItem:SetChecked (true)
+		end
+	)
 end
 
 function self:GetComboBox ()
@@ -35,6 +51,10 @@ end
 
 function self:GetText ()
 	return self.Text
+end
+
+function self:IsSelected ()
+	return self == self.ComboBox:GetSelectedItem ()
 end
 
 function self:Select ()
@@ -54,6 +74,7 @@ function self:SetMenuItem (menuItem)
 	
 	if self.MenuItem then
 		self.MenuItem:SetText (self:GetText ())
+		self.MenuItem:SetChecked (self:IsSelected ())
 	end
 	
 	return self
