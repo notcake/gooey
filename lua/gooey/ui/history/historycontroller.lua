@@ -65,15 +65,15 @@ function self:GetHistoryStack ()
 	return self.HistoryStack
 end
 
-function self:SetHistoryStackStack (historyStack)
-	if self.HistoryStackStack then
-		self.HistoryStackStack:RemoveEventListener ("StackChanged", self:GetHashCode ())
+function self:SetHistoryStack (historyStack)
+	if self.HistoryStack then
+		self.HistoryStack:RemoveEventListener ("StackChanged", self:GetHashCode ())
 	end
 	
-	self.HistoryStackStack = historyStack
+	self.HistoryStack = historyStack
 	
-	if self.HistoryStackStack then
-		self.HistoryStackStack:AddEventListener ("StackChanged", self:GetHashCode (), self.StackChanged)
+	if self.HistoryStack then
+		self.HistoryStack:AddEventListener ("StackChanged", self:GetHashCode (), self.StackChanged)
 	end
 	
 	self:UpdateButtonState ()
@@ -89,7 +89,7 @@ function self:UpdateMoveForwardState ()
 	self:UpdateActionState ("Move Forward", self.HistoryStack and self.HistoryStack:CanMoveForward () or false)
 end
 
-function self:UpdateMoveBackwardState ()
+function self:UpdateMoveBackState ()
 	self:UpdateActionState ("Move Back",    self.HistoryStack and self.HistoryStack:CanMoveBack    () or false)
 end
 

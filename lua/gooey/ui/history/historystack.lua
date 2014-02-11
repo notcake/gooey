@@ -9,6 +9,8 @@ Gooey.HistoryStack = Gooey.MakeConstructor (self, Gooey.IHistoryStack)
 			Fired when the state has been moved forward.
 		MovedBack (HistoryItem historyItem)
 			Fired when the state has been moved back.
+		CurrentItemChanged (HistoryItem historyItem)
+			Fired when the current HistoryItem has been changed.
 		StackChanged ()
 			Fired when a HistoryItem has been added or the state has been moved forward or back.
 		StackCleared ()
@@ -37,6 +39,7 @@ function self:Clear ()
 	
 	self:DispatchEvent ("StackChanged")
 	self:DispatchEvent ("StackCleared")
+	self:DispatchEvent ("CurrentItemChanged", self.CurrentItem)
 end
 
 function self:GetCurrentItem ()
@@ -74,6 +77,7 @@ function self:Push (historyItem)
 	self.CurrentItem = historyItem
 	self.NextStack:Clear ()
 	
+	self:DispatchEvent ("CurrentItemChanged", self.CurrentItem)
 	self:DispatchEvent ("ItemPushed", self.CurrentItem)
 	self:DispatchEvent ("StackChanged")
 end
@@ -84,10 +88,11 @@ function self:MoveForward (count)
 		if self.NextStack.Count == 0 then return end
 		
 		self.PreviousStack:Push (self.CurrentItem)
-		self.NextStack.Top:Redo ()
+		self.NextStack.Top:MoveForward ()
 		self.CurrentItem = self.NextStack:Pop ()
 		
 		self:DispatchEvent ("MovedForward", self.CurrentItem)
+		self:DispatchEvent ("CurrentItemChanged", self.CurrentItem)
 		self:DispatchEvent ("StackChanged")
 	end
 end
@@ -98,10 +103,11 @@ function self:MoveBack (count)
 		if self.PreviousStack.Count == 0 then return end
 		
 		self.NextStack:Push (self.CurrentItem)
-		self.PreviousStack.Top:Undo ()
+		self.PreviousStack.Top:MoveBack ()
 		self.CurrentItem = self.PreviousStack:Pop ()
 		
 		self:DispatchEvent ("MovedBack", self.CurrentItem)
+		self:DispatchEvent ("CurrentItemChanged", self.CurrentItem)
 		self:DispatchEvent ("StackChanged")
 	end
 end
