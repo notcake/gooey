@@ -128,25 +128,35 @@ function self:Paint (renderContext)
 	renderContext = renderContext or Gooey.RenderContext
 	
 	-- Calculate scissor rect
-	local left, top = 0, 0
-	local right, bottom = ScrW (), ScrH ()
+	-- Start in local panel coordinates and work upwards until screen coordinates
 	local panel = self.Control
+	
+	local left, top = 0, 0
+	local right, bottom = panel:GetSize ()
+	
+	local dx, dy = panel:GetPos ()
+	panel = panel:GetParent ()
 	while panel and panel:IsValid () do
-		local panelLeft, panelTop = panel:LocalToScreen (0, 0)
-		local panelRight = panelLeft + panel:GetWide ()
-		local panelBottom = panelTop + panel:GetTall ()
+		left   = left   + dx
+		top    = top    + dy
+		right  = right  + dx
+		bottom = bottom + dy
 		
-		if panelLeft > left		then left	= panelLeft		end
-		if panelRight < right	then right	= panelRight	end
-		if panelTop > top		then top	= panelTop		end
-		if panelBottom < bottom	then bottom	= panelBottom	end
+		local w, h = panel:GetSize ()
+		if left   < 0 then left   = 0 end
+		if top    < 0 then top    = 0 end
+		if right  > w then right  = w end
+		if bottom > h then bottom = h end
 		
+		dx, dy = panel:GetPos ()
 		panel = panel:GetParent ()
 	end
 	
+	-- Apply scissor rect
 	render.SetScissorRect (left, top, right, bottom, true)
 	renderContext:PushScreenViewPort ()
 	
+	-- Render children
 	local control = nil
 	for i = 1, #self.Controls do
 		control = self.Controls [i]
@@ -157,6 +167,7 @@ function self:Paint (renderContext)
 		end
 	end
 	
+	-- Restore render settings
 	renderContext:PopViewPort ()
 	render.SetScissorRect (0, 0, ScrW (), ScrH (), false)
 	surface.DisableClipping (false)
