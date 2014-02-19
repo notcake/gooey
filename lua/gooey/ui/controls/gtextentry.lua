@@ -36,6 +36,11 @@ end
 -- Event handlers
 Gooey.CreateMouseEvents (PANEL)
 
+function PANEL:OnKeyCodePressed (keyCode)
+	return self:DispatchKeyboardAction (keyCode)
+end
+PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
+
 function PANEL:OnTextChanged ()
 	self.Text = self:GetText ()
 	self:DispatchEvent ("TextChanged", self:GetText ())
