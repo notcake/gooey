@@ -5,8 +5,8 @@ function self:ctor ()
 	self.Keys = {}
 end
 
-function self:Clone ()
-	local keyboardMap = Gooey.KeyboardMap ()
+function self:Clone (keyboardMap)
+	keyboardMap = keyboardMap or Gooey.KeyboardMap ()
 	for key, handlers in pairs (self.Keys) do
 		for _, handler in ipairs (handlers) do
 			keyboardMap:Register (key, handler)
@@ -51,4 +51,8 @@ function self:Register (key, handler)
 	
 	self.Keys [key] = self.Keys [key] or {}
 	self.Keys [key] [#self.Keys [key] + 1] = handler
+end
+
+function self:__call ()
+	return self:Clone ()
 end

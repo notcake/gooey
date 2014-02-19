@@ -1,4 +1,4 @@
-local PANEL = {}
+local self = {}
 
 --[[
 	Events:
@@ -12,7 +12,7 @@ local PANEL = {}
 			Fired when this frame's sizability has been changed.
 ]]
 
-function PANEL:Init ()
+function self:Init ()
 	-- Size Control
 	self.btnMaxim:SetDisabled (false)
 	self.btnMaxim.DoClick = function ()
@@ -38,8 +38,11 @@ function PANEL:Init ()
 	
 	self:AddEventListener ("DoubleClick",
 		function (_, x, y)
+			if not self:CanMaximize () then return end
+			
 			if x >= self.btnMinim:GetPos () then return end
 			if y >= 31 then return end
+			
 			if self:IsMaximized () then
 				self:Restore ()
 			else
@@ -70,7 +73,7 @@ function PANEL:Init ()
 end
 
 -- Based off SKIN:PaintFrame () in skins/default.lua
-function PANEL:Paint (w, h)
+function self:Paint (w, h)
 	if self.m_bPaintShadow then
 		surface.DisableClipping (true)
 		self:GetSkin ().tex.Shadow (-4, -4, w + 10, h + 10)
@@ -84,7 +87,7 @@ function PANEL:Paint (w, h)
 	end
 end
 
-function PANEL:IsActive ()
+function self:IsActive ()
 	if self:IsFocused () then return true end
 	
 	local focusedPanel = vgui.GetKeyboardFocus ()
@@ -96,15 +99,19 @@ function PANEL:IsActive ()
 end
 
 -- Size Control
-function PANEL:IsMaximized ()
+function self:CanMaximize ()
+	return self.Maximizable
+end
+
+function self:IsMaximized ()
 	return self.Maximized
 end
 
-function PANEL:IsSizable ()
+function self:IsSizable ()
 	return self.Sizable
 end
 
-function PANEL:Maximize ()
+function self:Maximize ()
 	if self:IsMaximized () then return end
 	
 	self.Maximized = true
@@ -140,7 +147,7 @@ function PANEL:Maximize ()
 	self:DispatchEvent ("Maximized")
 end
 
-function PANEL:Restore ()
+function self:Restore ()
 	if not self:IsMaximized () then return end
 	
 	self.Maximized = false
@@ -156,7 +163,7 @@ function PANEL:Restore ()
 	self:DispatchEvent ("Restored")
 end
 
-function PANEL:SetMaximizable (maximizable)
+function self:SetMaximizable (maximizable)
 	if self.Maximizable == maximizable then return end
 	
 	self.Maximizable = maximizable
@@ -165,7 +172,7 @@ function PANEL:SetMaximizable (maximizable)
 	self:DispatchEvent ("MaximizableChanged", self.Maximizable)
 end
 
-function PANEL:SetSizable (sizable)
+function self:SetSizable (sizable)
 	self.Sizable = sizable
 	
 	DFrame.SetSizable (self, sizable)
@@ -173,11 +180,12 @@ function PANEL:SetSizable (sizable)
 end
 
 -- Event handlers
-Gooey.CreateMouseEvents (PANEL)
+Gooey.CreateMouseEvents (self)
 
-function PANEL:OnKeyCodePressed (keyCode)
+function self:OnKeyCodePressed (keyCode)
+	print (keyCode)
 	return self:DispatchKeyboardAction (keyCode)
 end
-PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
+self.OnKeyCodeTyped = self.OnKeyCodePressed
 
-Gooey.Register ("GFrame", PANEL, "DFrame")
+Gooey.Register ("GFrame", self, "DFrame")

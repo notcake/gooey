@@ -157,6 +157,7 @@ include ("controls/gtoolbarseparator.lua")
 include ("controls/gtoolbarsplitbutton.lua")
 
 -- Dialogs
+include ("dialogs/dialogkeyboardmap.lua")
 include ("dialogs/simplebuttondialog.lua")
 
 -- Glyphs

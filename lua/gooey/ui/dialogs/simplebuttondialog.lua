@@ -1,6 +1,6 @@
-local PANEL = {}
+local self = {}
 
-function PANEL:Init ()
+function self:Init ()
 	self:SetTitle ("Dialog")
 	
 	self:SetSize (300, 128)
@@ -18,13 +18,7 @@ function PANEL:Init ()
 	
 	self.Callback = Gooey.NullCallback
 	
-	self:SetKeyboardMap (Gooey.KeyboardMap ())
-	self:GetKeyboardMap ():Register ({ KEY_ESCAPE },
-		function (self, key, ctrl, shift, alt)
-			self:Remove ()
-			gui.HideGameUI ()
-		end
-	)
+	self:SetKeyboardMap (Gooey.DialogKeyboardMap)
 	
 	self:AddEventListener ("TextChanged",
 		function (_, text)
@@ -39,7 +33,11 @@ function PANEL:Init ()
 	)
 end
 
-function PANEL:AddButton (text)
+function self:Close ()
+	self:Remove ()
+end
+
+function self:AddButton (text)
 	local button = vgui.Create ("GButton", self)
 	self.Buttons [#self.Buttons + 1] = button
 	
@@ -56,7 +54,7 @@ function PANEL:AddButton (text)
 	self:InvalidateLayout ()
 end
 
-function PANEL:PerformLayout ()
+function self:PerformLayout ()
 	DFrame.PerformLayout (self)
 	
 	if self.Buttons then
@@ -71,23 +69,23 @@ function PANEL:PerformLayout ()
 	end
 end
 
-function PANEL:SetCallback (callback)
+function self:SetCallback (callback)
 	self.Callback = callback or Gooey.NullCallback
 	return self
 end
 
-function PANEL:SetTitle (title)
+function self:SetTitle (title)
 	DFrame.SetTitle (self, title)
 	return self
 end
 
-function PANEL:OnRemoved ()
+function self:OnRemoved ()
 	self.Callback (nil)
 
 	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
-Gooey.Register ("GSimpleButtonDialog", PANEL, "GFrame")
+Gooey.Register ("GSimpleButtonDialog", self, "GFrame")
 
 function Gooey.YesNoDialog (callback)
 	callback = callback or Gooey.NullCallback
