@@ -35,6 +35,7 @@ include ("mousemonitor.lua")
 -- Keyboard
 include ("keyboardmap.lua")
 include ("keyboardmonitor.lua")
+include ("escapekeyhandler.lua")
 
 include ("dragcontroller.lua")
 include ("dragdropcontroller.lua")

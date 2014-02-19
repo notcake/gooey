@@ -183,7 +183,6 @@ end
 Gooey.CreateMouseEvents (self)
 
 function self:OnKeyCodePressed (keyCode)
-	print (keyCode)
 	return self:DispatchKeyboardAction (keyCode)
 end
 self.OnKeyCodeTyped = self.OnKeyCodePressed
