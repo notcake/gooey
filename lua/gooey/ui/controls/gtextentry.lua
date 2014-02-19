@@ -37,7 +37,7 @@ end
 Gooey.CreateMouseEvents (PANEL)
 
 function PANEL:OnKeyCodePressed (keyCode)
-	return self:DispatchKeyboardAction (keyCode)
+	return self:DispatchKeyboardAction (keyCode) or DTextEntry.OnKeyCodeTyped (self, keyCode)
 end
 PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
 
