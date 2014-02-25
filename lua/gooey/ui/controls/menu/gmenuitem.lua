@@ -146,10 +146,10 @@ function PANEL:OnActionChanged (action)
 		self:SetEnabled (self:GetItem ():IsEnabled () and action and action:CanRun (control) or false)
 		if action then
 			if action:GetIcon () then
-				item:SetIcon (action:GetIcon ())
+				self.Item:SetIcon (action:GetIcon ())
 			end
 			if action:IsToggleAction () then
-				item:SetChecked (action:IsToggled ())
+				self.Item:SetChecked (action:IsToggled ())
 			end
 		end
 	end
