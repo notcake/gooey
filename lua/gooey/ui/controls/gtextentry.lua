@@ -1,28 +1,38 @@
-local PANEL = {}
+local self = {}
 
 --[[
 	Events:
+		BorderColorChanged (borderColor)
+			Fired when this panel's border color has changed.
 ]]
 
-function PANEL:Init ()
+function self:Init ()
 	self:SetAllowNonAsciiCharacters (true)
+	
+	self.BorderColor = nil
 end
 
--- Compatibility with Derma skin's PaintTextEntry
-function PANEL:HasFocus ()
-	return self:IsFocused ()
+-- Colors
+function self:GetBorderColor ()
+	return self.BorderColor or GLib.Colors.Black
 end
 
--- Compatibility with spawn menu hooks
-function PANEL:HasParent (control)
-	return debug.getregistry ().Panel.HasParent (self, control)
+function self:GetDefaultBackgroundColor ()
+	return GLib.Colors.White
 end
 
-function PANEL:GetText ()
+function self:SetBorderColor (borderColor)
+	self.BorderColor = borderColor
+	self:DispatchEvent ("BorderColorChanged", self.BorderColor)
+	return self
+end
+
+-- Text
+function self:GetText ()
 	return debug.getregistry ().Panel.GetText (self)
 end
 
-function PANEL:SetText (text)
+function self:SetText (text)
 	if self:GetText () == text then return self end
 	
 	self.Text = text
@@ -33,17 +43,46 @@ function PANEL:SetText (text)
 	return self
 end
 
--- Event handlers
-Gooey.CreateMouseEvents (PANEL)
+function self:Paint (w, h)
+	if self.m_bBackground then
+		if not self:IsEnabled () then
+			self:GetSkin ().tex.TextBox_Disabled (0, 0, w, h, self:GetBackgroundColor ())
+		elseif self:HasFocus() then
+			self:GetSkin ().tex.TextBox_Focus (0, 0, w, h, self:GetBackgroundColor ())
+		else
+			self:GetSkin ().tex.TextBox (0, 0, w, h, self:GetBackgroundColor ())
+		end
+	end
+	
+	if self.BorderColor then
+		surface.SetDrawColor (self.BorderColor)
+		surface.DrawOutlinedRect (0, 0, w, h)
+	end
+	
+	self:DrawTextEntryText (self:GetTextColor (), self.m_colHighlight, self.m_colCursor)
+end
 
-function PANEL:OnKeyCodePressed (keyCode)
+-- Compatibility with Derma skin's PaintTextEntry
+function self:HasFocus ()
+	return self:IsFocused ()
+end
+
+-- Compatibility with spawn menu hooks
+function self:HasParent (control)
+	return debug.getregistry ().Panel.HasParent (self, control)
+end
+
+-- Event handlers
+Gooey.CreateMouseEvents (self)
+
+function self:OnKeyCodePressed (keyCode)
 	return self:DispatchKeyboardAction (keyCode) or DTextEntry.OnKeyCodeTyped (self, keyCode)
 end
-PANEL.OnKeyCodeTyped = PANEL.OnKeyCodePressed
+self.OnKeyCodeTyped = self.OnKeyCodePressed
 
-function PANEL:OnTextChanged ()
+function self:OnTextChanged ()
 	self.Text = self:GetText ()
 	self:DispatchEvent ("TextChanged", self:GetText ())
 end
 
-Gooey.Register ("GTextEntry", PANEL, "DTextEntry") 
+Gooey.Register ("GTextEntry", self, "DTextEntry") 

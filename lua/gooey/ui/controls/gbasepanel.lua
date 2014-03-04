@@ -294,40 +294,42 @@ end
 -- Colors
 function self:GetBackgroundColor ()
 	if not self.BackgroundColor then
-		self.BackgroundColor = self.m_Skin.control_color or GLib.Colors.DarkGray
+		self.BackgroundColor = self:GetDefaultBackgroundColor ()
 	end
 	return self.BackgroundColor
+end
+
+function self:GetDefaultBackgroundColor ()
+	return self.m_Skin.control_color or GLib.Colors.DarkGray
 end
 
 function self:GetTextColor ()
 	return self.TextColor or GLib.Colors.Black
 end
 
-function self:SetBackgroundColor (color)
-	self.BackgroundColor = color
+function self:SetBackgroundColor (backgroundColor)
+	self.BackgroundColor = backgroundColor
 	self:DispatchEvent ("BackgroundColorChanged", self.BackgroundColor)
 	return self
 end
 
-function self:SetTextColor (color)
-	if self.TextColor == color then return end
+function self:SetTextColor (textColor)
+	if self.TextColor == textColor then return end
 	if self.TextColor and
-	   self.TextColor.r == color.r and 
-	   self.TextColor.g == color.g and 
-	   self.TextColor.b == color.b and 
-	   self.TextColor.a == color.a then
+	   self.TextColor.r == textColor.r and 
+	   self.TextColor.g == textColor.g and 
+	   self.TextColor.b == textColor.b and 
+	   self.TextColor.a == textColor.a then
 		return
 	end
-	self.TextColor = color
+	self.TextColor = textColor
 	
-	if type (color) == "number" then
+	if type (textColor) == "number" then
 		Gooey.PrintStackTrace ()
 	end
-	debug.getregistry ().Panel.SetFGColor (self, color)
-	self.m_cTextColor = color -- for DTree_Node compatibility
-	self.m_colText    = color -- for DLabel compatibility
-	
-	DLabel.ApplySchemeSettings (self)
+	debug.getregistry ().Panel.SetFGColor (self, textColor)
+	self.m_cTextColor = textColor -- for DTree_Node compatibility
+	self.m_colText    = textColor -- for DLabel compatibility
 	
 	return self
 end
