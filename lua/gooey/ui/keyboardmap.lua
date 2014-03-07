@@ -53,6 +53,29 @@ function self:Register (key, handler)
 	self.Keys [key] [#self.Keys [key] + 1] = handler
 end
 
+function self:Unregister (key, handler)
+	if not handler then
+		Gooey.Error ("KeyboardMap:Unregister : No handler specified.")
+	end
+	
+	if not self.Keys [key] then return end
+	
+	for i = 1, #self.Keys [key] do
+		if self.Keys [key] [i] == handler then
+			table.remove (self.Keys [key], i)
+			break
+		end
+	end
+end
+
+function self:UnregisterAll (key)
+	if not key then
+		self.Keys = {}
+	else
+		self.Keys [key] = nil
+	end
+end
+
 function self:__call ()
 	return self:Clone ()
 end
