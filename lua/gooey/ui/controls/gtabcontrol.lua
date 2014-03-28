@@ -387,7 +387,27 @@ function PANEL:RemoveTab (tab, delete)
 	
 	-- Update selected tab
 	if self:GetSelectedTab () == tab then
-		self:SetSelectedTab (self.Tabs [index] or self.Tabs [index - 1])
+		local selectedTab = nil
+		
+		-- Search forwards for visible tabs
+		for i = index, #self.Tabs do
+			if self.Tabs [i]:IsVisible () then
+				selectedTab = self.Tabs [i]
+				break
+			end
+		end
+		
+		-- Otherwise search backwards
+		if not selectedTab then
+			for i = index - 1, 1, -1 do
+				if self.Tabs [i]:IsVisible () then
+					selectedTab = self.Tabs [i]
+					break
+				end
+			end
+		end
+		
+		self:SetSelectedTab (selectedTab)
 	end
 	
 	tab:SetTabControl (nil)
