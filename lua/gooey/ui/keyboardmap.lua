@@ -15,6 +15,7 @@ function self:Clone (keyboardMap)
 	return keyboardMap
 end
 
+local lastEscapeFrame = nil
 function self:Execute (control, key, ctrl, shift, alt)
 	if not self.Keys [key] then return false end
 	
@@ -31,10 +32,13 @@ function self:Execute (control, key, ctrl, shift, alt)
 	end
 	
 	if handled and key == KEY_ESCAPE then
-		if gui.IsGameUIVisible () then
-			gui.HideGameUI ()
-		else
-			gui.ActivateGameUI ()
+		if lastEscapeFrame ~= FrameNumber () then
+			lastEscapeFrame = FrameNumber ()
+			if gui.IsGameUIVisible () then
+				gui.HideGameUI ()
+			else
+				gui.ActivateGameUI ()
+			end
 		end
 	end
 	
