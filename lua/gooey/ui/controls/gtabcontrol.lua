@@ -218,11 +218,7 @@ function PANEL:GetContentRectangle ()
 end
 
 function PANEL:GetEnumerator ()
-	local i = 0
-	return function ()
-		i = i + 1
-		return self.Tabs [i]
-	end
+	return GLib.ArrayEnumerator (self.Tabs)
 end
 
 function PANEL:GetHeaderHeight ()

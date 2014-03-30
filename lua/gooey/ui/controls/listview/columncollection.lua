@@ -54,11 +54,7 @@ function self:GetColumnCount ()
 end
 
 function self:GetEnumerator ()
-	local i = 0
-	return function ()
-		i = i + 1
-		return self.OrderedColumns [i]
-	end
+	return GLib.ArrayEnumerator (self.OrderedColumns)
 end
 
 function self:GetListView ()

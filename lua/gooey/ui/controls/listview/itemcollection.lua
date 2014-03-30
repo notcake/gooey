@@ -58,11 +58,7 @@ function self:Clear ()
 end
 
 function self:GetEnumerator ()
-	local i = 0
-	return function ()
-		i = i + 1
-		return self.OrderedItems [i]
-	end
+	return GLib.ArrayEnumerator (self.OrderedItems)
 end
 
 function self:GetItem (index)

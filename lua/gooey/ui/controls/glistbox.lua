@@ -128,11 +128,7 @@ function PANEL:GetItemCount ()
 end
 
 function PANEL:GetItemEnumerator ()
-	local next, tbl, key = pairs (self:GetItems ())
-	return function ()
-		key = next (tbl, key)
-		return tbl [key]
-	end
+	return GLib.ValueEnumerator (self:GetItems ())
 end
 
 function PANEL:GetMenu ()

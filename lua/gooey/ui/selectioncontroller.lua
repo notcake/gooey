@@ -85,11 +85,7 @@ function self:GetSelectedItems ()
 end
 
 function self:GetSelectionEnumerator ()
-	local next, tbl, key = ipairs (self.SelectedItems)
-	return function ()
-		key = next (tbl, key)
-		return tbl [key]
-	end
+	return GLib.ValueEnumerator (self.SelectedItems)
 end
 
 function self:GetSelectionMode ()
