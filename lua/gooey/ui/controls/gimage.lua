@@ -21,6 +21,21 @@ function PANEL:GetImage ()
 	return self.Image
 end
 
+function PANEL:GetImageHeight ()
+	if not self.Image then return 0 end
+	return Gooey.ImageCache:LoadImage (self.Image):GetHeight ()
+end
+
+function PANEL:GetImageSize ()
+	if not self.Image then return 0, 0 end
+	return Gooey.ImageCache:LoadImage (self.Image):GetSize ()
+end
+
+function PANEL:GetImageWidth ()
+	if not self.Image then return 0 end
+	return Gooey.ImageCache:LoadImage (self.Image):GetWidth ()
+end
+
 function PANEL:Paint (renderContext)
 	renderContext = renderContext or Gooey.RenderContext
 	

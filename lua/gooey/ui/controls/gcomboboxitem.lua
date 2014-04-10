@@ -5,6 +5,8 @@ Gooey.ComboBoxItem = Gooey.MakeConstructor (self)
 	Events:
 		Deselected ()
 			Fired when this item has been deselected.
+		IconChanged (string icon)
+			Fired when this item's icon has changed.
 		Selected ()
 			Fired when this item has been selected.
 		TextChanged (string text)
@@ -12,10 +14,15 @@ Gooey.ComboBoxItem = Gooey.MakeConstructor (self)
 ]]
 
 function self:ctor (comboBox, id, text)
+	-- Identity
 	self.ComboBox = comboBox
 	self.Id = id
-	self.Text = text
 	
+	-- Appearance
+	self.Text = text
+	self.Icon = nil
+	
+	-- Menu item
 	self.MenuItem = nil
 	
 	Gooey.EventProvider (self)
@@ -37,6 +44,7 @@ function self:ctor (comboBox, id, text)
 	)
 end
 
+-- Identity
 function self:GetComboBox ()
 	return self.ComboBox
 end
@@ -45,37 +53,28 @@ function self:GetId ()
 	return self.Id or self:GetHashCode ()
 end
 
-function self:GetMenuItem ()
-	return self.MenuItem
+function self:SetId (id)
+	self.Id = id
+end
+
+-- Appearance
+function self:GetIcon ()
+	return self.Icon
 end
 
 function self:GetText ()
 	return self.Text
 end
 
-function self:IsSelected ()
-	return self == self.ComboBox:GetSelectedItem ()
-end
-
-function self:Select ()
-	self.ComboBox:SetSelectedItem (self)
-end
-
-function self:SetId (id)
-	self.Id = id
-end
-
-function self:SetMenuItem (menuItem)
-	if self.MenuItem == menuItem then return self end
+function self:SetIcon (icon)
+	if self.Icon == icon then return self end
 	
-	self:UnhookMenuItem (self.MenuItem)
-	self.MenuItem = menuItem
-	self:HookMenuItem (self.MenuItem)
-	
+	self.Icon = icon
 	if self.MenuItem then
-		self.MenuItem:SetText (self:GetText ())
-		self.MenuItem:SetChecked (self:IsSelected ())
+		self.MenuItem:SetIcon (self.Icon)
 	end
+	
+	self:DispatchEvent ("IconChanged", self.Icon)
 	
 	return self
 end
@@ -89,6 +88,35 @@ function self:SetText (text)
 	end
 	
 	self:DispatchEvent ("TextChanged", text)
+	
+	return self
+end
+
+-- State
+function self:IsSelected ()
+	return self == self.ComboBox:GetSelectedItem ()
+end
+
+function self:Select ()
+	self.ComboBox:SetSelectedItem (self)
+end
+
+-- Menu item
+function self:GetMenuItem ()
+	return self.MenuItem
+end
+
+function self:SetMenuItem (menuItem)
+	if self.MenuItem == menuItem then return self end
+	
+	self:UnhookMenuItem (self.MenuItem)
+	self.MenuItem = menuItem
+	self:HookMenuItem (self.MenuItem)
+	
+	if self.MenuItem then
+		self.MenuItem:SetText (self:GetText ())
+		self.MenuItem:SetChecked (self:IsSelected ())
+	end
 	
 	return self
 end

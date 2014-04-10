@@ -4,6 +4,8 @@ local PANEL = {}
 	GComboBox
 	
 	Events:
+		MenuOpening (Menu menu)
+			Fired when the menu is opening.
 		SelectedItemChanged (ComboBoxItem lastSelectedItem, ComboBoxItem selectedItem)
 			Fired when the selected item has changed.
 ]]
@@ -20,20 +22,25 @@ function PANEL:Init ()
 	
 	self:SetContentAlignment (4)
 	self:SetTextInset (8, 0)
+	self.Icon = nil
 	
+	-- Items
 	self.Items = {}
 	self.ItemsById = {}
 	self.SelectedItem = nil
 	
+	-- Menu
 	self.Menu = Gooey.Menu ()
 	self.MenuDownwards = true
 	self.MenuOpen = false
 	self.MenuCloseTime = 0
+	
 	self.Menu:AddEventListener ("MenuOpening",
 		function ()
 			self:DispatchEvent ("MenuOpening", self.Menu)
 		end
 	)
+	
 	self.Menu:AddEventListener ("MenuClosed",
 		function ()
 			self.MenuOpen = false
@@ -53,6 +60,12 @@ function PANEL:Init ()
 					self.MenuDownwards = menu:GetAnchorVerticalAlignment () == Gooey.VerticalAlignment.Top
 				end
 			end
+		end
+	)
+	
+	self:AddEventListener ("TextChanged",
+		function (_)
+			self:UpdateTooltip ()
 		end
 	)
 end
@@ -84,6 +97,10 @@ function PANEL:AddItem (text, id)
 end
 
 function PANEL:Clear ()
+	for comboBoxItem in self:GetItemEnumerator () do
+		self:UnhookComboBoxItem (comboBoxItem)
+	end
+	
 	self.Items = {}
 	self.ItemsById = {}
 	
@@ -98,6 +115,14 @@ end
 
 function PANEL:GetItemCount ()
 	return #self.Items
+end
+
+function PANEL:GetItemEnumerator ()
+	return GLib.ArrayEnumerator (self.Items)
+end
+
+function PANEL:GetMenu ()
+	return self.Menu
 end
 
 function PANEL:GetSelectedItem ()
@@ -118,13 +143,16 @@ function PANEL:SetSelectedItem (comboBoxItem)
 	local lastSelectedItem = self.SelectedItem
 	
 	if self.SelectedItem then
+		self:UnhookSelectedComboBoxItem (self.SelectedItem)
 		self.SelectedItem:DispatchEvent ("Deselected")
 	end
 	
 	self.SelectedItem = comboBoxItem
+	self:SetIcon (comboBoxItem and comboBoxItem:GetIcon ())
 	self:SetText (comboBoxItem and comboBoxItem:GetText () or "")
 	
 	if self.SelectedItem then
+		self:HookSelectedComboBoxItem (self.SelectedItem)
 		self.SelectedItem:DispatchEvent ("Selected")
 	end
 	
@@ -133,6 +161,7 @@ function PANEL:SetSelectedItem (comboBoxItem)
 	return self
 end
 
+-- Events
 function PANEL:DoClick ()
 end
 
@@ -148,7 +177,28 @@ function PANEL:Paint (w, h)
 	derma.SkinHook ("Paint", "ComboBox", self, w, h)
 end
 
+-- Layout
+function PANEL:CalculateTextInset ()
+	if self.Icon then
+		return self.Icon:GetPos () + self.Icon:GetWidth () + 3
+	else
+		return 8
+	end
+end
+
+function PANEL:GetTextAreaWidth ()
+	return self:GetWidth () - self:CalculateTextInset ()
+end
+
 function PANEL:PerformLayout ()
+	if self.Icon then
+		local iconInset = (self:GetHeight () - self.Icon:GetHeight ()) / 2
+		self.Icon:SetSize (16, 16)
+		self.Icon:SetPos (iconInset, iconInset)
+	end
+	
+	self:SetTextInset (self:CalculateTextInset (), 0)
+	
 	self.DropButton:SetSize (15, 15)
 	self.DropButton:AlignRight (4)
 	self.DropButton:CenterVertical ()
@@ -156,20 +206,71 @@ function PANEL:PerformLayout ()
 	self.Menu:SetWidth (self:GetWidth ())
 end
 
+-- Internal, do not call
+function PANEL:GetIcon ()
+	if not self.Icon then return nil end
+	return self.Icon:GetImage ()
+end
+
+function PANEL:SetIcon (icon)
+	if self:GetIcon () == icon then return self end
+	
+	if not icon then
+		self.Icon:Remove ()
+		self.Icon = nil
+		self:InvalidateLayout ()
+		self:UpdateTooltip ()
+	else
+		if not self.Icon then
+			self.Icon = vgui.Create ("GImage", self)
+			self:InvalidateLayout ()
+			self:UpdateTooltip ()
+		end
+		
+		self.Icon:SetImage (icon)
+	end
+	
+	return self
+end
+
+function PANEL:UpdateTooltip ()
+	local textAreaWidth = self:GetTextAreaWidth ()
+	
+	surface.SetFont (self:GetFont ())
+	local textWidth = surface.GetTextSize (self:GetText ())
+	
+	self:SetToolTipText (textWidth > textAreaWidth and self:GetText () or nil)
+end
+
 -- Hooks
 function PANEL:HookComboBoxItem (comboBoxItem)
 	if not comboBoxItem then return end
+end
+
+function PANEL:HookSelectedComboBoxItem (comboBoxItem)
+	if not comboBoxItem then return end
+	
+	comboBoxItem:AddEventListener ("IconChanged", self:GetHashCode (),
+		function (_, icon)
+			self:SetIcon (icon)
+		end
+	)
 	
 	comboBoxItem:AddEventListener ("TextChanged", self:GetHashCode (),
-		function ()
-			
+		function (_, text)
+			self:SetText (text)
 		end
 	)
 end
 
 function PANEL:UnhookComboBoxItem (comboBoxItem)
 	if not comboBoxItem then return end
+end
+
+function PANEL:UnhookSelectedComboBoxItem (comboBoxItem)
+	if not comboBoxItem then return end
 	
+	comboBoxItem:RemoveEventListener ("IconChanged", self:GetHashCode ())
 	comboBoxItem:RemoveEventListener ("TextChanged", self:GetHashCode ())
 end
 
