@@ -63,10 +63,10 @@ function Gooey.CreateMouseEvents (panel)
 	function panel:OnMouseWheeled (delta)
 		local handled = self:DispatchEvent ("MouseWheel", delta, self:CursorPos ())
 		if self.OnMouseWheel then handled = handled or self:OnMouseWheel (delta, self:CursorPos ()) end
-		if handled then return end
+		if handled then return true end
 		
 		if self:GetParent ().OnMouseWheeled then
-			self:GetParent ():OnMouseWheeled (delta)
+			return self:GetParent ():OnMouseWheeled (delta)
 		end
 	end
 end

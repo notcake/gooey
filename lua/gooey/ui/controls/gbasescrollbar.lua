@@ -71,7 +71,7 @@ function PANEL:Init ()
 	)
 	self:AddEventListener ("MouseWheel",
 		function (_, delta, x, y)
-			self:ScrollAnimated (delta * -3 * self:GetSmallIncrement ())
+			self:ScrollAnimated (delta * -5 * self:GetSmallIncrement ())
 			return true
 		end
 	)

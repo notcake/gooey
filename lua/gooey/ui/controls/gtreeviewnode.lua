@@ -290,7 +290,7 @@ function PANEL:OnChildRemoved (childNode)
 end
 
 function PANEL:OnMouseWheel (delta, x, y)
-	self:GetTreeView ():OnMouseWheeled (delta)
+	return self:GetTreeView ():OnMouseWheeled (delta)
 end
 
 function PANEL:OnRemoved ()	
