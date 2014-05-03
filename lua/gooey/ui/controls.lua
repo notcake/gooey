@@ -1,15 +1,13 @@
 Gooey.UI = {}
 
-include ("orientation.lua")
-include ("horizontalalignment.lua")
-include ("verticalalignment.lua")
+-- Layout
+include ("layout/orientation.lua")
+include ("layout/horizontalalignment.lua")
+include ("layout/verticalalignment.lua")
+include ("layout/sizingmethod.lua")
 
-include ("sizingmethod.lua")
 include ("sortorder.lua")
 include ("splitcontainerpanel.lua")
-include ("tooltippositioningmode.lua")
-
-include ("glyphs.lua")
 
 -- Images
 include ("imagecacheentry.lua")
@@ -26,22 +24,24 @@ include ("toggleaction.lua")
 include ("booleancontroller.lua")
 include ("visibilitycontroller.lua")
 
--- Bindings
-include ("keybinds.lua")
-
 -- Mouse
-include ("mousemonitor.lua")
+include ("mouse/mousemonitor.lua")
+
+-- Event Bases
+include ("mouse/mouseevents.lua")
 
 -- Keyboard
-include ("keyboardmap.lua")
-include ("keyboardmonitor.lua")
-include ("escapekeyhandler.lua")
+include ("keyboard/keyboardmap.lua")
+include ("keyboard/keyboardmonitor.lua")
+include ("keyboard/escapekeyhandler.lua")
 
+-- Bindings
+include ("keyboard/keybinds.lua")
+
+-- Controllers
 include ("dragcontroller.lua")
 include ("dragdropcontroller.lua")
 include ("selectioncontroller.lua")
-include ("tooltipcontroller.lua")
-include ("tooltipmanager.lua")
 
 include ("iclipboardtarget.lua")
 
@@ -70,9 +70,6 @@ include ("history/undoredostack.lua")
 include ("history/undoredocontroller.lua")
 
 include ("vpanelcontainer.lua")
-
--- Event Bases
-include ("mouseevents.lua")
 
 -- Control Bases
 include ("controls/gbasepanel.lua")
@@ -105,6 +102,12 @@ include ("scrollableviewcontroller.lua")
 include ("controls/gbasescrollbar.lua")
 include ("controls/ghscrollbar.lua")
 include ("controls/gvscrollbar.lua")
+
+-- Tooltips
+include ("controls/tooltips/tooltippositioningmode.lua")
+include ("controls/tooltips/tooltipcontroller.lua")
+include ("controls/tooltips/tooltipmanager.lua")
+include ("controls/tooltips/gtooltip.lua")
 
 -- Controls
 include ("controls/gbutton.lua")
@@ -141,7 +144,6 @@ include ("controls/gstatusbarcomboboxpanel.lua")
 include ("controls/gtabcontrol.lua")
 include ("controls/gtextentry.lua")
 include ("controls/gtoolbar.lua")
-include ("controls/gtooltip.lua")
 include ("controls/gtreeviewnode.lua")
 include ("controls/gtreeview.lua")
 include ("controls/gworldview.lua")
@@ -162,6 +164,7 @@ include ("dialogs/dialogkeyboardmap.lua")
 include ("dialogs/simplebuttondialog.lua")
 
 -- Glyphs
+include ("glyphs.lua")
 include ("glyphs/close.lua")
 include ("glyphs/down.lua")
 include ("glyphs/up.lua")
