@@ -29,6 +29,8 @@ function self:ctor ()
 end
 
 function self:dtor ()
+	self:Clear ()
+	
 	if self.Control and self.Control:IsValid () then
 		self.Control:Remove ()
 		self.Control = nil
@@ -77,6 +79,10 @@ function self:AddSeparator (id)
 end
 
 function self:Clear ()
+	for item in self:GetEnumerator () do
+		item:dtor ()
+	end
+	
 	self.Items = {}
 	self.ItemsById = {}
 	
