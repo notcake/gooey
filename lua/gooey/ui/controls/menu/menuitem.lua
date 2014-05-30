@@ -11,6 +11,10 @@ Gooey.MenuItem = Gooey.MakeConstructor (self, Gooey.BaseMenuItem)
 			Fired when this item has been clicked.
 		IconChanged (icon)
 			Fired when this menu item's icon has changed.
+		MouseEnter ()
+			Fired when the mouse has entered this menu item.
+		MouseLeave ()
+			Fired when the mouse has left this menu item.
 		SubMenuChanged (oldSubMenu, newSubMenu)
 			Fired when this menu item's submenu has changed.
 		TextChanged (text)
