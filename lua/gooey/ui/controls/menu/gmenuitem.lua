@@ -159,7 +159,6 @@ function PANEL:OnCursorEntered ()
 	self.Depressed = input.IsMouseDown (MOUSE_LEFT)
 	self.Pressed   = input.IsMouseDown (MOUSE_LEFT)
 	
-	PrintTable (self:GetEventProvider ())
 	self:DispatchEvent ("MouseEnter")
 	if self.OnMouseEnter then self:OnMouseEnter () end
 	
