@@ -109,8 +109,16 @@ function self:GetEnumerator ()
 	return GLib.ArrayEnumerator (self.Items)
 end
 
+function self:GetItem (index)
+	return self.Items [index]
+end
+
 function self:GetItemById (id)
 	return self.ItemsById [id]
+end
+
+function self:GetItemCount ()
+	return #self.Items
 end
 
 function self:GetWidth ()
