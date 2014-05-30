@@ -355,6 +355,18 @@ function PANEL:AddMenuItem (menuItem)
 			menuItem:DispatchEvent ("Click", targetItem)
 		end
 	)
+	
+	control:AddEventListener ("MouseEnter", self:GetHashCode (),
+		function (_, ...)
+			menuItem:DispatchEvent ("MouseEnter", ...)
+		end
+	)
+	
+	control:AddEventListener ("MouseLeave", self:GetHashCode (),
+		function (_, ...)
+			menuItem:DispatchEvent ("MouseLeave", ...)
+		end
+	)
 end
 
 function PANEL:AddButton (menuItem)
@@ -400,7 +412,9 @@ end
 function PANEL:UnhookMenuItem (menuItem)
 	local control = self.ItemControls [menuItem]
 	
-	menuItem:RemoveEventListener ("Click", self:GetHashCode ())
+	menuItem:RemoveEventListener ("Click",      self:GetHashCode ())
+	menuItem:RemoveEventListener ("MouseEnter", self:GetHashCode ())
+	menuItem:RemoveEventListener ("MouseLeave", self:GetHashCode ())
 	
 	GLib.UnbindProperty (control, menuItem, "Enabled", self:GetHashCode ())
 	GLib.UnbindProperty (control, menuItem, "Visible", self:GetHashCode ())

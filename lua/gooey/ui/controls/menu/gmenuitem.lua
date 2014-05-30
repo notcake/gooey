@@ -156,16 +156,29 @@ function PANEL:OnActionChanged (action)
 end
 
 function PANEL:OnCursorEntered ()
+	self.Depressed = input.IsMouseDown (MOUSE_LEFT)
+	self.Pressed   = input.IsMouseDown (MOUSE_LEFT)
+	
+	PrintTable (self:GetEventProvider ())
+	self:DispatchEvent ("MouseEnter")
+	if self.OnMouseEnter then self:OnMouseEnter () end
+	
 	self:GetContainingMenu ():SetHoveredItem (self)
 end
 
 function PANEL:OnCursorExited ()
+	self:DispatchEvent ("MouseLeave")
+	if self.OnMouseLeave then self:OnMouseLeave () end
+	
 	if self:GetContainingMenu ():GetHoveredItem () == self then
 		self:GetContainingMenu ():SetHoveredItem (nil)
 	end
 end
 
 function PANEL:OnMousePressed (mouseCode)
+	self:DispatchEvent ("MouseDown", mouseCode, self:CursorPos ())
+	if self.OnMouseDown then self:OnMouseDown (mouseCode, self:CursorPos ()) end
+	
 	if not self:IsEnabled () then
 		return false
 	end
@@ -176,6 +189,9 @@ function PANEL:OnMousePressed (mouseCode)
 end
 
 function PANEL:OnMouseReleased (mouseCode)
+	self:DispatchEvent ("MouseUp", mouseCode, self:CursorPos ())
+	if self.OnMouseUp then self:OnMouseUp (mouseCode, self:CursorPos ()) end
+	
 	if not self:IsEnabled () then
 		return false
 	end
