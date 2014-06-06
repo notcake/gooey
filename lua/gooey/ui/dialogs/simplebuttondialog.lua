@@ -26,6 +26,12 @@ function self:Init ()
 		end
 	)
 	
+	self:AddEventListener ("TextColorChanged",
+		function (_, textColor)
+			self.TextLabel:SetTextColor (textColor)
+		end
+	)
+	
 	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
 		function ()
 			self:Remove ()
@@ -87,35 +93,27 @@ end
 
 Gooey.Register ("GSimpleButtonDialog", self, "GFrame")
 
-function Gooey.OkDialog (callback)
-	callback = callback or Gooey.NullCallback
-	
-	local dialog = vgui.Create ("GSimpleButtonDialog")
-	dialog:SetCallback (callback)
-	dialog:AddButton ("OK")
-	
-	return dialog
-end
+local dialogs =
+{
+	["Empty"           ] = {                            },
+	["Ok"              ] = { "OK"                       },
+	["OkCancel"        ] = { "OK",             "Cancel" },
+	["YesNo"           ] = { "Yes",   "No"              },
+	["YesNoCancel"     ] = { "Yes",   "No",    "Cancel" },
+	["AbortRetryIgnore"] = { "Abort", "Retry", "Ignore" }
+}
 
-function Gooey.OkCancelDialog (callback)
-	callback = callback or Gooey.NullCallback
-	
-	local dialog = vgui.Create ("GSimpleButtonDialog")
-	dialog:SetCallback (callback)
-	dialog:AddButton ("OK")
-	dialog:AddButton ("Cancel")
-	
-	return dialog
-end
-
-function Gooey.YesNoDialog (callback)
-	callback = callback or Gooey.NullCallback
-	
-	local dialog = vgui.Create ("GSimpleButtonDialog")
-	dialog:SetCallback (callback)
-	dialog:AddButton ("Yes")
-	dialog:AddButton ("No")
-	dialog:AddButton ("Cancel")
-	
-	return dialog
+for dialogName, dialogButtons in pairs (dialogs) do
+	Gooey [dialogName .. "Dialog"] = function (callback)
+		callback = callback or Gooey.NullCallback
+		
+		local dialog = vgui.Create ("GSimpleButtonDialog")
+		dialog:SetCallback (callback)
+		
+		for _, buttonText in ipairs (dialogButtons) do
+			dialog:AddButton (buttonText)
+		end
+		
+		return dialog
+	end
 end
