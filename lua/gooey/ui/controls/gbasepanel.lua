@@ -36,6 +36,8 @@ Gooey.LastFocusRequestTime  = 0
 			Fired when this panel's size has changed.
 		TextChanged (text)
 			Fired when this panel's text has changed.
+		TextColorChanged (Color textColor)
+			Fired when this panel's text color has changed.
 		VisibleChanged (visible)
 			Fired when this panel's visibility has changed.
 		WidthChanged (width)
@@ -314,13 +316,13 @@ function self:SetBackgroundColor (backgroundColor)
 end
 
 function self:SetTextColor (textColor)
-	if self.TextColor == textColor then return end
+	if self.TextColor == textColor then return self end
 	if self.TextColor and
 	   self.TextColor.r == textColor.r and 
 	   self.TextColor.g == textColor.g and 
 	   self.TextColor.b == textColor.b and 
 	   self.TextColor.a == textColor.a then
-		return
+		return self
 	end
 	self.TextColor = textColor
 	
@@ -330,6 +332,8 @@ function self:SetTextColor (textColor)
 	debug.getregistry ().Panel.SetFGColor (self, textColor)
 	self.m_cTextColor = textColor -- for DTree_Node compatibility
 	self.m_colText    = textColor -- for DLabel compatibility
+	
+	self:DispatchEvent ("TextColorChanged", self.TextColor)
 	
 	return self
 end

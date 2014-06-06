@@ -87,6 +87,27 @@ end
 
 Gooey.Register ("GSimpleButtonDialog", self, "GFrame")
 
+function Gooey.OkDialog (callback)
+	callback = callback or Gooey.NullCallback
+	
+	local dialog = vgui.Create ("GSimpleButtonDialog")
+	dialog:SetCallback (callback)
+	dialog:AddButton ("OK")
+	
+	return dialog
+end
+
+function Gooey.OkCancelDialog (callback)
+	callback = callback or Gooey.NullCallback
+	
+	local dialog = vgui.Create ("GSimpleButtonDialog")
+	dialog:SetCallback (callback)
+	dialog:AddButton ("OK")
+	dialog:AddButton ("Cancel")
+	
+	return dialog
+end
+
 function Gooey.YesNoDialog (callback)
 	callback = callback or Gooey.NullCallback
 	
