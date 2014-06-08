@@ -105,7 +105,8 @@ local dialogs =
 
 for dialogName, dialogButtons in pairs (dialogs) do
 	Gooey [dialogName .. "Dialog"] = function (callback)
-		if not isfunction (callback) then
+		if callback ~= nil and
+		   not isfunction (callback) then
 			Gooey.Error ("Gooey." .. dialogName .. "Dialog: This function takes a callback, not whatever you've given it!")
 			callback = nil
 		end
