@@ -405,8 +405,10 @@ function PANEL:RemoveMenuItem (menuItem)
 	
 	self:UnhookMenuItem (menuItem)
 	
-	self.ItemControls [menuItem]:Remove ()
-	self.ItemControls [menuItem] = nil
+	if self.ItemControls [menuItem] then
+		self.ItemControls [menuItem]:Remove ()
+		self.ItemControls [menuItem] = nil
+	end
 end
 
 function PANEL:UnhookMenuItem (menuItem)
