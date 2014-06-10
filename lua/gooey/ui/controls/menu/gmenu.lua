@@ -171,13 +171,11 @@ function PANEL:PerformLayout ()
 	local w, h = self:GetMinimumWidth (), 0
 	
 	for control in self:GetEnumerator () do
-		control:PerformLayout()
-		w = math.max (w, control:GetWide ())
+		w = math.max (w, control:GetMinimumContentWidth ())
     end
 	
 	-- Enforce fixed width
 	w = self.Menu:GetWidth () or w
-	self:SetWidth (w)
 	for control in self:GetEnumerator () do
 		control:SetWide (w)
 		control:SetPos (0, h)
@@ -188,6 +186,7 @@ function PANEL:PerformLayout ()
 		end
 	end
 	
+	self:SetWidth (w)
 	self:SetHeight (h)
 	self:Reanchor ()
 	

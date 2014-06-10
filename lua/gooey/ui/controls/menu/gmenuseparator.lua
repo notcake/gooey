@@ -21,6 +21,10 @@ function PANEL:GetItem ()
 	return self.Item
 end
 
+function PANEL:GetMinimumContentWidth ()
+	return 0
+end
+
 function PANEL:IsItem ()
 	return false
 end

@@ -44,6 +44,10 @@ function PANEL:GetItem ()
 	return self.Item
 end
 
+function PANEL:GetMinimumContentWidth ()
+	return self:GetContentSize () + 30
+end
+
 function PANEL:IsChecked ()
 	return self.Checked
 end
