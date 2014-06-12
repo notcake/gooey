@@ -475,6 +475,10 @@ function self:GetKeyboardMap ()
 	return self.KeyboardMap
 end
 
+function self:HasAction ()
+	return self.Action ~= nil
+end
+
 function self:RunAction (...)
 	if not self:GetAction () then return end
 	self:DispatchAction (self:GetAction (), ...)

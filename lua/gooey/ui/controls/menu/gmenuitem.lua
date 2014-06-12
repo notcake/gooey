@@ -24,10 +24,6 @@ function PANEL:ContainsPoint (x, y)
 	       y >= 0 and y < self:GetTall ()
 end
 
-function PANEL:DoClick ()
-	self:DispatchEvent ("Click", self.ContainingMenu and self.ContainingMenu:GetTargetItem () or nil)
-end
-
 function PANEL:GetIcon ()
 	return self.Icon and self.Icon.ImageName or nil
 end
@@ -138,6 +134,10 @@ function PANEL:SetItem (menuItem)
 end
 
 -- Event handlers
+function PANEL:DoClick ()
+	self:DispatchEvent ("Click", self.ContainingMenu and self.ContainingMenu:GetTargetItem () or nil)
+end
+
 function PANEL:OnActionChanged (action)
 	if not self:GetAction () then
 		self:SetEnabled (self:GetItem ():IsEnabled ())
@@ -203,7 +203,11 @@ function PANEL:OnMouseReleased (mouseCode)
 
 	if self.m_MenuClicking then
 		self.m_MenuClicking = false
-		self.ContainingMenu:CloseMenus ()
+		if not self:GetItem ():HasSubMenu () or
+		   self:HasAction () or
+		   self:GetItem ():GetEventProvider ():HasEventListeners ("Click") then
+			self.ContainingMenu:CloseMenus ()
+		end
 	end
 end
 

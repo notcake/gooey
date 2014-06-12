@@ -16,6 +16,7 @@ if CLIENT then
 	function Gooey.Register (className, classTable, baseClassName)
 		local init = classTable.Init
 		
+		-- Merge in GBasePanel methods
 		for k, v in pairs (Gooey.BasePanel) do
 			if not rawget (classTable, k) then
 				classTable [k] = v

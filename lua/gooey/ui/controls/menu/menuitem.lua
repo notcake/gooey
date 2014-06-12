@@ -85,6 +85,10 @@ function self:GetText ()
 	return self.Text
 end
 
+function self:HasSubMenu ()
+	return self.SubMenu ~= nil
+end
+
 function self:IsChecked ()
 	return self.Checked
 end
