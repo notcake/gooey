@@ -38,6 +38,8 @@ Gooey.LastFocusRequestTime  = 0
 			Fired when this panel's text has changed.
 		TextColorChanged (Color textColor)
 			Fired when this panel's text color has changed.
+		ToolTipTextChanged (toolTipText)
+			Fired when this panel's tooltip text has changed.
 		VisibleChanged (visible)
 			Fired when this panel's visibility has changed.
 		WidthChanged (width)
@@ -402,6 +404,8 @@ function self:SetToolTipText (text)
 		self.ToolTipController = Gooey.ToolTipController (self)
 	end
 	self.ToolTipController:SetEnabled (self.ToolTipText ~= nil)
+	
+	self:DispatchEvent ("ToolTipTextChanged", self.ToolTipText)
 	
 	return self
 end

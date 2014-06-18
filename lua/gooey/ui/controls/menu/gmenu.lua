@@ -344,8 +344,9 @@ function PANEL:AddMenuItem (menuItem)
 	
 	if not control then return end
 	
-	GLib.BindProperty (control, menuItem, "Enabled", self:GetHashCode ())
-	GLib.BindProperty (control, menuItem, "Visible", self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Enabled",     self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "ToolTipText", self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Visible",     self:GetHashCode ())
 	
 	self.ItemControls [menuItem] = control
 	
@@ -417,12 +418,16 @@ function PANEL:UnhookMenuItem (menuItem)
 	menuItem:RemoveEventListener ("MouseEnter", self:GetHashCode ())
 	menuItem:RemoveEventListener ("MouseLeave", self:GetHashCode ())
 	
-	GLib.UnbindProperty (control, menuItem, "Enabled", self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Visible", self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Action",  self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Checked", self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Icon",    self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Text",    self:GetHashCode ())
+	-- BaseMenuItems
+	GLib.UnbindProperty (control, menuItem, "Enabled",     self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "ToolTipText", self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Visible",     self:GetHashCode ())
+	
+	-- MenuItems
+	GLib.UnbindProperty (control, menuItem, "Action",      self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Checked",     self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Icon",        self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Text",        self:GetHashCode ())
 end
 
 function PANEL:HookMenu (menu)

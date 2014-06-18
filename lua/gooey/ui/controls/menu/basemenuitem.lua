@@ -13,6 +13,8 @@ Gooey.BaseMenuItem = Gooey.MakeConstructor (self)
 			Fired when this item has been removed.
 		Select ()
 			Fired when the user has hovered over this item.
+		ToolTipTextChanged (tooltipText)
+			Fired when this item's tooltip text has changed.
 		VisibleChanged (visible)
 			Fired when this item's visibility has changed.
 ]]
@@ -24,6 +26,8 @@ function self:ctor ()
 	
 	self.Enabled = true
 	self.Visible = true
+	
+	self.ToolTipText = nil
 	
 	Gooey.EventProvider (self)
 end
@@ -38,6 +42,10 @@ end
 
 function self:GetParent ()
 	return self.Parent
+end
+
+function self:GetToolTipText ()
+	return self.ToolTipText
 end
 
 function self:IsEnabled ()
@@ -83,6 +91,15 @@ function self:SetParent (parent)
 	self.Parent = parent
 	
 	self:DispatchEvent ("ParentChanged", self.Parent)
+	return self
+end
+
+function self:SetToolTipText (toolTipText)
+	if self.ToolTipText == toolTipText then return self end
+	
+	self.ToolTipText = toolTipText
+	self:DispatchEvent ("ToolTipTextChanged", self.ToolTipText)
+	
 	return self
 end
 
