@@ -49,6 +49,9 @@ if CLIENT then
 	include ("ui/controls.lua")
 end
 
+Gooey.CodeExporter = GLib.Lua.CodeExporter ("Gooey", "gooey")
+Gooey.CodeExporter:AddAuxiliarySystemName ("GLib")
+
 Gooey:DispatchEvent ("Initialize")
 
 Gooey.AddReloadCommand ("gooey/gooey.lua", "gooey", "Gooey")
