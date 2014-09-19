@@ -121,14 +121,6 @@ function self:GetOwner ()
 	return self.Owner
 end
 
-function self:GetWidth ()
-	return self:GetWide ()
-end
-
-function self:GetHeight ()
-	return self:GetTall ()
-end
-
 function self:IsEnabled ()
 	return self.Enabled
 end
@@ -182,16 +174,6 @@ function self:SetEnabled (enabled)
 	return self
 end
 
-function self:SetHeight (height)
-	if self:GetTall () == height then return self end
-	
-	debug.getregistry ().Panel.SetTall (self, height)
-	self:DispatchEvent ("HeightChanged", self:GetTall ())
-	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
-	
-	return self
-end
-
 function self:SetOwner (owner)
 	if self.Owner == owner then return self end
 	
@@ -214,7 +196,38 @@ function self:SetParent (parent)
 	return self
 end
 
-function self:SetPos (x, y, ...)
+-- Position
+function self:GetX ()
+	local x, y = self:GetPos ()
+	return x
+end
+
+function self:GetY ()
+	local x, y = self:GetPos ()
+	return y
+end
+
+function self:SetX (x)
+	local currentX, currentY = self:GetPos ()
+	if currentX == x then return self end
+	
+	debug.getregistry ().Panel.SetPos (self, x, currentY)
+	self:DispatchEvent ("PositionChanged", x, currentY)
+	
+	return self
+end
+
+function self:SetY (y)
+	local currentX, currentY = self:GetPos ()
+	if currentY == y then return self end
+	
+	debug.getregistry ().Panel.SetPos (self, currentX, y)
+	self:DispatchEvent ("PositionChanged", currentX, y)
+	
+	return self
+end
+
+function self:SetPos (x, y)
 	local currentX, currentY = self:GetPos ()
 	if currentX == x and currentY == y then return self end
 	
@@ -224,7 +237,26 @@ function self:SetPos (x, y, ...)
 	return self
 end
 
-function self:SetSize (width, height, ...)
+-- Size
+function self:GetWidth ()
+	return self:GetWide ()
+end
+
+function self:GetHeight ()
+	return self:GetTall ()
+end
+
+function self:SetHeight (height)
+	if self:GetTall () == height then return self end
+	
+	debug.getregistry ().Panel.SetTall (self, height)
+	self:DispatchEvent ("HeightChanged", self:GetTall ())
+	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
+	
+	return self
+end
+
+function self:SetSize (width, height)
 	if self:GetWide () == width and self:GetTall () == height then return self end
 	
 	debug.getregistry ().Panel.SetSize (self, width, height)
