@@ -24,7 +24,7 @@ function Gooey.RegisterOpenMenu (menu)
 	)
 end
 
-hook.Add ("VGUIMousePressed", "GMenus",
+hook.Add ("VGUIMousePressed", "Gooey.Menus",
 	function (panel, mouseCode)
 		while panel ~= nil and panel:IsValid () do
 			if panel.ClassName == "DMenu" then
