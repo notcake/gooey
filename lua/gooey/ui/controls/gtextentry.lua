@@ -47,7 +47,7 @@ function self:Paint (w, h)
 	if self.m_bBackground then
 		if not self:IsEnabled () then
 			self:GetSkin ().tex.TextBox_Disabled (0, 0, w, h, self:GetBackgroundColor ())
-		elseif self:HasFocus() then
+		elseif self:IsFocused () then
 			self:GetSkin ().tex.TextBox_Focus (0, 0, w, h, self:GetBackgroundColor ())
 		else
 			self:GetSkin ().tex.TextBox (0, 0, w, h, self:GetBackgroundColor ())

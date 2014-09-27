@@ -365,6 +365,8 @@ function PANEL:IsItemVisible (listBoxItem)
 	if not listBoxItem then return false end
 	
 	local listBoxItemControl = self.ItemControls [listBoxItem]
+	if not listBoxItemControl then return false end
+	
 	local y = listBoxItemControl:GetY ()
 	local h = listBoxItemControl:GetHeight ()
 	local viewY      = self.ScrollableViewController:GetViewY ()
