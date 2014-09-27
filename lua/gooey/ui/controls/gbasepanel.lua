@@ -604,9 +604,9 @@ function self:IsDisabled ()
 	return not self:IsEnabled ()
 end
 
-self.GetColor     = Gooey.DeprecatedFunction
-self.HasFocus     = Gooey.DeprecatedFunction
-self.HasParent    = Gooey.DeprecatedFunction
-self.RequestFocus = Gooey.DeprecatedFunction
-self.SetColor     = Gooey.DeprecatedFunction
-self.SetDisabled  = Gooey.DeprecatedFunction
+self.GetColor     = Gooey.DeprecatedFunctionFactory ("Panel:GetTextColor")
+self.HasFocus     = Gooey.DeprecatedFunctionFactory ("Panel:IsFocused"   )
+self.HasParent    = Gooey.DeprecatedFunctionFactory ("Panel:Contains"    )
+self.RequestFocus = Gooey.DeprecatedFunctionFactory ("Panel:Focus"       )
+self.SetColor     = Gooey.DeprecatedFunctionFactory ("Panel:SetTextColor")
+self.SetDisabled  = Gooey.DeprecatedFunctionFactory ("Panel:SetEnabled"  )

@@ -109,7 +109,7 @@ function PANEL:Paint (w, h)
 		if not self:GetListBox ():IsFocused () then
 			col = GLib.Colors.Silver
 		end
-		surface.SetDrawColor (col.r, col.g, col.b, col.a)
+		surface.SetDrawColor (col)
 		self:DrawFilledRect ()
 	elseif self:IsHovered () then
 		surface.SetDrawColor (col.r, col.g, col.b, col.a * 0.25)

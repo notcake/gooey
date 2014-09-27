@@ -8,6 +8,8 @@ local PANEL = {}
 			Fired when an item has been double clicked.
 		ItemHeightChanged (itemHeight)
 			Fired when the item height has changed.
+		ItemSpacingChanged (itemSpacing)
+			Fired when the spacing between ListBoxItems has changed.
 		RightClick (ListBoxItem item)
 			Fired when an item has been right clicked.
 		SelectionChanged (ListBoxItem item)
@@ -25,7 +27,9 @@ function PANEL:Init ()
 	self.Items = Gooey.ListBox.ItemCollection (self)
 	self.ItemControls = {}
 	
-	self.ItemHeight = 0
+	-- Item Layout
+	self.ItemHeight  = 0
+	self.ItemSpacing = 0
 	
 	self.Items:AddEventListener ("ItemAdded",
 		function (_, listBoxItem)
@@ -126,8 +130,10 @@ function PANEL:Init ()
 	
 	self:AddEventListener ("ItemHeightChanged",
 		function (_, itemHeight)
-			self.HScroll:SetSmallIncrement (itemHeight)
-			self.VScroll:SetSmallIncrement (itemHeight)
+			if itemHeight then
+				self.HScroll:SetSmallIncrement (itemHeight)
+				self.VScroll:SetSmallIncrement (itemHeight)
+			end
 		end
 	)
 	
@@ -212,11 +218,11 @@ function PANEL:PerformLayout (w, h)
 			end
 			
 			if listBoxItemControl:IsVisible () then
-				y = y + listBoxItemControl:GetHeight ()
+				y = y + listBoxItemControl:GetHeight () + self.ItemSpacing
 			end
 		end
 		
-		local contentHeight = y
+		local contentHeight = y - self.ItemSpacing
 		self.ScrollableViewController:SetContentHeight (contentHeight)
 		self.ItemCanvas:SetHeight (contentHeight)
 	end
@@ -302,10 +308,6 @@ function PANEL:GetItemEnumerator ()
 	return self.Items:GetEnumerator ()
 end
 
-function PANEL:GetItemHeight ()
-	return self.ItemHeight
-end
-
 function PANEL:GetItems ()
 	return self.Items
 end
@@ -316,6 +318,15 @@ end
 
 function PANEL:RemoveItem (listBoxItem)
 	return self.Items:RemoveItem (listBoxItem)
+end
+
+-- Item Layout
+function PANEL:GetItemHeight ()
+	return self.ItemHeight
+end
+
+function PANEL:GetItemSpacing ()
+	return self.ItemSpacing
 end
 
 function PANEL:SetItemHeight (itemHeight)
@@ -332,6 +343,18 @@ function PANEL:SetItemHeight (itemHeight)
 	self:InvalidateVerticalItemLayout ()
 	
 	self:DispatchEvent ("ItemHeightChanged", self.ItemHeight)
+	
+	return self
+end
+
+function PANEL:SetItemSpacing (itemSpacing)
+	if self.ItemSpacing == itemSpacing then return self end
+	
+	self.ItemSpacing = itemSpacing
+	
+	self:InvalidateVerticalItemLayout ()
+	
+	self:DispatchEvent ("ItemSpacingChanged", self.ItemSpacing)
 	
 	return self
 end

@@ -12,6 +12,12 @@ function Gooey.DeprecatedFunction ()
 	GLib.Error ("Gooey: Derma function should not be called.")
 end
 
+function Gooey.DeprecatedFunctionFactory (alternativeFunctionName)
+	return function ()
+		GLib.Error ("Gooey: Derma function should not be called. Use " .. alternativeFunctionName .. " instead.")
+	end
+end
+
 if CLIENT then
 	function Gooey.Register (className, classTable, baseClassName)
 		local init = classTable.Init
