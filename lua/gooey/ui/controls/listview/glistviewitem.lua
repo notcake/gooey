@@ -81,6 +81,14 @@ function PANEL:SetListView (listView)
 	self.ListView = listView
 end
 
+function PANEL:GetIndex ()
+	return self.ListView:GetItems ():IndexOf (self)
+end
+
+function PANEL:GetSortedIndex ()
+	return self.ListView:GetItems ():SortedIndexOf (self)
+end
+
 -- SubItems
 function PANEL:GetIcon ()
 	return self.Icon

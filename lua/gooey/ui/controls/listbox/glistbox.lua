@@ -141,6 +141,11 @@ function PANEL:Init ()
 	self:AddEventListener ("WidthChanged",
 		function (_, w)
 			self.ItemCanvas:SetWidth (self:GetContentWidth ())
+		end
+	)
+	
+	self.ItemCanvas:AddEventListener ("WidthChanged",
+		function (_, w)
 			self:InvalidateItemWidths ()
 		end
 	)
@@ -154,7 +159,7 @@ end
 PANEL.VScrollBarClassName         = "GVScrollBar"
 PANEL.HScrollBarClassName         = "GHScrollBar"
 PANEL.ScrollBarCornerClassName    = "GScrollBarCorner"
-PANEL.ListBoxItemControlClassName = "GListBoxItemX"
+PANEL.ListBoxItemControlClassName = "GListBoxItem"
 
 function PANEL.VScrollBarFactory (self)
 	return self:Create (self.VScrollBarClassName)
@@ -274,8 +279,17 @@ function PANEL:FindItem (text)
 	return nil
 end
 
+-- Returns the ListBoxItem at the sorted index
+function PANEL:GetItem (index)
+	return self.Items:GetItem (index)
+end
+
 function PANEL:GetItemById (id)
 	return self.Items:GetItemById (id)
+end
+
+function PANEL:GetItemBySortedIndex (sortedIndex)
+	return self.Items:GetItemBySortedIndex (sortedIndex)
 end
 
 function PANEL:GetItemCount ()
@@ -294,17 +308,8 @@ function PANEL:GetItems ()
 	return self.Items
 end
 
---- Returns whether the specified ListBoxItem will lie fully within the visible part of the ListBox after the current animation has ended
--- @return A boolean indicating whether the specified ListBoxItem will lie fully within the visible part of the ListBox after the current animation has ended
-function PANEL:IsItemVisible (listBoxItem)
-	if not listBoxItem then return false end
-	
-	local listBoxItemControl = self.ItemControls [listBoxItem]
-	local y = listBoxItemControl:GetY ()
-	local h = listBoxItemControl:GetHeight ()
-	local viewY      = self.ScrollableViewController:GetViewY ()
-	local viewHeight = self.ScrollableViewController:GetViewHeight ()
-	return y >= viewY and y + h <= viewY + viewHeight
+function PANEL:IsEmpty ()
+	return self.Items:IsEmpty ()
 end
 
 function PANEL:RemoveItem (listBoxItem)
@@ -327,6 +332,19 @@ function PANEL:SetItemHeight (itemHeight)
 	self:DispatchEvent ("ItemHeightChanged", self.ItemHeight)
 	
 	return self
+end
+
+--- Returns whether the specified ListBoxItem will lie fully within the visible part of the ListBox after the current animation has ended
+-- @return A boolean indicating whether the specified ListBoxItem will lie fully within the visible part of the ListBox after the current animation has ended
+function PANEL:IsItemVisible (listBoxItem)
+	if not listBoxItem then return false end
+	
+	local listBoxItemControl = self.ItemControls [listBoxItem]
+	local y = listBoxItemControl:GetY ()
+	local h = listBoxItemControl:GetHeight ()
+	local viewY      = self.ScrollableViewController:GetViewY ()
+	local viewHeight = self.ScrollableViewController:GetViewHeight ()
+	return y >= viewY and y + h <= viewY + viewHeight
 end
 
 -- Spatial queries
@@ -400,10 +418,10 @@ function PANEL:ItemsIntersectingContentAABB (x1, y1, x2, y2, out)
 	end
 	
 	for i = firstItemIndex, lastItemIndex do
-		local listBoxItem = self:GetItems ():GetItem (i)
+		local listBoxItem = self.Items:GetItem (i)
 		local listBoxItemControl = listBoxItem:GetControl ()
 		if listBoxItemControl:IsVisible () then
-			out [#out + 1] = self:GetItems ():GetItem (i)
+			out [#out + 1] = listBoxItem
 		end
 	end
 	
@@ -439,6 +457,11 @@ end
 
 function PANEL:GetSelectionMode ()
 	return self.SelectionController:GetSelectionMode ()
+end
+
+function PANEL:SetSelectedItem (listBoxItem)
+	self.SelectionController:ClearSelection ()
+	self.SelectionController:AddToSelection (listBoxItem)
 end
 
 function PANEL:SetSelectionMode (selectionMode)
@@ -616,4 +639,4 @@ function PANEL:UnhookListBoxItem (listBoxItem)
 	listBoxItem:RemoveEventListener ("VisibleChanged", "GListBox." .. self:GetHashCode ())
 end
 
-Gooey.Register ("GListBoxX", PANEL, "GPanel")
+Gooey.Register ("GListBox", PANEL, "GPanel")

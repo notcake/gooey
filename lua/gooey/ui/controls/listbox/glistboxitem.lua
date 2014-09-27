@@ -20,6 +20,20 @@ function PANEL:Init ()
 			self.ListBoxItem:DispatchEvent ("Click")
 		end
 	)
+	self:AddEventListener ("PositionChanged", "GListBoxItem." .. self:GetHashCode (),
+		function (_, x, y)
+			if not self.ListBoxItem then return self end
+			
+			self.ListBoxItem:DispatchEvent ("PositionChanged", x, y)
+		end
+	)
+	self:AddEventListener ("SizeChanged", "GListBoxItem." .. self:GetHashCode (),
+		function (_, x, y)
+			if not self.ListBoxItem then return self end
+			
+			self.ListBoxItem:DispatchEvent ("SizeChanged", x, y)
+		end
+	)
 end
 
 -- ListBox
@@ -43,6 +57,7 @@ function PANEL:SetListBoxItem (listBoxItem)
 		GLib.UnbindProperty (self,           self.ListBoxItem, "BackgroundColor", self:GetHashCode ())
 		GLib.UnbindProperty (self,           self.ListBoxItem, "Height",          self:GetHashCode ())
 		GLib.UnbindProperty (self,           self.ListBoxItem, "Visible",         self:GetHashCode ())
+		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "Font",            self:GetHashCode ())
 		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "Text",            self:GetHashCode ())
 		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "TextColor",       self:GetHashCode ())
 		
@@ -57,6 +72,7 @@ function PANEL:SetListBoxItem (listBoxItem)
 		GLib.BindProperty (self,           self.ListBoxItem, "BackgroundColor", self:GetHashCode ())
 		GLib.BindProperty (self,           self.ListBoxItem, "Height",          self:GetHashCode ())
 		GLib.BindProperty (self,           self.ListBoxItem, "Visible",         self:GetHashCode ())
+		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "Font",            self:GetHashCode ())
 		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "Text",            self:GetHashCode ())
 		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "TextColor",       self:GetHashCode ())
 		
@@ -120,21 +136,8 @@ function PANEL:PerformLayout (w, h)
 	self.TextLabel:SetSize (w - x, h)
 end
 
--- function PANEL:IsHovered ()
--- 	if not self.Hovered then return false end
--- 	
--- 	local mouseX, mouseY = self:CursorPos ()
--- 	return mouseX >= 0 and mouseX < self:GetWidth () and
--- 	       mouseY >= 0 and mouseY < self:GetHeight ()
--- end
-
 function PANEL:IsSelected ()
 	return self.ListBox.SelectionController:IsSelected (self.ListBoxItem)
-end
-
-function PANEL:Select ()
-	self.ListBox.SelectionController:ClearSelection ()
-	self.ListBox.SelectionController:AddToSelection (self.ListBoxItem)
 end
 
 -- Event handlers
@@ -155,11 +158,8 @@ function PANEL:OnMouseReleased (mouseCode)
 end
 
 function PANEL:OnRemoved ()
-	local listBox = self:GetListBox ()
-	if listBox then
-		self:SetListBox (nil)
-		listBox:GetItems ():RemoveItem (self:GetListBoxItem ())
-	end
+	self:SetListBox (nil)
+	self:SetListBoxItem (nil)
 end
 
 function PANEL:OnListBoxItemChanged (lastListBoxItem, listBoxItem)
@@ -167,4 +167,4 @@ end
 
 -- Internal, do not call
 
-Gooey.Register ("GListBoxItemX", PANEL, "GPanel")
+Gooey.Register ("GListBoxItem", PANEL, "GPanel")

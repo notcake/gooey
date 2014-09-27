@@ -308,6 +308,18 @@ function PANEL:FindItem (text)
 	return nil
 end
 
+function PANEL:GetItem (index)
+	return self.Items:GetItem (index)
+end
+
+function PANEL:GetItemById (id)
+	return self.Items:GetItemById (id)
+end
+
+function PANEL:GetItemBySortedIndex (sortedIndex)
+	return self.Items:GetItemBySortedIndex (sortedIndex)
+end
+
 function PANEL:GetItemCount ()
 	return self.Items:GetItemCount ()
 end
@@ -322,6 +334,10 @@ end
 
 function PANEL:GetItems ()
 	return self.Items
+end
+
+function PANEL:IsEmpty ()
+	return self.Items:IsEmpty ()
 end
 
 function PANEL:RemoveItem (listViewItem)

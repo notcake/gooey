@@ -14,7 +14,7 @@ Gooey.ListView.ItemCollection = Gooey.MakeConstructor (self)
 function self:ctor (listView)
 	self.ListView = listView
 	
-	self.Items = {}
+	self.ItemsById = {}
 	self.OrderedItems = {}
 	
 	Gooey.EventProvider (self)
@@ -22,7 +22,7 @@ end
 
 function self:AddItem (...)
 	local listViewItem = vgui.Create ("GListViewItem", self:GetListView ())
-	local id = #self.Items + 1
+	local id = #self.ItemsById + 1
 	listViewItem:SetListView (self:GetListView ())
 	listViewItem:SetId (id)
 	listViewItem:SetEnabled (self:GetListView ():IsEnabled ())
@@ -37,7 +37,7 @@ function self:AddItem (...)
 		end
 	end
 	
-	self.Items [id] = listViewItem
+	self.ItemsById [id] = listViewItem
 	self.OrderedItems [#self.OrderedItems + 1] = listViewItem
 	
 	self:DispatchEvent ("ItemAdded", listViewItem)
@@ -46,8 +46,8 @@ function self:AddItem (...)
 end
 
 function self:Clear ()
-	for id, listViewItem in pairs (self.Items) do
-		self.Items [id] = nil
+	for id, listViewItem in pairs (self.ItemsById) do
+		self.ItemsById [id] = nil
 		listViewItem:Remove ()
 		self:DispatchEvent ("ItemRemoved", listViewItem)
 	end
@@ -66,7 +66,11 @@ function self:GetItem (index)
 end
 
 function self:GetItemById (id)
-	return self.Items [id]
+	return self.ItemsById [id]
+end
+
+function self:GetItemBySortedIndex (index)
+	return self.OrderedItems [index]
 end
 
 function self:GetItemCount ()
@@ -77,23 +81,59 @@ function self:GetListView ()
 	return self.ListView
 end
 
+function self:IsEmpty ()
+	return #self.OrderedItems == 0
+end
+
 function self:RemoveItem (listViewItem)
+	listViewItem = self.ItemsById [listViewItem] or listViewItem
+	
 	if not listViewItem then return end
 	if not listViewItem:IsValid () then return end
-	if self.Items [listViewItem:GetId ()] ~= listViewItem then return end
+	if self.ItemsById [listViewItem:GetId ()] ~= listViewItem then return end
 	
-	for i = 1, #self.OrderedItems do
-		if self.OrderedItems [i] == listViewItem then
-			table.remove (self.OrderedItems, i)
-			break
-		end
-	end
+	self.ItemsById [listViewItem:GetId ()] = nil
 	
-	self.Items [listViewItem:GetId ()] = nil
+	table.remove (self.OrderedItems, self:IndexOf (listViewItem))
 	
 	listViewItem:Remove ()
 	
 	self:DispatchEvent ("ItemRemoved", listViewItem)
+end
+
+-- Search
+function self:BinarySearch (director)
+	local minIndex = 0
+	local maxIndex = #self.OrderedItems + 1
+	
+	while maxIndex - minIndex > 1 do
+		local midIndex = math.floor ((maxIndex + minIndex) * 0.5)
+		
+		local direction = director (self.OrderedItems [midIndex])
+		if direction < 0 then
+			maxIndex = midIndex
+		elseif direction > 0 then
+			minIndex = midIndex
+		else
+			return true, midIndex, self.OrderedItems [midIndex]
+		end
+	end
+	
+	return false, minIndex, self.OrderedItems [minIndex]
+end
+
+function self:IndexOf (listViewItem)
+	for i = 1, #self.OrderedItems do
+		if self.OrderedItems [i] == listViewItem then
+			return i
+		end
+	end
+	
+	return nil
+end
+
+function self:SortedIndexOf (listBoxItem)
+	return self:IndexOf (listBoxItem)
 end
 
 function self:Sort (comparator, sortOrder)

@@ -13,6 +13,10 @@ Gooey.ListBox.ListBoxItem = Gooey.MakeConstructor (self)
 			Fired when this ListBoxItem's parent has changed.
 		ParentChanged (ListBox listBox)
 			Fired when this ListBoxItem's parent has changed.
+		PositionChanged (x, y)
+			Fired when this ListBoxItem's position has changed.
+		SizeChanged (width, height)
+			Fired when this ListBoxItem's size has changed.
 		TextChanged (text)
 			Fired when this ListBoxItems' text has changed.
 		ToolTipTextChanged (toolTipText)
@@ -42,6 +46,7 @@ function self:ctor (listBox)
 	self.BackgroundColor = nil
 	
 	-- Text
+	self.Font            = "DermaDefault"
 	self.Text            = "ListBoxItem"
 	self.TextColor       = GLib.Colors.Black
 	
@@ -54,7 +59,7 @@ function self:ctor (listBox)
 end
 
 function self:dtor ()
-	self:DispatchEvent ("Removed")
+	self:Remove ()
 end
 
 -- ListBox
@@ -82,6 +87,14 @@ function self:SetParent (parent)
 	
 	self:DispatchEvent ("ParentChanged", self.Parent)
 	return self
+end
+
+function self:GetIndex ()
+	return self.ListBox:GetItems ():IndexOf (self)
+end
+
+function self:GetSortedIndex ()
+	return self.ListBox:GetItems ():SortedIndexOf (self)
 end
 
 -- Control
@@ -212,12 +225,26 @@ function self:SetIcon (icon)
 end
 
 -- Text
+function self:GetFont ()
+	return self.Font
+end
+
 function self:GetText ()
 	return self.Text
 end
 
 function self:GetTextColor ()
 	return self.TextColor
+end
+
+function self:SetFont (font)
+	if self.Font == font then return self end
+	
+	self.Font = font
+	
+	self:DispatchEvent ("FontChanged", self.Font)
+	
+	return self
 end
 
 function self:SetText (text)
@@ -264,11 +291,21 @@ function self:EnsureVisible ()
 	self.ListBox:EnsureVisible (self)
 end
 
+function self:Select ()
+	self.ListBox.SelectionController:ClearSelection ()
+	self.ListBox.SelectionController:AddToSelection (self)
+end
+
 function self:SetCanSelect (canSelect)
 	self.Selectable = canSelect
 end
 
 -- ListBoxItem
 function self:Remove ()
-	self:dtor ()
+	if not self.ListBox then return end
+	
+	self.ListBox:GetItems ():RemoveItem (self)
+	self:SetListBox (nil)
+	
+	self:DispatchEvent ("Removed")
 end

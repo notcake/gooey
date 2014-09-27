@@ -54,13 +54,13 @@ function self:AddItem (id, text)
 end
 
 function self:Clear ()
-	for listboxItem, _ in pairs (self.ItemSet) do
+	for listBoxItem, _ in pairs (self.ItemSet) do
 		self.ItemSet [listBoxItem] = nil
 		listBoxItem:Remove ()
 		self:DispatchEvent ("ItemRemoved", listBoxItem)
 	end
 	
-	self.ItemsById = {}
+	self.ItemsById    = {}
 	self.OrderedItems = {}
 	
 	self:DispatchEvent ("Cleared")
@@ -78,13 +78,23 @@ function self:GetItemById (id)
 	return self.ItemsById [id]
 end
 
+function self:GetItemBySortedIndex (index)
+	return self.OrderedItems [index]
+end
+
 function self:GetItemCount ()
 	return #self.OrderedItems
 end
 
+function self:IsEmpty ()
+	return #self.OrderedItems == 0
+end
+
 function self:RemoveItem (listBoxItem)
+	listBoxItem = self.ItemsById [listBoxItem] or listBoxItem
+	
 	if not listBoxItem then return end
-	if self.ItemSet [listBoxItem] then return end
+	if not self.ItemSet [listBoxItem] then return end
 	
 	self.ItemSet [listBoxItem] = nil
 	if self.ItemsById [listBoxItem:GetId ()] == listBoxItem then
@@ -127,6 +137,10 @@ function self:IndexOf (listBoxItem)
 	end
 	
 	return nil
+end
+
+function self:SortedIndexOf (listBoxItem)
+	return self:IndexOf (listBoxItem)
 end
 
 function self:Sort (comparator, sortOrder)

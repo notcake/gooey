@@ -266,6 +266,7 @@ function self:MouseMove (_, mouseCode, x, y)
 		self.InBoxSelection = true
 	end
 	if not self.InBoxSelection then return end
+	
 	if self.SelectionAction == SelectionAction.Override then self:ClearSelection () end
 	self:ClearNewSelection ()
 	
@@ -283,6 +284,7 @@ function self:MouseMove (_, mouseCode, x, y)
 		end
 	end
 	
+	-- Cleanup results array for next time
 	for i = 1, #self.ItemsInBox do
 		self.ItemsInBox [i] = nil
 	end
