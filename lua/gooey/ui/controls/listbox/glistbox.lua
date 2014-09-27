@@ -207,7 +207,9 @@ function PANEL:PerformLayout (w, h)
 		for listBoxItem in self:GetItemEnumerator () do
 			local listBoxItemControl = self.ItemControls [listBoxItem]
 			listBoxItemControl:SetPos (0, y)
-			listBoxItemControl:SetHeight (self:GetItemHeight ())
+			if self:GetItemHeight () then
+				listBoxItemControl:SetHeight (self:GetItemHeight ())
+			end
 			
 			if listBoxItemControl:IsVisible () then
 				y = y + listBoxItemControl:GetHeight ()
