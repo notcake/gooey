@@ -414,9 +414,9 @@ end
 function PANEL:UnhookMenuItem (menuItem)
 	local control = self.ItemControls [menuItem]
 	
-	menuItem:RemoveEventListener ("Click",      self:GetHashCode ())
-	menuItem:RemoveEventListener ("MouseEnter", self:GetHashCode ())
-	menuItem:RemoveEventListener ("MouseLeave", self:GetHashCode ())
+	control:RemoveEventListener ("Click",      self:GetHashCode ())
+	control:RemoveEventListener ("MouseEnter", self:GetHashCode ())
+	control:RemoveEventListener ("MouseLeave", self:GetHashCode ())
 	
 	-- BaseMenuItems
 	GLib.UnbindProperty (control, menuItem, "Enabled",     self:GetHashCode ())

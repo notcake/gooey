@@ -324,25 +324,6 @@ function PANEL:GetItems ()
 	return self.Items
 end
 
-function PANEL:ItemFromPoint (x, y)
-	local left, top, right, bottom = self:GetContentBounds ()
-	if x < left    then return nil end
-	if x >= right  then return nil end
-	if y < top     then return nil end
-	if y >= bottom then return nil end
-	
-	x, y = self:LocalToScreen (x, y)
-	for item in self:GetItemEnumerator () do
-		local px, py = item:LocalToScreen (0, 0)
-		local w, h = item:GetSize ()
-		if px <= x and x < px + w and
-		   py <= y and y < py + h then
-			return item
-		end
-	end
-	return nil
-end
-
 function PANEL:RemoveItem (listViewItem)
 	return self.Items:RemoveItem (listViewItem)
 end
@@ -359,6 +340,55 @@ function PANEL:SetItemHeight (itemHeight)
 	return self
 end
 
+-- Spatial queries
+function PANEL:ItemFromPoint (x, y)
+	local left, top, right, bottom = self:GetContentBounds ()
+	if x <  left   then return nil end
+	if x >= right  then return nil end
+	if y <  top    then return nil end
+	if y >= bottom then return nil end
+	
+	x, y = self:LocalToScreen (x, y)
+	for item in self:GetItemEnumerator () do
+		local px, py = item:LocalToScreen (0, 0)
+		local w, h = item:GetSize ()
+		if px <= x and x < px + w and
+		   py <= y and y < py + h then
+			return item
+		end
+	end
+	return nil
+end
+
+function PANEL:ItemsIntersectingAABB (x1, y1, x2, y2, out)
+	-- Convert to content coordinates
+	local dx, dy = self.ItemView:GetPos ()
+	x1, y1 = x1 - dx, y1 - dy
+	x2, y2 = x2 - dx, y2 - dy
+	dx, dy = self.ItemCanvas:GetPos ()
+	x1, y1 = x1 - dx, y1 - dy
+	x2, y2 = x2 - dx, y2 - dy
+	
+	return self:ItemsIntersectingContentAABB (x1, y1, x2, y2, out)
+end
+
+function PANEL:ItemsIntersectingContentAABB (x1, y1, x2, y2, out)
+	out = out or {}
+	
+	for item in self:GetItemEnumerator () do
+		local itemX1, itemY1, itemWidth, itemHeight = item:GetBounds ()
+		local itemX2, itemY2 = itemX1 + itemWidth, itemY1 + itemHeight
+		
+		-- Intersect AABBs
+		if math.max (x1, itemX1) < math.min (x2, itemX2) and
+		   math.max (y1, itemY1) < math.min (y2, itemY2) then
+			out [#out + 1] = item
+		end
+	end
+	
+	return out
+end
+
 -- Keyboard
 function PANEL:GetFocusedItem ()
 	return self.FocusedItem
@@ -366,6 +396,7 @@ end
 
 function PANEL:SetFocusedItem (listViewItem)
 	self.FocusedItem = listViewItem
+	return self
 end
 
 -- Selection

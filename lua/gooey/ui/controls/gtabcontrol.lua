@@ -304,7 +304,7 @@ function PANEL:LayoutTabHeaders ()
 	local x = 0
 	for _, tab in ipairs (self.Tabs) do
 		tab:GetHeader ():SetOffset (x, 0)
-		tab:GetHeader ():PerformLayout ()
+		tab:GetHeader ():PerformLayout (tab:GetHeader ():GetSize ())
 		if tab:IsVisible () then
 			x = x + tab:GetHeader ():GetWide ()
 		end

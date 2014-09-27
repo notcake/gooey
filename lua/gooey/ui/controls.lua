@@ -74,6 +74,14 @@ include ("vpanelcontainer.lua")
 -- Control Bases
 include ("controls/gbasepanel.lua")
 
+-- ListBox
+Gooey.ListBox = {}
+include ("controls/listbox/glistbox.lua")
+include ("controls/listbox/glistboxitem.lua")
+include ("controls/listbox/itemcollection.lua")
+include ("controls/listbox/listboxitem.lua")
+include ("controls/listbox/keyboardmap.lua")
+
 -- ListView
 Gooey.ListView = {}
 include ("controls/listview/glistview.lua")

@@ -131,11 +131,11 @@ end
 
 function PANEL:Paint (w, h)
 	if self.Tab:IsSelected () then
-		draw.RoundedBoxEx (4, 0, 0, w, h, GLib.Colors.Silver, true, true, false, false)
+		draw.RoundedBoxEx (4, 0, 0, w, h, GLib.Colors.Silver,   true, true, false, false)
 	elseif self:IsHovered () then
 		draw.RoundedBoxEx (4, 0, 0, w, h, GLib.Colors.DarkGray, true, true, false, false)
 	else
-		draw.RoundedBoxEx (4, 0, 0, w, h, GLib.Colors.Gray, true, true, false, false)
+		draw.RoundedBoxEx (4, 0, 0, w, h, GLib.Colors.Gray,     true, true, false, false)
 	end
 	
 	local x = 4
@@ -146,23 +146,23 @@ function PANEL:Paint (w, h)
 	surface.SetFont ("DermaDefault")
 	local _, textHeight = surface.GetTextSize (self:GetText ())
 	surface.SetTextColor (GLib.Colors.Black)
-	surface.SetTextPos (x, (self:GetTall () - textHeight) * 0.5)
+	surface.SetTextPos (x, (h - textHeight) * 0.5)
 	surface.DrawText (self:GetText ())
 	
 	self.VPanelContainer:Paint (Gooey.RenderContext)
 end
 
-function PANEL:PerformLayout ()
+function PANEL:PerformLayout (w, h)
 	local x = 4
 	
 	if self:GetIcon () then
-		self.Image:SetPos (4, (self:GetTall () - self.Image:GetHeight ()) * 0.5)
+		self.Image:SetPos (4, (h - self.Image:GetHeight ()) * 0.5)
 		x = x + self.Image:GetWidth () + 4
 	end
 	
 	surface.SetFont ("DermaDefault")
-	local w, h = surface.GetTextSize (string.gsub (self:GetText (), "&", "#"))
-	x = x + w + 4
+	local textWidth, textHeight = surface.GetTextSize (self:GetText ())
+	x = x + textWidth + 4
 	
 	if self:IsCloseButtonVisible () then
 		x = x + self.CloseButton:GetWidth () + 4
@@ -172,9 +172,9 @@ function PANEL:PerformLayout ()
 	self:SetWidth (x)
 	
 	if self:IsCloseButtonVisible () then
-		local baseline = (self:GetTall () + h) * 0.5
+		local baseline = (h + textHeight) * 0.5
 		self.CloseButton:SetPos (x - 4 - self.CloseButton:GetWidth (), baseline - self.CloseButton:GetHeight ())
-		self.CloseButton:SetPos (x - 4 - self.CloseButton:GetWidth (), (self:GetTall () - self.CloseButton:GetHeight ()) * 0.5 + 1)
+		self.CloseButton:SetPos (x - 4 - self.CloseButton:GetWidth (), (h - self.CloseButton:GetHeight ()) * 0.5 + 1)
 	end
 end
 

@@ -45,8 +45,16 @@ function PANEL:Init ()
 	)
 end
 
+-- Factories
+PANEL.ListBoxItemClassName = "GListBoxItem"
+
+function PANEL.ListBoxItemFactory (self)
+	return self:Create (self.ListBoxItemClassName)
+end
+
+-- ListBox
 function PANEL:AddItem (text, id)
-    local listBoxItem = vgui.Create ("GListBoxItem", self)
+    local listBoxItem = self.ListBoxItemFactory (self)
 	
 	-- inline expansion of SetMother and SetID
     listBoxItem.ListBox = self
@@ -192,6 +200,7 @@ function PANEL:IsItemVisible (listBoxItem)
 	return y >= viewY and y + h < viewY + self:GetTall ()
 end
 
+-- Spatial queries
 function PANEL:ItemFromPoint (x, y)
 	x, y = self:LocalToScreen (x, y)
 	for _, item in pairs (self:GetItems ()) do
@@ -204,6 +213,27 @@ function PANEL:ItemFromPoint (x, y)
 		end
 	end
 	return nil
+end
+
+function PANEL:ItemsIntersectingAABB (x1, y1, x2, y2, out)
+	out = out or {}
+	
+	x1, y1 = self:LocalToScreen (x1, y1)
+	x2, y2 = self:LocalToScreen (x2, y2)
+	
+	for item in self:GetItemEnumerator () do
+		local itemX1,    itemY1     = item:LocalToScreen (0, 0)
+		local itemWidth, itemHeight = item:GetSize ()
+		local itemX2,    itemY2     = itemX1 + itemWidth, itemY1 + itemHeight
+		
+		-- Intersect AABBs
+		if math.max (x1, itemX1) < math.min (x2, itemX2) and
+		   math.max (y1, itemY1) < math.min (y2, itemY2) then
+			out [#out + 1] = item
+		end
+	end
+	
+	return out
 end
 
 function PANEL:PaintOver ()

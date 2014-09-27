@@ -34,20 +34,24 @@ local SelectionMode = Gooey.SelectionMode
 function self:ctor (control)
 	self.Control = control
 	
+	-- Box selection
 	self.MouseDownX = 0
 	self.MouseDownY = 0
 	self.ExpectingBoxSelection = false
 	self.InBoxSelection = false
 	
-	self.SelectionMode = Gooey.SelectionMode.Multiple
+	self.SelectionMode   = Gooey.SelectionMode.Multiple
 	self.SelectionAction = SelectionAction.Override
 	
-	self.SelectedItem = nil			-- The last item added to the selection
-	self.SelectedItems = {}			-- Array of selected items
-	self.SelectedItemSet = {}		-- Set of selected items (items as keys)
+	self.ItemsInBox         = {}
 	
-	self.NewSelectedItems = {}		-- Array of box selected items
-	self.NewSelectedItemSet = {}	-- Set of box selected items (items as keys)
+	-- Selection items
+	self.SelectedItem       = nil -- The last item added to the selection
+	self.SelectedItems      = {}  -- Array of selected items
+	self.SelectedItemSet    = {}  -- Set of selected items (items as keys)
+	
+	self.NewSelectedItems   = {}  -- Array of box selected items
+	self.NewSelectedItemSet = {}  -- Set of box selected items (items as keys)
 	
 	Gooey.EventProvider (self)
 	
@@ -132,11 +136,13 @@ end
 
 -- Internal, do not call
 function self:ClampPosition (x, y)
-	local minx, miny, maxx, maxy = self.Control:GetContentBounds ()
-	if x <  minx then x = minx end
-	if y <  miny then y = miny end
-	if x >= maxx then x = maxx end
-	if y >= maxy then y = maxy end
+	local x1, y1, x2, y2 = self.Control:GetContentBounds ()
+	
+	if x <  x1 then x = x1     end
+	if y <  y1 then y = y1     end
+	if x >= x2 then x = x2 - 1 end
+	if y >= y2 then y = y2 - 1 end
+	
 	return x, y
 end
 
@@ -221,10 +227,12 @@ end
 
 function self:GetBoxSelectionRectangle ()
 	local mouseX, mouseY = self:ClampPosition (self.Control:CursorPos ())
-	local width  = math.abs (self.MouseDownX - mouseX)
-	local height = math.abs (self.MouseDownY - mouseY)
+	
+	local width  = math.abs (self.MouseDownX - mouseX) + 1
+	local height = math.abs (self.MouseDownY - mouseY) + 1
 	local left   = math.min (self.MouseDownX, mouseX)
 	local top    = math.min (self.MouseDownY, mouseY)
+	
 	return left, top, width, height
 end
 
@@ -251,6 +259,7 @@ function self:MouseDown (_, mouseCode, x, y)
 	end
 end
 
+local items = {}
 function self:MouseMove (_, mouseCode, x, y)
 	if self.ExpectingBoxSelection then
 		self.ExpectingBoxSelection = false
@@ -259,26 +268,23 @@ function self:MouseMove (_, mouseCode, x, y)
 	if not self.InBoxSelection then return end
 	if self.SelectionAction == SelectionAction.Override then self:ClearSelection () end
 	self:ClearNewSelection ()
-	local left, top, width, height = self:GetBoxSelectionRectangle ()
-	left, top = self.Control:LocalToScreen (left, top)
 	
-	for item in self.Control:GetItemEnumerator () do
+	local x, y, w, h = self:GetBoxSelectionRectangle ()
+	self.ItemsInBox = self.Control:ItemsIntersectingAABB (x, y, x + w, y + h, self.ItemsInBox)
+	for i = 1, #self.ItemsInBox do
+		local item = self.ItemsInBox [i]
 		if item:CanSelect () then
-			local ileft, itop = item:LocalToScreen (0, 0)
-			local iwidth, iheight = item:GetSize ()
+			self.NewSelectedItems [#self.NewSelectedItems + 1] = item
+			self.NewSelectedItemSet [item] = true
 			
-			-- intersect spans
-			local sleft   = math.max (left, ileft)
-			local sright  = math.min (left + width, ileft + iwidth)
-			local stop    = math.max (top, itop)
-			local sbottom = math.min (top + height, itop + iheight)
-			if sleft <= sright and stop <= sbottom then
-				self.NewSelectedItems [#self.NewSelectedItems + 1] = item
-				self.NewSelectedItemSet [item] = true
+			if self.SelectionMode == SelectionMode.One and #self.NewSelectedItems == 1 then
+				break
 			end
-			
-			if self.SelectionMode == SelectionMode.One and #self.NewSelectedItems == 1 then return end
 		end
+	end
+	
+	for i = 1, #self.ItemsInBox do
+		self.ItemsInBox [i] = nil
 	end
 end
 

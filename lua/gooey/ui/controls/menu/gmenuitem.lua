@@ -19,33 +19,32 @@ function PANEL:Init ()
 	)
 end
 
-function PANEL:ContainsPoint (x, y)
-	return x >= 0 and x < self:GetWide () and
-	       y >= 0 and y < self:GetTall ()
-end
-
-function PANEL:GetIcon ()
-	return self.Icon and self.Icon.ImageName or nil
-end
-
+-- Menu
 function PANEL:GetContainingMenu ()
 	return self.ContainingMenu
 end
 
+function PANEL:SetContainingMenu (menu)
+	self.ContainingMenu = menu
+end
+
+-- Identity
 function PANEL:GetId ()
 	return self.Id
 end
 
+function PANEL:SetId (id)
+	self.Id = id
+	return self
+end
+
+-- MenuItem
 function PANEL:GetItem ()
 	return self.Item
 end
 
-function PANEL:GetMinimumContentWidth ()
-	return self:GetContentSize () + 30
-end
-
-function PANEL:IsChecked ()
-	return self.Checked
+function PANEL:SetItem (menuItem)
+	self.Item = menuItem
 end
 
 function PANEL:IsItem ()
@@ -54,6 +53,53 @@ end
 
 function PANEL:IsSeparator ()
 	return false
+end
+
+-- Appearance
+function PANEL:GetIcon ()
+	return self.Icon and self.Icon.ImageName or nil
+end
+
+function PANEL:IsChecked ()
+	return self.Checked
+end
+
+function PANEL:SetChecked (checked)
+	if self.Checked == checked then return self end
+	
+	self.Checked = checked
+	self:DispatchEvent ("CheckedChanged", self.Checked)
+	
+	return self
+end
+
+function PANEL:SetIcon (icon)
+	if not icon then
+		if self.Icon and self.Icon:IsValid () then
+			self.Icon:Remove ()
+		end
+		self.Icon = nil
+		return
+	end
+	if not self.Icon then
+		self.Icon = vgui.Create ("GImage", self)
+		self.Icon:SetPos (3, 3)
+		self.Icon:SetSize (16, 16)
+	end
+	
+	self.Icon:SetImage (icon)
+	
+	return self
+end
+
+-- Size
+function PANEL:ContainsPoint (x, y)
+	return x >= 0 and x < self:GetWide () and
+	       y >= 0 and y < self:GetTall ()
+end
+
+function PANEL:GetMinimumContentWidth ()
+	return self:GetContentSize () + 30
 end
 
 function PANEL:Paint (w, h)
@@ -90,47 +136,6 @@ function PANEL:Paint (w, h)
 	end
 	surface.DrawText (self:GetText ())
 	return true
-end
-
-function PANEL:SetChecked (checked)
-	if self.Checked == checked then return self end
-	
-	self.Checked = checked
-	self:DispatchEvent ("CheckedChanged", self.Checked)
-	
-	return self
-end
-
-function PANEL:SetContainingMenu (menu)
-	self.ContainingMenu = menu
-end
-
-function PANEL:SetIcon (icon)
-	if not icon then
-		if self.Icon and self.Icon:IsValid () then
-			self.Icon:Remove ()
-		end
-		self.Icon = nil
-		return
-	end
-	if not self.Icon then
-		self.Icon = vgui.Create ("GImage", self)
-		self.Icon:SetPos (3, 3)
-		self.Icon:SetSize (16, 16)
-	end
-	
-	self.Icon:SetImage (icon)
-	
-	return self
-end
-
-function PANEL:SetId (id)
-	self.Id = id
-	return self
-end
-
-function PANEL:SetItem (menuItem)
-	self.Item = menuItem
 end
 
 -- Event handlers

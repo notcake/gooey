@@ -131,7 +131,7 @@ function self:Paint (renderContext)
 	-- Start in local panel coordinates and work upwards until screen coordinates
 	local panel = self.Control
 	
-	local left, top = 0, 0
+	local left,  top    = 0, 0
 	local right, bottom = panel:GetSize ()
 	
 	local dx, dy = panel:GetPos ()

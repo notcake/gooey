@@ -41,7 +41,7 @@ function PANEL:Paint (renderContext)
 		else
 			if self:GetParent () and not self:GetParent ():IsSelected () then
 				-- Rendering on an inactive tab header
-				Gooey.Glyphs.Draw ("close", renderContext, self.Gray707070, 0, 0, self.Width, self.Height)
+				Gooey.Glyphs.Draw ("close", renderContext, self.Gray707070,      0, 0, self.Width, self.Height)
 			else
 				Gooey.Glyphs.Draw ("close", renderContext, GLib.Colors.DarkGray, 0, 0, self.Width, self.Height)
 			end

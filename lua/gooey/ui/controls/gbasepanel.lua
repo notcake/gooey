@@ -126,7 +126,7 @@ function self:IsEnabled ()
 end
 
 function self:IsHovered ()
-	return self.Hovered
+	return vgui.GetHoveredPanel () == self
 end
 
 function self:IsPressed ()

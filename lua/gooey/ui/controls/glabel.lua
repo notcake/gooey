@@ -3,6 +3,12 @@ local PANEL = {}
 function PANEL:Init ()
 end
 
+function PANEL:ApplySchemeSettings ()
+	self:UpdateColours (self:GetSkin ())
+	
+	self:SetFGColor (self.m_colText or self.m_colTextStyle)
+end
+
 function PANEL:GetLineHeight ()
 	surface.SetFont (self:GetFont ())
 	local _, lineHeight = surface.GetTextSize ("W")
