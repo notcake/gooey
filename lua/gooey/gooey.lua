@@ -22,18 +22,32 @@ if CLIENT then
 	function Gooey.Register (className, classTable, baseClassName)
 		local init = classTable.Init
 		
-		-- Merge in GBasePanel methods
-		for k, v in pairs (Gooey.BasePanel) do
-			if not rawget (classTable, k) then
-				classTable [k] = v
+		local basePanelInjected = false
+		
+		-- Check if GBasePanel methods have already been added to a base class
+		local baseClass = vgui.GetControlTable (baseClassName)
+		while baseClass do
+			if baseClass._ctor then
+				basePanelInjected = true
+				break
 			end
+			baseClass = vgui.GetControlTable (baseClass.Base)
 		end
 		
-		classTable.Init = function (...)
-			-- BasePanel._ctor will check for and avoid multiple initialization
-			Gooey.BasePanel._ctor (...)
-			if init then
-				init (...)
+		if not basePanelInjected then
+			-- Merge in GBasePanel methods
+			for k, v in pairs (Gooey.BasePanel) do
+				if not rawget (classTable, k) then
+					classTable [k] = v
+				end
+			end
+			
+			classTable.Init = function (...)
+				-- BasePanel._ctor will check for and avoid multiple initialization
+				Gooey.BasePanel._ctor (...)
+				if init then
+					init (...)
+				end
 			end
 		end
 		
