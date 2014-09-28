@@ -156,7 +156,8 @@ function self:Remove ()
 	self:DispatchEvent ("Removed")
 	
 	for _, v in ipairs (self:GetChildren ()) do
-		if not v:IsMarkedForDeletion () then
+		if not v:IsMarkedForDeletion () and
+		   v:GetName () ~= "EditMenu" then
 			v:Remove ()
 		end
 	end
