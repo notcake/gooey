@@ -263,8 +263,10 @@ function PANEL:EnsureVisible (listBoxItem)
 	if not listBoxItem then return end
 	if self:IsItemVisible (listBoxItem) then return end
 	
-	local left, top, right, bottom = self:GetContentBounds ()
 	local listBoxItemControl = self.ItemControls [listBoxItem]
+	if not listBoxItemControl then return false end
+	
+	local left, top, right, bottom = self:GetContentBounds ()
 	local y = listBoxItemControl:GetY ()
 	local h = listBoxItemControl:GetHeight ()
 	local viewY      = self.ScrollableViewController:GetViewY ()
