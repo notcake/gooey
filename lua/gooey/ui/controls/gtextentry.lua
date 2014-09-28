@@ -10,6 +10,21 @@ function self:Init ()
 	self:SetAllowNonAsciiCharacters (true)
 	
 	self.BorderColor = nil
+	
+	self:AddEventListener ("MouseDown", "GTextEntry." .. self:GetHashCode (),
+		function (_)
+			local parent = self:GetParent ()
+			while parent and parent:IsValid () do
+				if isfunction (parent.OnTextEntryMouseDown) then
+					parent:OnTextEntryMouseDown (self)
+				end
+				if isfunction (parent.DispatchEvent) then
+					parent:DispatchEvent ("TextEntryMouseDown", self)
+				end
+				parent = parent:GetParent ()
+			end
+		end
+	)
 end
 
 -- Colors
