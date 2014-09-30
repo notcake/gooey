@@ -6,6 +6,8 @@ local PANEL = {}
 			Fired when an item has been clicked.
 		DoubleClick (ListBoxItem item)
 			Fired when an item has been double clicked.
+		FilterChanged (f)
+			Fired when the filter has changed.
 		ItemHeightChanged (itemHeight)
 			Fired when the item height has changed.
 		ItemSpacingChanged (itemSpacing)
@@ -27,7 +29,10 @@ function PANEL:Init ()
 	self.Items = Gooey.ListBox.ItemCollection (self)
 	self.ItemControls = {}
 	
-	-- Item Layout
+	-- Item filtering
+	self.FilterFunction = nil
+	
+	-- Item layout
 	self.ItemHeight  = 0
 	self.ItemSpacing = 0
 	
@@ -209,6 +214,14 @@ function PANEL:PerformLayout (w, h)
 	if not self.VerticalItemLayoutValid then
 		self.VerticalItemLayoutValid = true
 		
+		-- Apply filtering
+		local filterFunction = self.FilterFunction or function () return true end
+		for listBoxItem in self:GetItemEnumerator () do
+			local listBoxItemControl = self.ItemControls [listBoxItem]
+			listBoxItemControl:SetVisible (listBoxItem:IsVisible () and filterFunction (listBoxItem))
+		end
+		
+		-- Item positioning
 		local y = 0
 		for listBoxItem in self:GetItemEnumerator () do
 			local listBoxItemControl = self.ItemControls [listBoxItem]
@@ -322,7 +335,23 @@ function PANEL:RemoveItem (listBoxItem)
 	return self.Items:RemoveItem (listBoxItem)
 end
 
--- Item Layout
+-- Item filtering
+function PANEL:GetFilter ()
+	return self.FilterFunction
+end
+
+function PANEL:SetFilter (filterFunction)
+	if self.FilterFunction == filterFunction then return self end
+	
+	self.FilterFunction = filterFunction
+	
+	self:InvalidateVerticalItemLayout ()
+	self:DispatchEvent ("FilterChanged", self.FilterFunction)
+	
+	return self
+end
+
+-- Item layout
 function PANEL:GetItemHeight ()
 	return self.ItemHeight
 end
