@@ -144,8 +144,8 @@ function PANEL:Init ()
 	
 	self:AddEventListener ("SizeChanged",
 		function (_, w, h)
-			self.ScrollableViewController:SetViewSize (w - 2, h - 2)
-			self.ScrollableViewController:SetViewSizeWithScrollBars (w - 1 - self.VScroll:GetWidth (), h - 1 - self.HScroll:GetHeight ())
+			self.ScrollableViewController:SetViewSize (self:GetContentSizeWithoutScrollbars ())
+			self.ScrollableViewController:SetViewSizeWithScrollBars (self:GetContentSizeWithScrollbars ())
 		end
 	)
 	
@@ -201,8 +201,9 @@ function PANEL:PaintOver ()
 end
 
 function PANEL:PerformLayout (w, h)
-	self.ItemView:SetPos (1, 1)
-	self.ItemView:SetSize (w - 1 - (self.VScroll:IsVisible () and self.VScroll:GetWidth () or 1), h - 1 - (self.HScroll:IsVisible () and self.HScroll:GetHeight () or 1))
+	local x1, y1, x2, y2 = self:GetContentBounds ()
+	self.ItemView:SetPos (x1, y1)
+	self.ItemView:SetSize (x2 - x1, y2 - y1)
 	
 	self.VScroll:SetPos (self:GetWidth () - self.VScroll:GetWidth (), 0)
 	self.VScroll:SetHeight (self:GetHeight () - (self.HScroll:IsVisible () and self.HScroll:GetHeight () or 0))
@@ -528,23 +529,53 @@ end
 
 -- Layout
 function PANEL:GetContentBounds ()
-	local scrollBarWidth  = 1
-	local scrollBarHeight = 1
+	local x1,  y1,  x2,  y2  = self:GetContentBoundsWithoutScrollbars ()
+	local sx1, sy1, sx2, sy2 = self:GetContentBoundsWithScrollbars ()
+	
 	if self.VScroll and self.VScroll:IsVisible () then
-		scrollBarWidth = self.VScroll:GetWidth ()
+		x1, x2 = sx1, sx2
 	end
 	if self.HScroll and self.HScroll:IsVisible () then
-		scrollBarHeight = self.HScroll:GetHeight ()
+		y1, y2 = sy1, sy2
 	end
-	return 1, 1, self:GetWidth () - scrollBarWidth, self:GetHeight () - scrollBarHeight
+	
+	return x1, y1, x2, y2
 end
 
 function PANEL:GetContentWidth ()
-	local scrollBarWidth  = 1
+	local x1, y1, x2, y2
 	if self.VScroll and self.VScroll:IsVisible () then
-		scrollBarWidth = self.VScroll:GetWidth ()
+		x1, y1, x2, y2 = self:GetContentBoundsWithScrollbars ()
+	else
+		x1, y1, x2, y2 = self:GetContentBoundsWithoutScrollbars ()
 	end
-	return self:GetWidth () - 1 - scrollBarWidth
+	return x2 - x1
+end
+
+function PANEL:GetContentSizeWithoutScrollbars ()
+	local x1, y1, x2, y2 = self:GetContentBoundsWithoutScrollbars ()
+	return x2 - x1, y2 - y1
+end
+
+function PANEL:GetContentSizeWithScrollbars ()
+	local x1, y1, x2, y2 = self:GetContentBoundsWithScrollbars ()
+	return x2 - x1, y2 - y1
+end
+
+function PANEL:GetContentBoundsWithoutScrollbars ()
+	return 1, 1, self:GetWidth () - 1, self:GetHeight () - 1
+end
+
+function PANEL:GetContentBoundsWithScrollbars ()
+	local scrollBarWidth  = 1
+	local scrollBarHeight = 1
+	if self.VScroll then
+		scrollBarWidth  = self.VScroll:GetWidth ()
+	end
+	if self.HScroll then
+		scrollBarHeight = self.HScroll:GetHeight ()
+	end
+	return 1, 1, self:GetWidth () - scrollBarWidth, self:GetHeight () - scrollBarHeight
 end
 
 -- Sorting

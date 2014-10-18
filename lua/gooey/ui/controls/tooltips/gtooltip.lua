@@ -1,7 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init ()
-	self.Label = vgui.Create ("DLabel", self)
+	self.Label = vgui.Create ("GLabel", self)
 	self.Label:SetTextColor (GLib.Colors.Black)
 	
 	self.Locked = false

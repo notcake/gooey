@@ -11,16 +11,19 @@ Gooey.ComboBoxItem = Gooey.MakeConstructor (self)
 			Fired when this item has been selected.
 		TextChanged (string text)
 			Fired when this item's text has changed.
+		VisibleChanged (bool visible)
+			Fired when this item's visibility has changed.
 ]]
 
 function self:ctor (comboBox, id, text)
 	-- Identity
 	self.ComboBox = comboBox
-	self.Id = id
+	self.Id       = id
 	
 	-- Appearance
-	self.Text = text
-	self.Icon = nil
+	self.Visible  = true
+	self.Text     = text
+	self.Icon     = nil
 	
 	-- Menu item
 	self.MenuItem = nil
@@ -66,6 +69,10 @@ function self:GetText ()
 	return self.Text
 end
 
+function self:IsVisible ()
+	return self.Visible
+end
+
 function self:SetIcon (icon)
 	if self.Icon == icon then return self end
 	
@@ -88,6 +95,19 @@ function self:SetText (text)
 	end
 	
 	self:DispatchEvent ("TextChanged", text)
+	
+	return self
+end
+
+function self:SetVisible (visible)
+	if self.Visible == visible then return self end
+	
+	self.Visible = visible
+	if self.MenuItem then
+		self.MenuItem:SetVisible (self.Visible)
+	end
+	
+	self:DispatchEvent ("VisibleChanged", visible)
 	
 	return self
 end

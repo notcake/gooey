@@ -86,6 +86,7 @@ function PANEL:AddItem (text, id)
 	
 	local menuItem = self.Menu:AddItem (comboBoxItem:GetText ())
 	comboBoxItem:SetMenuItem (menuItem)
+	menuItem:SetVisible (comboBoxItem:IsVisible ())
 	
 	self:HookComboBoxItem (comboBoxItem)
 	
