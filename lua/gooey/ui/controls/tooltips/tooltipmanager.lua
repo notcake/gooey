@@ -19,7 +19,9 @@ end
 
 function self:GetToolTip ()
 	for toolTip, _ in pairs (self.ToolTips) do
-		if toolTip:IsFree () then
+		if not toolTip:IsValid () then
+			self.ToolTips [toolTip] = nil
+		elseif toolTip:IsFree () then
 			toolTip:SetVisible (false) -- reset tooltip state
 			return toolTip
 		end
