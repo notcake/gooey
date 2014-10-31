@@ -85,6 +85,9 @@ function self:HideToolTip ()
 		self.Control:RemoveEventListener ("VisibleChanged", "Gooey.ToolTipController")
 	end
 	
+	-- Prevent automatic re-show
+	self.MouseEnterTime = math.huge
+	
 	hook.Remove ("Think", "Gooey.ToolTipController.CheckValidity")
 end
 

@@ -33,7 +33,7 @@ end
 -- Event handlers
 Gooey.CreateMouseEvents (self)
 
-function self:OnClick ()
+function self:OnClick (mouseCode, x, y)
 	gui.OpenURL (string.gsub (self.Url or self:GetText (), "^https://", "http://"))
 end
 
