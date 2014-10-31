@@ -21,12 +21,12 @@ function PANEL:Init ()
 		end
 	)
 	
-	self.LeftButton = vgui.Create ("GScrollBarButton", self)
+	self.LeftButton = self.ScrollBarButtonFactory (self)
 	self.LeftButton:SetScrollBar (self)
 	self.LeftButton:SetScrollIncrement (-self:GetSmallIncrement ())
 	self.LeftButton:SetDirection ("Left")
 	
-	self.RightButton = vgui.Create ("GScrollBarButton", self)
+	self.RightButton = self.ScrollBarButtonFactory (self)
 	self.RightButton:SetScrollBar (self)
 	self.RightButton:SetScrollIncrement (self:GetSmallIncrement ())
 	self.RightButton:SetDirection ("Right")
@@ -62,6 +62,13 @@ function PANEL:Init ()
 			self.RightButton:SetScrollIncrement (smallIncrement)
 		end
 	)
+end
+
+-- Factories
+PANEL.ScrollBarButtonClassName = "GScrollBarButton"
+
+function PANEL.ScrollBarButtonFactory (self)
+	return self:Create (self.ScrollBarButtonClassName)
 end
 
 function PANEL:GetOrientation ()

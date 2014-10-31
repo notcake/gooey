@@ -36,7 +36,7 @@ function PANEL:Init ()
 		end
 	)
 	
-	self.Grip = vgui.Create ("GScrollBarGrip", self)
+	self.Grip = self.ScrollBarGripFactory (self)
 	self.Grip:SetScrollBar (self)
 	
 	-- Button scrolling
@@ -75,6 +75,13 @@ function PANEL:Init ()
 			return true
 		end
 	)
+end
+
+-- Factories
+PANEL.ScrollBarGripClassName = "GScrollBarGrip"
+
+function PANEL.ScrollBarGripFactory (self)
+	return self:Create (self.ScrollBarGripClassName)
 end
 
 function PANEL:GetContentSize ()
