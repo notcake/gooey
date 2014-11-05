@@ -1,3 +1,5 @@
+local _R = debug.getregistry ()
+
 local PANEL = {}
 
 function PANEL:Init ()
@@ -66,7 +68,7 @@ end
 
 function PANEL:SetFont (font)
 	self.TextEntry:SetFont (font)
-	debug.getregistry ().Panel.SetFont (self, font)
+	_R.Panel.SetFont (self, font)
 end
 
 function PANEL:SetText (text)
@@ -77,7 +79,7 @@ function PANEL:SetText (text)
 		self.TextEntry:SetText (text)
 	end
 	
-	debug.getregistry ().Panel.SetText (self, text)
+	_R.Panel.SetText (self, text)
 end
 
 function PANEL:ShouldHideTextEntry ()

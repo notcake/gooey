@@ -1,5 +1,8 @@
+local _R = debug.getregistry ()
+
 local self = {}
 Gooey.BasePanel = self
+
 
 GLib.Lua.NameCache:Index (self, "Gooey.BasePanel")
 
@@ -162,7 +165,7 @@ function self:Remove ()
 		end
 	end
 	
-	debug.getregistry ().Panel.Remove (self)
+	_R.Panel.Remove (self)
 end
 
 function self:SetEnabled (enabled)
@@ -191,7 +194,7 @@ function self:SetParent (parent)
 	
 	local oldParent = self:GetParent ()
 	
-	debug.getregistry ().Panel.SetParent (self, parent)
+	_R.Panel.SetParent (self, parent)
 	self:DispatchEvent ("ParentChanged", oldParent, self:GetParent ())
 	
 	return self
@@ -212,7 +215,7 @@ function self:SetX (x)
 	local currentX, currentY = self:GetPos ()
 	if currentX == x then return self end
 	
-	debug.getregistry ().Panel.SetPos (self, x, currentY)
+	_R.Panel.SetPos (self, x, currentY)
 	self:DispatchEvent ("PositionChanged", x, currentY)
 	
 	return self
@@ -222,7 +225,7 @@ function self:SetY (y)
 	local currentX, currentY = self:GetPos ()
 	if currentY == y then return self end
 	
-	debug.getregistry ().Panel.SetPos (self, currentX, y)
+	_R.Panel.SetPos (self, currentX, y)
 	self:DispatchEvent ("PositionChanged", currentX, y)
 	
 	return self
@@ -232,7 +235,7 @@ function self:SetPos (x, y)
 	local currentX, currentY = self:GetPos ()
 	if currentX == x and currentY == y then return self end
 	
-	debug.getregistry ().Panel.SetPos (self, x, y)
+	_R.Panel.SetPos (self, x, y)
 	self:DispatchEvent ("PositionChanged", x, y)
 	
 	return self
@@ -250,7 +253,7 @@ end
 function self:SetHeight (height)
 	if self:GetTall () == height then return self end
 	
-	debug.getregistry ().Panel.SetTall (self, height)
+	_R.Panel.SetTall (self, height)
 	self:DispatchEvent ("HeightChanged", self:GetTall ())
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 	
@@ -260,7 +263,7 @@ end
 function self:SetSize (width, height)
 	if self:GetWide () == width and self:GetTall () == height then return self end
 	
-	debug.getregistry ().Panel.SetSize (self, width, height)
+	_R.Panel.SetSize (self, width, height)
 	self:DispatchEvent ("WidthChanged", self:GetWide ())
 	self:DispatchEvent ("HeightChanged", self:GetTall ())
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
@@ -273,7 +276,7 @@ self.SetTall = self.SetHeight
 function self:SetWide (width)
 	if self:GetWide () == width then return self end
 	
-	debug.getregistry ().Panel.SetWide (self, width)
+	_R.Panel.SetWide (self, width)
 	self:DispatchEvent ("WidthChanged", self:GetWide ())
 	self:DispatchEvent ("SizeChanged", self:GetWide (), self:GetTall ())
 	
@@ -302,7 +305,7 @@ function self:ContainsFocus ()
 end
 
 function self:Focus ()
-	debug.getregistry ().Panel.RequestFocus (self)
+	_R.Panel.RequestFocus (self)
 	
 	Gooey.LastFocusRequestPanel = self
 	Gooey.LastFocusRequestTime  = CurTime ()
@@ -364,7 +367,7 @@ function self:SetTextColor (textColor)
 	if type (textColor) == "number" then
 		Gooey.PrintStackTrace ()
 	end
-	debug.getregistry ().Panel.SetFGColor (self, textColor)
+	_R.Panel.SetFGColor (self, textColor)
 	self.m_cTextColor = textColor -- for DTree_Node compatibility
 	self.m_colText    = textColor -- for DLabel compatibility
 	
@@ -375,11 +378,11 @@ end
 
 -- Text
 function self:GetFont ()
-	return self.Font or debug.getregistry ().Panel.GetFont (self)
+	return self.Font or _R.Panel.GetFont (self)
 end
 
 function self:GetText ()
-	return self.Text or debug.getregistry ().Panel.GetText (self)
+	return self.Text or _R.Panel.GetText (self)
 end
 
 function self:SetFont (font)
@@ -387,7 +390,7 @@ function self:SetFont (font)
 	
 	self.Font = font
 	self.m_FontName = font
-	debug.getregistry ().Panel.SetFontInternal (self, font)
+	_R.Panel.SetFontInternal (self, font)
 	self:DispatchEvent ("FontChanged", font)
 	return self
 end
@@ -396,7 +399,7 @@ function self:SetText (text)
 	if self.Text == text then return self end
 	
 	self.Text = text
-	debug.getregistry ().Panel.SetText (self, text)
+	_R.Panel.SetText (self, text)
 	
 	self:DispatchEvent ("TextChanged", self.Text)
 	
@@ -548,7 +551,7 @@ end
 function self:SetVisible (visible)
 	if self:IsVisible () == visible then return self end
 	
-	debug.getregistry ().Panel.SetVisible (self, visible)
+	_R.Panel.SetVisible (self, visible)
 	self:DispatchEvent ("VisibleChanged", visible)
 	
 	return self

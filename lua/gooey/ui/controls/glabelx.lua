@@ -1,3 +1,5 @@
+local _R = debug.getregistry ()
+
 local PANEL = {}
 
 function PANEL:Init ()
@@ -59,7 +61,7 @@ function PANEL:SetWordWrap (wordWrap)
 	if self.WordWrap == wordWrap then return end
 	
 	self.WordWrap = wordWrap
-	debug.getregistry ().Panel.SetWrap (self, wordWrap)
+	_R.Panel.SetWrap (self, wordWrap)
 	
 	if not self.TextRenderer then return end
 	self.TextRenderer:SetWordWrap (self.WordWrap)
