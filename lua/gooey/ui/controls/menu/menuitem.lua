@@ -7,7 +7,7 @@ Gooey.MenuItem = Gooey.MakeConstructor (self, Gooey.BaseMenuItem)
 			Fired when this menu item's action has changed.
 		Checked (checked)
 			Fired when this menu item's check state has changed.
-		Click ()
+		Click (targetItem)
 			Fired when this item has been clicked.
 		IconChanged (icon)
 			Fired when this menu item's icon has changed.

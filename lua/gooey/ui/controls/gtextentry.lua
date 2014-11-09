@@ -130,6 +130,13 @@ function self:PaintHelpText (w, h)
 	surface.DrawText (self:GetHelpText ())
 end
 
+function self:Think ()
+	-- Hacky fix for OnTextChanged not being called on undo
+	if self.Text ~= self:GetText () then
+		self:OnTextChanged ()
+	end
+end
+
 -- Compatibility with Derma skin's PaintTextEntry
 function self:HasFocus ()
 	return self:IsFocused ()
