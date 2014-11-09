@@ -134,6 +134,12 @@ function self:Think ()
 	-- Hacky fix for OnTextChanged not being called on undo
 	if self.Text ~= self:GetText () then
 		self:OnTextChanged ()
+		
+		-- Hacky fix for undo bug
+		if self.Text == "" then
+			self:SetText (" ")
+			self:SetText ("")
+		end
 	end
 end
 
