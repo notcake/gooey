@@ -112,15 +112,22 @@ function self:Paint (w, h)
 	end
 	
 	-- Help text
-	if self:GetText () == "" and self:GetHelpText () then
-		surface.SetFont ("DermaDefaultItalic")
-		local textWidth, textHeight = surface.GetTextSize (self:GetHelpText ())
-		surface.SetTextPos (3, self:IsMultiline () and 1 or (0.5 * (h - textHeight) + 1))
-		surface.SetTextColor (self:GetHelpTextColor () or GLib.Colors.Silver)
-		surface.DrawText (self:GetHelpText ())
+	if self:GetText () == "" then
+		self:PaintHelpText (w, h)
 	end
 	
+	-- Text
 	self:DrawTextEntryText (self:GetTextColor (), self.m_colHighlight, self.m_colCursor)
+end
+
+function self:PaintHelpText (w, h)
+	if not self:GetHelpText () then return end
+	
+	surface.SetFont ("DermaDefaultItalic")
+	local textWidth, textHeight = surface.GetTextSize (self:GetHelpText ())
+	surface.SetTextPos (3, self:IsMultiline () and 1 or (0.5 * (h - textHeight) + 1))
+	surface.SetTextColor (self:GetHelpTextColor () or GLib.Colors.Silver)
+	surface.DrawText (self:GetHelpText ())
 end
 
 -- Compatibility with Derma skin's PaintTextEntry
