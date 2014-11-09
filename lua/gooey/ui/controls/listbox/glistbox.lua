@@ -587,11 +587,6 @@ function PANEL:GetComparator ()
 	return self.Comparator or self.DefaultComparator
 end
 
-function PANEL:GetSortColumnId ()
-	if not self.LastSortedByColumn then return nil end
-	return self.LastSortColumnId
-end
-
 function PANEL:GetSortOrder ()
 	return self.SortOrder
 end
@@ -601,15 +596,8 @@ function PANEL:SetComparator (comparator)
 end
 
 function PANEL:Sort (comparator)
-	if not comparator and self.LastSortedByColumn then
-		self:SortByColumn (self.LastSortColumnId, self.SortOrder)
-		return
-	end
-	
 	self.Items:Sort (comparator or self:GetComparator ())
 	self.SortOrder = Gooey.SortOrder.Ascending
-	
-	self.LastSortedByColumn = false
 	
 	self:InvalidateVerticalItemLayout ()
 end
@@ -642,10 +630,6 @@ end
 
 function PANEL:DoRightClick ()
 	self:DispatchEvent ("RightClick", self:ItemFromPoint (self:CursorPos ()))
-end
-
-function PANEL:ItemChecked (item, columnId, checked)
-	self:DispatchEvent ("ItemChecked", item, columnId, checked)
 end
 
 function PANEL:OnCursorMoved (x, y)
