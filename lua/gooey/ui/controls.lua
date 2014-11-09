@@ -1,5 +1,8 @@
 Gooey.UI = {}
 
+-- Fonts
+include ("fonts.lua")
+
 -- Layout
 include ("layout/orientation.lua")
 include ("layout/horizontalalignment.lua")

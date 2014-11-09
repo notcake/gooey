@@ -6,12 +6,18 @@ local self = {}
 	Events:
 		BorderColorChanged (borderColor)
 			Fired when this panel's border color has changed.
+		HelpTextChanged (helpText)
+			Fired when this text entry's help text has changed.
+		HelpTextColorChanged (helpTextColor)
+			Fired when this text entry's help text color has changed.
 ]]
 
 function self:Init ()
 	self:SetAllowNonAsciiCharacters (true)
 	
 	self.BorderColor = nil
+	
+	self.HelpText = nil
 	
 	self:AddEventListener ("MouseDown", "GTextEntry." .. self:GetHashCode (),
 		function (_)
@@ -41,6 +47,35 @@ end
 function self:SetBorderColor (borderColor)
 	self.BorderColor = borderColor
 	self:DispatchEvent ("BorderColorChanged", self.BorderColor)
+	return self
+end
+
+-- Help text
+function self:GetHelpText ()
+	return self.HelpText
+end
+
+function self:GetHelpTextColor ()
+	return self.HelpTextColor
+end
+
+function self:SetHelpText (helpText)
+	if self.HelpText == helpText then return self end
+	
+	self.HelpText = helpText
+	
+	self:DispatchEvent ("HelpTextChanged", self.HelpText)
+	
+	return self
+end
+
+function self:SetHelpTextColor (helpTextColor)
+	if self.HelpTextColor == helpTextColor then return self end
+	
+	self.HelpTextColor = helpTextColor
+	
+	self:DispatchEvent ("HelpTextColorChanged", self.HelpTextColor)
+	
 	return self
 end
 
@@ -74,6 +109,15 @@ function self:Paint (w, h)
 	if self.BorderColor then
 		surface.SetDrawColor (self.BorderColor)
 		surface.DrawOutlinedRect (0, 0, w, h)
+	end
+	
+	-- Help text
+	if self:GetText () == "" and self:GetHelpText () then
+		surface.SetFont ("DermaDefaultItalic")
+		local textWidth, textHeight = surface.GetTextSize (self:GetHelpText ())
+		surface.SetTextPos (3, self:IsMultiline () and 1 or (0.5 * (h - textHeight) + 1))
+		surface.SetTextColor (self:GetHelpTextColor () or GLib.Colors.Silver)
+		surface.DrawText (self:GetHelpText ())
 	end
 	
 	self:DrawTextEntryText (self:GetTextColor (), self.m_colHighlight, self.m_colCursor)
