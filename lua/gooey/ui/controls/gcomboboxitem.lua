@@ -5,6 +5,8 @@ Gooey.ComboBoxItem = Gooey.MakeConstructor (self)
 	Events:
 		Deselected ()
 			Fired when this item has been deselected.
+		EnabledChanged (enabled)
+			Fired when this item has been enabled or disabled.
 		IconChanged (string icon)
 			Fired when this item's icon has changed.
 		Selected ()
@@ -21,6 +23,7 @@ function self:ctor (comboBox, id, text)
 	self.Id       = id
 	
 	-- Appearance
+	self.Enabled  = true
 	self.Visible  = true
 	self.Text     = text
 	self.Icon     = nil
@@ -69,6 +72,10 @@ function self:GetText ()
 	return self.Text
 end
 
+function self:IsEnabled ()
+	return self.Enabled
+end
+
 function self:IsVisible ()
 	return self.Visible
 end
@@ -95,6 +102,19 @@ function self:SetText (text)
 	end
 	
 	self:DispatchEvent ("TextChanged", text)
+	
+	return self
+end
+
+function self:SetEnabled (enabled)
+	if self.Enabled == enabled then return self end
+	
+	self.Enabled = enabled
+	if self.MenuItem then
+		self.MenuItem:SetEnabled (self.Enabled)
+	end
+	
+	self:DispatchEvent ("EnabledChanged", enabled)
 	
 	return self
 end
@@ -134,7 +154,10 @@ function self:SetMenuItem (menuItem)
 	self:HookMenuItem (self.MenuItem)
 	
 	if self.MenuItem then
-		self.MenuItem:SetText (self:GetText ())
+		self.MenuItem:SetEnabled (self:IsEnabled  ())
+		self.MenuItem:SetVisible (self:IsVisible  ())
+		
+		self.MenuItem:SetText    (self:GetText    ())
 		self.MenuItem:SetChecked (self:IsSelected ())
 	end
 	

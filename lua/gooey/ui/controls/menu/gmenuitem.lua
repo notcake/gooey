@@ -83,8 +83,8 @@ function PANEL:SetIcon (icon)
 	end
 	if not self.Icon then
 		self.Icon = vgui.Create ("GImage", self)
-		self.Icon:SetPos (3, 3)
 		self.Icon:SetSize (16, 16)
+		self:InvalidateLayout ()
 	end
 	
 	self.Icon:SetImage (icon)
@@ -123,7 +123,7 @@ function PANEL:Paint (w, h)
 		self:GetSkin ().tex.Menu.RightArrow (w - 15 - 4, 0.5 * (h - 15), 15, 15)
 	end
 	
-	surface.SetFont ("DermaDefault")
+	surface.SetFont (self:GetFont () or "DermaDefault")
 	if self:IsEnabled () then
 		surface.SetTextColor (GLib.Colors.Black)
 		surface.SetTextPos (22, 4)
@@ -136,6 +136,29 @@ function PANEL:Paint (w, h)
 	end
 	surface.DrawText (self:GetText ())
 	return true
+end
+
+function PANEL:PerformLayout (w, h)
+	self:SizeToContents ()
+	self:SetWidth (self:GetWidth () + 30)
+	
+	local w = math.max (self:GetParent ():GetWide (), self:GetWidth ())
+	
+	surface.SetFont (self:GetFont () or "DermaDefault")
+	local _, textHeight = surface.GetTextSize ("W")
+	self:SetSize (w, textHeight + 9)
+	
+	if self.Icon then
+		self.Icon:SetPos (3, 0.5 * (self:GetHeight () - 16))
+	end
+	
+	if self.SubMenuArrow then
+		self.SubMenuArrow:SetSize (15, 15)
+		self.SubMenuArrow:CenterVertical ()
+		self.SubMenuArrow:AlignRight (4)
+	end
+
+	DButton.PerformLayout (self)
 end
 
 -- Event handlers

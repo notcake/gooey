@@ -17,7 +17,7 @@ function PANEL:Init ()
 	end
 	self.DropButton:SetMouseInputEnabled (false)
 	self.DropButton.ComboBox = self
-		
+	
 	self:SetHeight (22)
 	
 	self:SetContentAlignment (4)
@@ -86,7 +86,6 @@ function PANEL:AddItem (text, id)
 	
 	local menuItem = self.Menu:AddItem (comboBoxItem:GetText ())
 	comboBoxItem:SetMenuItem (menuItem)
-	menuItem:SetVisible (comboBoxItem:IsVisible ())
 	
 	self:HookComboBoxItem (comboBoxItem)
 	
