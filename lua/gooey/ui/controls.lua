@@ -157,6 +157,7 @@ include ("controls/gtreeviewnode.lua")
 include ("controls/gtreeview.lua")
 include ("controls/gurllabel.lua")
 include ("controls/gworldview.lua")
+include ("controls/gverticallayout.lua")
 
 include ("controls/gvpanel.lua")
 include ("controls/gclosebutton.lua")

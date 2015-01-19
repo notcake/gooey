@@ -13,7 +13,7 @@ end
 function PANEL:HookContents (contents)
 	if not contents then return end
 	
-	contents:AddEventListener ("MenuOpening", self:GetHashCode (),
+	contents:AddEventListener ("MenuOpening", "Gooey.StatusBarComboBoxPanel." .. self:GetHashCode (),
 		function (_, ...)
 			self:DispatchEvent ("MenuOpening", ...)
 		end
@@ -23,7 +23,7 @@ end
 function PANEL:UnhookContents (contents)
 	if not contents then return end
 	
-	contents:RemoveEventListener ("MenuOpening", self:GetHashCode ())
+	contents:RemoveEventListener ("MenuOpening", "Gooey.StatusBarComboBoxPanel." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GStatusBarComboBoxPanel", PANEL, "GStatusBarPanel")

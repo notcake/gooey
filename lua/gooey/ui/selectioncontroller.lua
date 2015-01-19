@@ -55,9 +55,9 @@ function self:ctor (control)
 	
 	Gooey.EventProvider (self)
 	
-	control:AddEventListener ("MouseDown", self:GetHashCode (), function (_, mouseCode, x, y) self:MouseDown (_, mouseCode, x, y) end)
-	control:AddEventListener ("MouseUp",   self:GetHashCode (), function (_, mouseCode, x, y) self:MouseUp   (_, mouseCode, x, y) end)
-	control:AddEventListener ("MouseMove", self:GetHashCode (), function (_, mouseCode, x, y) self:MouseMove (_, mouseCode, x, y) end)
+	control:AddEventListener ("MouseDown", "Gooey.SelectionController." .. self:GetHashCode (), function (_, mouseCode, x, y) self:MouseDown (_, mouseCode, x, y) end)
+	control:AddEventListener ("MouseUp",   "Gooey.SelectionController." .. self:GetHashCode (), function (_, mouseCode, x, y) self:MouseUp   (_, mouseCode, x, y) end)
+	control:AddEventListener ("MouseMove", "Gooey.SelectionController." .. self:GetHashCode (), function (_, mouseCode, x, y) self:MouseMove (_, mouseCode, x, y) end)
 end
 
 function self:AddToSelection (item)
@@ -270,6 +270,8 @@ function self:MouseMove (_, mouseCode, x, y)
 	if self.SelectionAction == SelectionAction.Override then self:ClearSelection () end
 	self:ClearNewSelection ()
 	
+	if Profiler then Profiler:Begin ("SelectionController : Box selection") end
+	
 	local x, y, w, h = self:GetBoxSelectionRectangle ()
 	self.ItemsInBox = self.Control:ItemsIntersectingAABB (x, y, x + w, y + h, self.ItemsInBox)
 	for i = 1, #self.ItemsInBox do
@@ -288,6 +290,8 @@ function self:MouseMove (_, mouseCode, x, y)
 	for i = 1, #self.ItemsInBox do
 		self.ItemsInBox [i] = nil
 	end
+	
+	if Profiler then Profiler:End () end
 end
 
 function self:MouseUp (_, mouseCode, x, y)

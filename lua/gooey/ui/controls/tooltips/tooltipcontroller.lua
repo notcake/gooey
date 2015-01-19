@@ -109,20 +109,20 @@ function self:SetControl (control)
 	
 	self:HideToolTip ()
 	if self.Control then
-		self.Control:RemoveEventListener ("EnabledChanged", self:GetHashCode ())
-		self.Control:RemoveEventListener ("MouseEnter",     self:GetHashCode ())
-		self.Control:RemoveEventListener ("MouseLeave",     self:GetHashCode ())
-		self.Control:RemoveEventListener ("Removed",        self:GetHashCode ())
+		self.Control:RemoveEventListener ("EnabledChanged", "Gooey.ToolTipController." .. self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseEnter",     "Gooey.ToolTipController." .. self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseLeave",     "Gooey.ToolTipController." .. self:GetHashCode ())
+		self.Control:RemoveEventListener ("Removed",        "Gooey.ToolTipController." .. self:GetHashCode ())
 		hook.Remove ("Think", "Gooey.ToolTipController")
 	end
 	
 	self.Control = control
 	
 	if self.Control and self.Enabled then
-		self.Control:AddEventListener ("EnabledChanged", self:GetHashCode (), self.EnabledChanged)
-		self.Control:AddEventListener ("MouseEnter",     self:GetHashCode (), self.MouseEnter)
-		self.Control:AddEventListener ("MouseLeave",     self:GetHashCode (), self.MouseLeave)
-		self.Control:AddEventListener ("Removed",        self:GetHashCode (), self.Removed)
+		self.Control:AddEventListener ("EnabledChanged", "Gooey.ToolTipController." .. self:GetHashCode (), self.EnabledChanged)
+		self.Control:AddEventListener ("MouseEnter",     "Gooey.ToolTipController." .. self:GetHashCode (), self.MouseEnter)
+		self.Control:AddEventListener ("MouseLeave",     "Gooey.ToolTipController." .. self:GetHashCode (), self.MouseLeave)
+		self.Control:AddEventListener ("Removed",        "Gooey.ToolTipController." .. self:GetHashCode (), self.Removed)
 	end
 end
 
@@ -133,14 +133,14 @@ function self:SetEnabled (enabled)
 	
 	if self.Control then
 		if self.Enabled then
-			self.Control:AddEventListener ("EnabledChanged", self:GetHashCode (), self.EnabledChanged)
-			self.Control:AddEventListener ("MouseEnter",     self:GetHashCode (), self.MouseEnter)
-			self.Control:AddEventListener ("MouseLeave",     self:GetHashCode (), self.MouseLeave)
+			self.Control:AddEventListener ("EnabledChanged", "Gooey.ToolTipController." .. self:GetHashCode (), self.EnabledChanged)
+			self.Control:AddEventListener ("MouseEnter",     "Gooey.ToolTipController." .. self:GetHashCode (), self.MouseEnter)
+			self.Control:AddEventListener ("MouseLeave",     "Gooey.ToolTipController." .. self:GetHashCode (), self.MouseLeave)
 		else
 			self:HideToolTip ()
-			self.Control:RemoveEventListener ("EnabledChanged", self:GetHashCode ())
-			self.Control:RemoveEventListener ("MouseEnter",     self:GetHashCode ())
-			self.Control:RemoveEventListener ("MouseLeave",     self:GetHashCode ())
+			self.Control:RemoveEventListener ("EnabledChanged", "Gooey.ToolTipController." .. self:GetHashCode ())
+			self.Control:RemoveEventListener ("MouseEnter",     "Gooey.ToolTipController." .. self:GetHashCode ())
+			self.Control:RemoveEventListener ("MouseLeave",     "Gooey.ToolTipController." .. self:GetHashCode ())
 			hook.Remove ("Think", "Gooey.ToolTipController")
 		end
 	end

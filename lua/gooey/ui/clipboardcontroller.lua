@@ -29,7 +29,7 @@ function self:ctor (clipboardTarget)
 		self:UpdateCutState ()
 	end
 	
-	self:AddEventListener ("ClipboardTextChanged", self:GetHashCode (),
+	self:AddEventListener ("ClipboardTextChanged", "Gooey.ClipboardController." .. self:GetHashCode (),
 		function ()
 			self:UpdateButtonState ()
 		end
@@ -84,13 +84,13 @@ end
 
 function self:SetClipboardTarget (clipboardTarget)
 	if self.ClipboardTarget then
-		self.ClipboardTarget:RemoveEventListener ("CanCopyChanged", self:GetHashCode ())
+		self.ClipboardTarget:RemoveEventListener ("CanCopyChanged", "Gooey.ClipboardController." .. self:GetHashCode ())
 	end
 	
 	self.ClipboardTarget = clipboardTarget
 	
 	if self.ClipboardTarget then
-		self.ClipboardTarget:AddEventListener ("CanCopyChanged", self:GetHashCode (), self.CanCopyChanged)
+		self.ClipboardTarget:AddEventListener ("CanCopyChanged", "Gooey.ClipboardController." .. self:GetHashCode (), self.CanCopyChanged)
 	end
 	
 	self:UpdateButtonState ()

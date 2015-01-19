@@ -227,7 +227,7 @@ end
 function self:HookItem (menuItem)
 	if not menuItem then return end
 	
-	menuItem:AddEventListener ("Removed", self:GetHashCode (),
+	menuItem:AddEventListener ("Removed", "Gooey.Menu." .. self:GetHashCode (),
 		function ()
 			for i = 1, #self.Items do
 				if self.Items [i] == menuItem then
@@ -248,5 +248,5 @@ end
 function self:UnhookItem (menuItem)
 	if not menuItem then return end
 	
-	menuItem:RemoveEventListener ("Removed", self:GetHashCode ())
+	menuItem:RemoveEventListener ("Removed", "Gooey.Menu." .. self:GetHashCode ())
 end

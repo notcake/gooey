@@ -343,18 +343,18 @@ end
 function self:HookHorizontalScrollBar (horizontalScrollBar)
 	if not horizontalScrollBar then return end
 	
-	horizontalScrollBar:AddEventListener ("InterpolatedScroll", self:GetHashCode (),
+	horizontalScrollBar:AddEventListener ("InterpolatedScroll", "Gooey.ScrollableViewController." .. self:GetHashCode (),
 		function (_, interpolatedViewX)
 			self:DispatchEvent ("InterpolatedViewXChanged", interpolatedViewX)
 			self:DispatchEvent ("InterpolatedViewPositionChanged", interpolatedViewX, self:GetInterpolatedViewY ())
 		end
 	)
-	horizontalScrollBar:AddEventListener ("Removed", self:GetHashCode (),
+	horizontalScrollBar:AddEventListener ("Removed", "Gooey.ScrollableViewController." .. self:GetHashCode (),
 		function (_)
 			self:SetHorizontalScrollBar (nil)
 		end
 	)
-	horizontalScrollBar:AddEventListener ("Scroll", self:GetHashCode (),
+	horizontalScrollBar:AddEventListener ("Scroll", "Gooey.ScrollableViewController." .. self:GetHashCode (),
 		function (_, viewX)
 			self:SetViewX (horizontalScrollBar:GetViewOffset ())
 		end
@@ -364,26 +364,26 @@ end
 function self:UnhookHorizontalScrollBar (horizontalScrollBar)
 	if not horizontalScrollBar then return end
 	
-	horizontalScrollBar:RemoveEventListener ("InterpolatedScroll", self:GetHashCode ())
-	horizontalScrollBar:RemoveEventListener ("Removed",            self:GetHashCode ())
-	horizontalScrollBar:RemoveEventListener ("Scroll",             self:GetHashCode ())
+	horizontalScrollBar:RemoveEventListener ("InterpolatedScroll", "Gooey.ScrollableViewController." .. self:GetHashCode ())
+	horizontalScrollBar:RemoveEventListener ("Removed",            "Gooey.ScrollableViewController." .. self:GetHashCode ())
+	horizontalScrollBar:RemoveEventListener ("Scroll",             "Gooey.ScrollableViewController." .. self:GetHashCode ())
 end
 
 function self:HookVerticalScrollBar (verticalScrollBar)
 	if not verticalScrollBar then return end
 	
-	verticalScrollBar:AddEventListener ("InterpolatedScroll", self:GetHashCode (),
+	verticalScrollBar:AddEventListener ("InterpolatedScroll", "Gooey.ScrollableViewController." .. self:GetHashCode (),
 		function (_, interpolatedViewY)
 			self:DispatchEvent ("InterpolatedViewYChanged", interpolatedViewY)
 			self:DispatchEvent ("InterpolatedViewPositionChanged", self:GetInterpolatedViewX (), interpolatedViewY)
 		end
 	)
-	verticalScrollBar:AddEventListener ("Removed", self:GetHashCode (),
+	verticalScrollBar:AddEventListener ("Removed", "Gooey.ScrollableViewController." .. self:GetHashCode (),
 		function (_)
 			self:SetVerticalScrollBar (nil)
 		end
 	)
-	verticalScrollBar:AddEventListener ("Scroll", self:GetHashCode (),
+	verticalScrollBar:AddEventListener ("Scroll", "Gooey.ScrollableViewController." .. self:GetHashCode (),
 		function (_, viewY)
 			self:SetViewY (verticalScrollBar:GetViewOffset ())
 		end
@@ -393,9 +393,9 @@ end
 function self:UnhookVerticalScrollBar (verticalScrollBar)
 	if not verticalScrollBar then return end
 	
-	verticalScrollBar:RemoveEventListener ("InterpolatedScroll", self:GetHashCode ())
-	verticalScrollBar:RemoveEventListener ("Removed",            self:GetHashCode ())
-	verticalScrollBar:RemoveEventListener ("Scroll",             self:GetHashCode ())
+	verticalScrollBar:RemoveEventListener ("InterpolatedScroll", "Gooey.ScrollableViewController." .. self:GetHashCode ())
+	verticalScrollBar:RemoveEventListener ("Removed",            "Gooey.ScrollableViewController." .. self:GetHashCode ())
+	verticalScrollBar:RemoveEventListener ("Scroll",             "Gooey.ScrollableViewController." .. self:GetHashCode ())
 end
 
 function self:UpdateHorizontalScrollBarVisibility ()

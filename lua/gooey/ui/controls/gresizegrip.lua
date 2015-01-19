@@ -32,10 +32,10 @@ function PANEL:Init ()
 	self:AddEventListener ("ParentChanged",
 		function (_, oldParent, parent)
 			if oldParent and oldParent:IsValid () then
-				oldParent:RemoveEventListener ("SizeChanged", self:GetHashCode ())
+				oldParent:RemoveEventListener ("SizeChanged", "Gooey.ResizeGrip." .. self:GetHashCode ())
 			end
 			if parent and parent:IsValid () then
-				parent:AddEventListener ("SizeChanged", self:GetHashCode (),
+				parent:AddEventListener ("SizeChanged", "Gooey.ResizeGrip." .. self:GetHashCode (),
 					function ()
 						self:PerformLayout ()
 					end

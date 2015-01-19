@@ -386,7 +386,7 @@ function self:GetText ()
 end
 
 function self:SetFont (font)
-	if self:GetFont () == font then return end
+	if self:GetFont () == font then return self end
 	
 	self.Font = font
 	self.m_FontName = font

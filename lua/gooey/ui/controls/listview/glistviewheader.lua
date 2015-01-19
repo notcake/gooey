@@ -185,13 +185,13 @@ end
 function PANEL:HookColumnCollection (columnCollection)
 	if not columnCollection then return end
 	
-	columnCollection:AddEventListener ("ColumnAdded", self:GetHashCode (),
+	columnCollection:AddEventListener ("ColumnAdded", "Gooey.ListViewHeader." .. self:GetHashCode (),
 		function (_, column)
 			self:OnColumnAdded (column)
 		end
 	)
 	
-	columnCollection:AddEventListener ("ColumnRemoved", self:GetHashCode (),
+	columnCollection:AddEventListener ("ColumnRemoved", "Gooey.ListViewHeader." .. self:GetHashCode (),
 		function (_, column)
 			self:OnColumnRemoved (column)
 		end
@@ -201,14 +201,14 @@ end
 function PANEL:UnhookColumnCollection (columnCollection)
 	if not columnCollection then return end
 	
-	columnCollection:AddEventListener ("ColumnAdded",   self:GetHashCode ())
-	columnCollection:AddEventListener ("ColumnRemoved", self:GetHashCode ())
+	columnCollection:AddEventListener ("ColumnAdded",   "Gooey.ListViewHeader." .. self:GetHashCode ())
+	columnCollection:AddEventListener ("ColumnRemoved", "Gooey.ListViewHeader." .. self:GetHashCode ())
 end
 
 function PANEL:HookColumn (column)
 	if not column then return end
 	
-	column:GetHeader ():AddEventListener ("Click", self:GetHashCode (),
+	column:GetHeader ():AddEventListener ("Click", "Gooey.ListViewHeader." .. self:GetHashCode (),
 		function (_)
 			local sortOrder = Gooey.SortOrder.Ascending
 			if self:GetListView ():GetSortColumnId () == column:GetId () and
@@ -219,13 +219,13 @@ function PANEL:HookColumn (column)
 		end
 	)
 	
-	column:GetHeader ():AddEventListener ("SizeChanged", self:GetHashCode (),
+	column:GetHeader ():AddEventListener ("SizeChanged", "Gooey.ListViewHeader." .. self:GetHashCode (),
 		function (_)
 			self:LayoutHeaders ()
 		end
 	)
 	
-	column:GetHeader ():AddEventListener ("VisibleChanged", self:GetHashCode (),
+	column:GetHeader ():AddEventListener ("VisibleChanged", "Gooey.ListViewHeader." .. self:GetHashCode (),
 		function (_)
 			self:LayoutHeaders ()
 		end
@@ -235,15 +235,15 @@ end
 function PANEL:UnhookColumn (column)
 	if not column then return end
 	
-	column:GetHeader ():RemoveEventListener ("Click",          self:GetHashCode ())
-	column:GetHeader ():RemoveEventListener ("SizeChanged",    self:GetHashCode ())
-	column:GetHeader ():RemoveEventListener ("VisibleChanged", self:GetHashCode ())
+	column:GetHeader ():RemoveEventListener ("Click",          "Gooey.ListViewHeader." .. self:GetHashCode ())
+	column:GetHeader ():RemoveEventListener ("SizeChanged",    "Gooey.ListViewHeader." .. self:GetHashCode ())
+	column:GetHeader ():RemoveEventListener ("VisibleChanged", "Gooey.ListViewHeader." .. self:GetHashCode ())
 end
 
 function PANEL:HookScrollableViewController (scrollableViewController)
 	if not scrollableViewController then return end
 	
-	scrollableViewController:AddEventListener ("ViewXChanged", self:GetHashCode (),
+	scrollableViewController:AddEventListener ("ViewXChanged", "Gooey.ListViewHeader." .. self:GetHashCode (),
 		function (_, viewX)
 			self:PerformLayout ()
 		end
@@ -253,7 +253,7 @@ end
 function PANEL:UnhookScrollableViewController (scrollableViewController)
 	if not scrollableViewController then return end
 	
-	scrollableViewController:RemoveEventListener ("ViewXChanged", self:GetHashCode ())
+	scrollableViewController:RemoveEventListener ("ViewXChanged", "Gooey.ListViewHeader." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GListViewHeader", PANEL, "GPanel")

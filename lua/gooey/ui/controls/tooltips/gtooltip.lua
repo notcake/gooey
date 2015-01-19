@@ -25,7 +25,7 @@ function PANEL:Init ()
 		end
 	)
 	
-	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
+	Gooey:AddEventListener ("Unloaded", "Gooey.ToolTip." .. self:GetHashCode (),
 		function ()
 			self:Remove ()
 		end
@@ -89,7 +89,7 @@ end
 -- Event handlers
 function PANEL:OnRemoved ()
 	Gooey.RemoveRenderHook (Gooey.RenderType.ToolTip, "Gooey.ToolTip." .. self:GetHashCode ())
-	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
+	Gooey:RemoveEventListener ("Unloaded", "Gooey.ToolTip." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GToolTip", PANEL, "GPanel")

@@ -251,13 +251,13 @@ end
 function PANEL:HookSelectedComboBoxItem (comboBoxItem)
 	if not comboBoxItem then return end
 	
-	comboBoxItem:AddEventListener ("IconChanged", self:GetHashCode (),
+	comboBoxItem:AddEventListener ("IconChanged", "Gooey.ComboBox." .. self:GetHashCode (),
 		function (_, icon)
 			self:SetIcon (icon)
 		end
 	)
 	
-	comboBoxItem:AddEventListener ("TextChanged", self:GetHashCode (),
+	comboBoxItem:AddEventListener ("TextChanged", "Gooey.ComboBox." .. self:GetHashCode (),
 		function (_, text)
 			self:SetText (text)
 		end
@@ -271,8 +271,8 @@ end
 function PANEL:UnhookSelectedComboBoxItem (comboBoxItem)
 	if not comboBoxItem then return end
 	
-	comboBoxItem:RemoveEventListener ("IconChanged", self:GetHashCode ())
-	comboBoxItem:RemoveEventListener ("TextChanged", self:GetHashCode ())
+	comboBoxItem:RemoveEventListener ("IconChanged", "Gooey.ComboBox." .. self:GetHashCode ())
+	comboBoxItem:RemoveEventListener ("TextChanged", "Gooey.ComboBox." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GComboBox", PANEL, "GButton")

@@ -90,7 +90,7 @@ function PANEL:Init ()
 	self.VerticalItemLayoutValid = true
 	
 	-- Scrolling
-	self.ItemView = vgui.Create ("GContainer", self)
+	self.ItemView   = vgui.Create ("GContainer", self)
 	self.ItemCanvas = vgui.Create ("GContainer", self.ItemView)
 	
 	self.VScroll = self.VScrollBarFactory (self)
@@ -205,50 +205,66 @@ function PANEL:PerformLayout (w, h)
 	self.ItemView:SetPos (x1, y1)
 	self.ItemView:SetSize (x2 - x1, y2 - y1)
 	
-	self.VScroll:SetPos (self:GetWidth () - self.VScroll:GetWidth (), 0)
-	self.VScroll:SetHeight (self:GetHeight () - (self.HScroll:IsVisible () and self.HScroll:GetHeight () or 0))
-	self.HScroll:SetPos (0, self:GetHeight () - self.HScroll:GetHeight (), 0)
-	self.HScroll:SetWidth (self:GetWidth () - (self.VScroll:IsVisible () and self.VScroll:GetWidth () or 0))
-	self.ScrollBarCorner:SetPos (self:GetWidth () - self.ScrollBarCorner:GetWidth (), self:GetHeight () - self.ScrollBarCorner:GetHeight ())
-	self.ScrollBarCorner:SetVisible (self.VScroll:IsVisible () and self.HScroll:IsVisible ())
+	self:LayoutScrollbars (w, h)
 	
 	if not self.VerticalItemLayoutValid then
-		self.VerticalItemLayoutValid = true
-		
-		-- Apply filtering
-		local filterFunction = self.FilterFunction or function () return true end
-		for listBoxItem in self:GetItemEnumerator () do
-			local listBoxItemControl = self.ItemControls [listBoxItem]
-			listBoxItemControl:SetVisible (listBoxItem:IsVisible () and filterFunction (listBoxItem))
-		end
-		
-		-- Item positioning
-		local y = 0
-		for listBoxItem in self:GetItemEnumerator () do
-			local listBoxItemControl = self.ItemControls [listBoxItem]
-			listBoxItemControl:SetPos (0, y)
-			if self:GetItemHeight () then
-				listBoxItemControl:SetHeight (self:GetItemHeight ())
-			end
-			
-			if listBoxItemControl:IsVisible () then
-				y = y + listBoxItemControl:GetHeight () + self.ItemSpacing
-			end
-		end
-		
-		local contentHeight = y - self.ItemSpacing
-		self.ScrollableViewController:SetContentHeight (contentHeight)
-		self.ItemCanvas:SetHeight (contentHeight)
+		self:LayoutItems (w, h)
 	end
 	
 	if not self.ItemWidthsValid then
-		self.ItemWidthsValid = true
-		
-		local contentWidth = self:GetContentWidth ()
-		for listBoxItem in self:GetItemEnumerator () do
-			local listBoxItemControl = self.ItemControls [listBoxItem]
-			listBoxItemControl:SetWidth (contentWidth)
+		self:LayoutItemWidths (w, h)
+	end
+end
+
+function PANEL:LayoutScrollbars (w, h)
+	self.VScroll:SetPos (w - self.VScroll:GetWidth (), 0)
+	self.VScroll:SetHeight (h - (self.HScroll:IsVisible () and self.HScroll:GetHeight () or 0))
+	self.HScroll:SetPos (0, h - self.HScroll:GetHeight ())
+	self.HScroll:SetWidth (w - (self.VScroll:IsVisible () and self.VScroll:GetWidth () or 0))
+	self.ScrollBarCorner:SetPos (w - self.ScrollBarCorner:GetWidth (), h - self.ScrollBarCorner:GetHeight ())
+	self.ScrollBarCorner:SetVisible (self.VScroll:IsVisible () and self.HScroll:IsVisible ())
+end
+
+function PANEL:LayoutItems (w, h)
+	if self.VerticalItemLayoutValid then return end
+	
+	self.VerticalItemLayoutValid = true
+	
+	-- Apply filtering
+	local filterFunction = self.FilterFunction or function () return true end
+	for listBoxItem in self:GetItemEnumerator () do
+		local listBoxItemControl = self.ItemControls [listBoxItem]
+		listBoxItemControl:SetVisible (listBoxItem:IsVisible () and filterFunction (listBoxItem))
+	end
+	
+	-- Item positioning
+	local y = 0
+	for listBoxItem in self:GetItemEnumerator () do
+		local listBoxItemControl = self.ItemControls [listBoxItem]
+		listBoxItemControl:SetPos (0, y)
+		if self:GetItemHeight () then
+			listBoxItemControl:SetHeight (self:GetItemHeight ())
 		end
+		
+		if listBoxItemControl:IsVisible () then
+			y = y + listBoxItemControl:GetHeight () + self.ItemSpacing
+		end
+	end
+	
+	local contentHeight = y - self.ItemSpacing
+	self.ScrollableViewController:SetContentHeight (contentHeight)
+	self.ItemCanvas:SetHeight (contentHeight)
+end
+
+function PANEL:LayoutItemWidths (w, h)
+	if self.ItemWidthsValid then return end
+	
+	self.ItemWidthsValid = true
+	
+	local contentWidth = self:GetContentWidth ()
+	for listBoxItem in self:GetItemEnumerator () do
+		local listBoxItemControl = self.ItemControls [listBoxItem]
+		listBoxItemControl:SetWidth (contentWidth)
 	end
 end
 
@@ -693,12 +709,12 @@ end
 function PANEL:HookListBoxItem (listBoxItem)
 	if not listBoxItem then return end
 	
-	listBoxItem:AddEventListener ("HeightChanged", "GListBox." .. self:GetHashCode (),
+	listBoxItem:AddEventListener ("HeightChanged", "Gooey.ListBox." .. self:GetHashCode (),
 		function (_)
 			self:InvalidateVerticalItemLayout ()
 		end
 	)
-	listBoxItem:AddEventListener ("VisibleChanged", "GListBox." .. self:GetHashCode (),
+	listBoxItem:AddEventListener ("VisibleChanged", "Gooey.ListBox." .. self:GetHashCode (),
 		function (_)
 			self:InvalidateVerticalItemLayout ()
 		end
@@ -708,8 +724,8 @@ end
 function PANEL:UnhookListBoxItem (listBoxItem)
 	if not listBoxItem then return end
 	
-	listBoxItem:RemoveEventListener ("HeightChanged",  "GListBox." .. self:GetHashCode ())
-	listBoxItem:RemoveEventListener ("VisibleChanged", "GListBox." .. self:GetHashCode ())
+	listBoxItem:RemoveEventListener ("HeightChanged",  "Gooey.ListBox." .. self:GetHashCode ())
+	listBoxItem:RemoveEventListener ("VisibleChanged", "Gooey.ListBox." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GListBox", PANEL, "GPanel")

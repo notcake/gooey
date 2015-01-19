@@ -145,7 +145,7 @@ end
 function self:HookMenuItem (menuItem)
 	if not menuItem then return end
 	
-	menuItem:AddEventListener ("Click", self:GetHashCode (),
+	menuItem:AddEventListener ("Click", "Gooey.ComboBoxItem." .. self:GetHashCode (),
 		function ()
 			self:Select ()
 		end
@@ -155,5 +155,5 @@ end
 function self:UnhookMenuItem (menuItem)
 	if not menuItem then return end
 	
-	menuItem:RemoveEventListener ("Click", self:GetHashCode ())
+	menuItem:RemoveEventListener ("Click", "Gooey.ComboBoxItem." .. self:GetHashCode ())
 end

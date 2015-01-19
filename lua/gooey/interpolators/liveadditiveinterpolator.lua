@@ -121,7 +121,7 @@ end
 function self:HookTickController (tickController)
 	if not tickController then return end
 	
-	tickController:AddEventListener ("Tick", self:GetHashCode (),
+	tickController:AddEventListener ("Tick", "Gooey.LiveAdditiveInterpolator." .. self:GetHashCode (),
 		function ()
 			self:Tick ()
 		end
@@ -131,5 +131,5 @@ end
 function self:UnhookTickController (tickController)
 	if not tickController then return end
 	
-	tickController:RemoveEventListener ("Tick", self:GetHashCode ())
+	tickController:RemoveEventListener ("Tick", "Gooey.LiveAdditiveInterpolator." .. self:GetHashCode ())
 end

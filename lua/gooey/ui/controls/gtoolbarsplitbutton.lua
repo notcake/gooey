@@ -20,7 +20,7 @@ function PANEL:ctor (text)
 		end
 	)
 	
-	self:AddEventListener ("MouseDown", self:GetHashCode (),
+	self:AddEventListener ("MouseDown", "Gooey.ToolbarSplitButton." .. self:GetHashCode (),
 		function (_, mouseCode, x, y)
 			local buttonWidth = self.Height
 			local rightWidth = self.Width - self.Height

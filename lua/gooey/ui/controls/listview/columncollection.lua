@@ -65,13 +65,13 @@ end
 function self:HookColumn (column)
 	if not column then return end
 	
-	column:AddEventListener ("AlignmentChanged", self:GetHashCode (),
+	column:AddEventListener ("AlignmentChanged", "Gooey.ListView.ColumnCollection." .. self:GetHashCode (),
 		function (_, alignment)
 			self:DispatchEvent ("ColumnAlignmentChanged", column, alignment)
 		end
 	)
 	
-	column:AddEventListener ("VisibleChanged", self:GetHashCode (),
+	column:AddEventListener ("VisibleChanged", "Gooey.ListView.ColumnCollection." .. self:GetHashCode (),
 		function (_, visible)
 			self:DispatchEvent ("ColumnVisibleChanged", column, visible)
 		end
@@ -81,6 +81,6 @@ end
 function self:UnhookColumn (column)
 	if not column then return end
 	
-	column:RemoveEventListener ("AlignmentChanged", self:GetHashCode ())
-	column:RemoveEventListener ("VisibleChanged",   self:GetHashCode ())
+	column:RemoveEventListener ("AlignmentChanged", "Gooey.ListView.ColumnCollection." .. self:GetHashCode ())
+	column:RemoveEventListener ("VisibleChanged",   "Gooey.ListView.ColumnCollection." .. self:GetHashCode ())
 end

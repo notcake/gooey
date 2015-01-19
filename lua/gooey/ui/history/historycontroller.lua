@@ -67,13 +67,13 @@ end
 
 function self:SetHistoryStack (historyStack)
 	if self.HistoryStack then
-		self.HistoryStack:RemoveEventListener ("StackChanged", self:GetHashCode ())
+		self.HistoryStack:RemoveEventListener ("StackChanged", "Gooey.HistoryController." .. self:GetHashCode ())
 	end
 	
 	self.HistoryStack = historyStack
 	
 	if self.HistoryStack then
-		self.HistoryStack:AddEventListener ("StackChanged", self:GetHashCode (), self.StackChanged)
+		self.HistoryStack:AddEventListener ("StackChanged", "Gooey.HistoryController." .. self:GetHashCode (), self.StackChanged)
 	end
 	
 	self:UpdateButtonState ()

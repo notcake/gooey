@@ -74,17 +74,17 @@ function self:SetControl (control)
 	self:EndDrag ()
 	
 	if self.Control then
-		self.Control:RemoveEventListener ("MouseDown", self:GetHashCode ())
-		self.Control:RemoveEventListener ("MouseMove", self:GetHashCode ())
-		self.Control:RemoveEventListener ("MouseUp",   self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseDown", "Gooey.DragController." .. self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseMove", "Gooey.DragController." .. self:GetHashCode ())
+		self.Control:RemoveEventListener ("MouseUp",   "Gooey.DragController." .. self:GetHashCode ())
 	end
 	
 	self.Control = control
 	
 	if self.Control then
-		self.Control:AddEventListener ("MouseDown", self:GetHashCode (), self.MouseDown)
-		self.Control:AddEventListener ("MouseMove", self:GetHashCode (), self.MouseMove)
-		self.Control:AddEventListener ("MouseUp",   self:GetHashCode (), self.MouseUp)
+		self.Control:AddEventListener ("MouseDown", "Gooey.DragController." .. self:GetHashCode (), self.MouseDown)
+		self.Control:AddEventListener ("MouseMove", "Gooey.DragController." .. self:GetHashCode (), self.MouseMove)
+		self.Control:AddEventListener ("MouseUp",   "Gooey.DragController." .. self:GetHashCode (), self.MouseUp)
 	end
 end
 

@@ -13,21 +13,21 @@ function PANEL:Init ()
 	
 	self.TextLabel   = self:Create ("GLabel")
 	
-	self:AddEventListener ("Click", "GListBoxItem." .. self:GetHashCode (),
+	self:AddEventListener ("Click", "Gooey.ListBoxItem." .. self:GetHashCode (),
 		function (_)
 			if not self.ListBoxItem then return self end
 			
 			self.ListBoxItem:DispatchEvent ("Click")
 		end
 	)
-	self:AddEventListener ("PositionChanged", "GListBoxItem." .. self:GetHashCode (),
+	self:AddEventListener ("PositionChanged", "Gooey.ListBoxItem." .. self:GetHashCode (),
 		function (_, x, y)
 			if not self.ListBoxItem then return self end
 			
 			self.ListBoxItem:DispatchEvent ("PositionChanged", x, y)
 		end
 	)
-	self:AddEventListener ("SizeChanged", "GListBoxItem." .. self:GetHashCode (),
+	self:AddEventListener ("SizeChanged", "Gooey.ListBoxItem." .. self:GetHashCode (),
 		function (_, x, y)
 			if not self.ListBoxItem then return self end
 			
@@ -54,32 +54,32 @@ function PANEL:SetListBoxItem (listBoxItem)
 	if self.ListBoxItem == listBoxItem then return self end
 	
 	if self.ListBoxItem then
-		GLib.UnbindProperty (self,           self.ListBoxItem, "BackgroundColor", self:GetHashCode ())
-		GLib.UnbindProperty (self,           self.ListBoxItem, "Height",          self:GetHashCode ())
-		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "Font",            self:GetHashCode ())
-		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "Text",            self:GetHashCode ())
-		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "TextColor",       self:GetHashCode ())
+		GLib.UnbindProperty (self,           self.ListBoxItem, "BackgroundColor", "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.UnbindProperty (self,           self.ListBoxItem, "Height",          "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "Font",            "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "Text",            "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.UnbindProperty (self.TextLabel, self.ListBoxItem, "TextColor",       "Gooey.ListBoxItem." .. self:GetHashCode ())
 		
-		self.ListBoxItem:RemoveEventListener ("IconChanged", self:GetHashCode ())
-		self.ListBoxItem:RemoveEventListener ("IndentChanged", self:GetHashCode ())
+		self.ListBoxItem:RemoveEventListener ("IconChanged",   "Gooey.ListBoxItem." .. self:GetHashCode ())
+		self.ListBoxItem:RemoveEventListener ("IndentChanged", "Gooey.ListBoxItem." .. self:GetHashCode ())
 	end
 	
 	local lastListBoxItem = self.ListBoxItem
 	self.ListBoxItem = listBoxItem
 	
 	if self.ListBoxItem then
-		GLib.BindProperty (self,           self.ListBoxItem, "BackgroundColor", self:GetHashCode ())
-		GLib.BindProperty (self,           self.ListBoxItem, "Height",          self:GetHashCode ())
-		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "Font",            self:GetHashCode ())
-		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "Text",            self:GetHashCode ())
-		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "TextColor",       self:GetHashCode ())
+		GLib.BindProperty (self,           self.ListBoxItem, "BackgroundColor", "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.BindProperty (self,           self.ListBoxItem, "Height",          "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "Font",            "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "Text",            "Gooey.ListBoxItem." .. self:GetHashCode ())
+		GLib.BindProperty (self.TextLabel, self.ListBoxItem, "TextColor",       "Gooey.ListBoxItem." .. self:GetHashCode ())
 		
-		self.ListBoxItem:AddEventListener ("IconChanged", self:GetHashCode (),
+		self.ListBoxItem:AddEventListener ("IconChanged", "Gooey.ListBoxItem." .. self:GetHashCode (),
 			function (_)
 				self:InvalidateLayout ()
 			end
 		)
-		self.ListBoxItem:AddEventListener ("IndentChanged", self:GetHashCode (),
+		self.ListBoxItem:AddEventListener ("IndentChanged", "Gooey.ListBoxItem." .. self:GetHashCode (),
 			function (_)
 				self:InvalidateLayout ()
 			end

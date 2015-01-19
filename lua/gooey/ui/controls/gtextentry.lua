@@ -19,7 +19,7 @@ function self:Init ()
 	
 	self.HelpText = nil
 	
-	self:AddEventListener ("MouseDown", "GTextEntry." .. self:GetHashCode (),
+	self:AddEventListener ("MouseDown", "Gooey.TextEntry." .. self:GetHashCode (),
 		function (_)
 			local parent = self:GetParent ()
 			while parent and parent:IsValid () do

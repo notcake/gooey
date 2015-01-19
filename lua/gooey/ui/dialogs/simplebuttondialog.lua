@@ -32,7 +32,7 @@ function self:Init ()
 		end
 	)
 	
-	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
+	Gooey:AddEventListener ("Unloaded", "Gooey.SimpleButtonDialog." .. self:GetHashCode (),
 		function ()
 			self:Remove ()
 		end
@@ -88,7 +88,7 @@ end
 function self:OnRemoved ()
 	self.Callback (nil)
 
-	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
+	Gooey:RemoveEventListener ("Unloaded", "Gooey.SimpleButtonDialog." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GSimpleButtonDialog", self, "GFrame")

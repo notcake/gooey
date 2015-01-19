@@ -33,7 +33,7 @@ function PANEL:Init ()
 	
 	self:SetDeleteSelf (false)
 	
-	Gooey:AddEventListener ("Unloaded", self:GetHashCode (),
+	Gooey:AddEventListener ("Unloaded", "Gooey.Menu." .. self:GetHashCode (),
 		function ()
 			self:Remove ()
 		end
@@ -256,7 +256,7 @@ function PANEL:OnRemoved ()
 	
 	self:SetMenu (nil)
 	
-	Gooey:RemoveEventListener ("Unloaded", self:GetHashCode ())
+	Gooey:RemoveEventListener ("Unloaded", "Gooey.Menu." .. self:GetHashCode ())
 end
 
 function PANEL:Think ()
@@ -344,25 +344,25 @@ function PANEL:AddMenuItem (menuItem)
 	
 	if not control then return end
 	
-	GLib.BindProperty (control, menuItem, "Enabled",     self:GetHashCode ())
-	GLib.BindProperty (control, menuItem, "ToolTipText", self:GetHashCode ())
-	GLib.BindProperty (control, menuItem, "Visible",     self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Enabled",     "Gooey.Menu." .. self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "ToolTipText", "Gooey.Menu." .. self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Visible",     "Gooey.Menu." .. self:GetHashCode ())
 	
 	self.ItemControls [menuItem] = control
 	
-	control:AddEventListener ("Click", self:GetHashCode (),
+	control:AddEventListener ("Click", "Gooey.Menu." .. self:GetHashCode (),
 		function (_, targetItem)
 			menuItem:DispatchEvent ("Click", targetItem)
 		end
 	)
 	
-	control:AddEventListener ("MouseEnter", self:GetHashCode (),
+	control:AddEventListener ("MouseEnter", "Gooey.Menu." .. self:GetHashCode (),
 		function (_, ...)
 			menuItem:DispatchEvent ("MouseEnter", ...)
 		end
 	)
 	
-	control:AddEventListener ("MouseLeave", self:GetHashCode (),
+	control:AddEventListener ("MouseLeave", "Gooey.Menu." .. self:GetHashCode (),
 		function (_, ...)
 			menuItem:DispatchEvent ("MouseLeave", ...)
 		end
@@ -375,10 +375,10 @@ function PANEL:AddButton (menuItem)
 	control:SetContainingMenu (self)
 	control:SetItem (menuItem)
 	
-	GLib.BindProperty (control, menuItem, "Action",  self:GetHashCode ())
-	GLib.BindProperty (control, menuItem, "Checked", self:GetHashCode ())
-	GLib.BindProperty (control, menuItem, "Icon",    self:GetHashCode ())
-	GLib.BindProperty (control, menuItem, "Text",    self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Action",  "Gooey.Menu." .. self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Checked", "Gooey.Menu." .. self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Icon",    "Gooey.Menu." .. self:GetHashCode ())
+	GLib.BindProperty (control, menuItem, "Text",    "Gooey.Menu." .. self:GetHashCode ())
 	
 	self:AddPanel (control)
 	
@@ -414,26 +414,26 @@ end
 function PANEL:UnhookMenuItem (menuItem)
 	local control = self.ItemControls [menuItem]
 	
-	control:RemoveEventListener ("Click",      self:GetHashCode ())
-	control:RemoveEventListener ("MouseEnter", self:GetHashCode ())
-	control:RemoveEventListener ("MouseLeave", self:GetHashCode ())
+	control:RemoveEventListener ("Click",      "Gooey.Menu." .. self:GetHashCode ())
+	control:RemoveEventListener ("MouseEnter", "Gooey.Menu." .. self:GetHashCode ())
+	control:RemoveEventListener ("MouseLeave", "Gooey.Menu." .. self:GetHashCode ())
 	
 	-- BaseMenuItems
-	GLib.UnbindProperty (control, menuItem, "Enabled",     self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "ToolTipText", self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Visible",     self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Enabled",     "Gooey.Menu." .. self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "ToolTipText", "Gooey.Menu." .. self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Visible",     "Gooey.Menu." .. self:GetHashCode ())
 	
 	-- MenuItems
-	GLib.UnbindProperty (control, menuItem, "Action",      self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Checked",     self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Icon",        self:GetHashCode ())
-	GLib.UnbindProperty (control, menuItem, "Text",        self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Action",      "Gooey.Menu." .. self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Checked",     "Gooey.Menu." .. self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Icon",        "Gooey.Menu." .. self:GetHashCode ())
+	GLib.UnbindProperty (control, menuItem, "Text",        "Gooey.Menu." .. self:GetHashCode ())
 end
 
 function PANEL:HookMenu (menu)
 	if not menu then return end
 	
-	menu:AddEventListener ("Cleared", self:GetHashCode (),
+	menu:AddEventListener ("Cleared", "Gooey.Menu." .. self:GetHashCode (),
 		function (_)
 			for control in self:GetEnumerator () do
 				self:UnhookMenuItem (control.Item)
@@ -443,19 +443,19 @@ function PANEL:HookMenu (menu)
 		end
 	)
 	
-	menu:AddEventListener ("ItemAdded", self:GetHashCode (),
+	menu:AddEventListener ("ItemAdded", "Gooey.Menu." .. self:GetHashCode (),
 		function (_, menuItem)
 			self:AddMenuItem (menuItem)
 		end
 	)
 	
-	menu:AddEventListener ("ItemRemoved", self:GetHashCode (),
+	menu:AddEventListener ("ItemRemoved", "Gooey.Menu." .. self:GetHashCode (),
 		function (_, menuItem)
 			self:RemoveMenuItem (menuItem)
 		end
 	)
 	
-	menu:AddEventListener ("WidthChanged", self:GetHashCode (),
+	menu:AddEventListener ("WidthChanged", "Gooey.Menu." .. self:GetHashCode (),
 		function (_, width)
 			self:PerformLayout ()
 		end
@@ -465,10 +465,10 @@ end
 function PANEL:UnhookMenu (menu)
 	if not menu then return end
 	
-	menu:RemoveEventListener ("Cleared",      self:GetHashCode ())
-	menu:RemoveEventListener ("ItemAdded",    self:GetHashCode ())
-	menu:RemoveEventListener ("ItemRemoved",  self:GetHashCode ())
-	menu:RemoveEventListener ("WidthChanged", self:GetHashCode ())
+	menu:RemoveEventListener ("Cleared",      "Gooey.Menu." .. self:GetHashCode ())
+	menu:RemoveEventListener ("ItemAdded",    "Gooey.Menu." .. self:GetHashCode ())
+	menu:RemoveEventListener ("ItemRemoved",  "Gooey.Menu." .. self:GetHashCode ())
+	menu:RemoveEventListener ("WidthChanged", "Gooey.Menu." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GMenu", PANEL, "DMenu")

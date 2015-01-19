@@ -225,7 +225,7 @@ end
 function self:HookControl (control)
 	if not control then return end
 	
-	control:AddEventListener ("Removed", self:GetHashCode (),
+	control:AddEventListener ("Removed", "Gooey.DragDropController." .. self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end
@@ -235,7 +235,7 @@ end
 function self:UnhookControl (control)
 	if not control then return end
 	
-	control:RemoveEventListener ("Removed", self:GetHashCode ())
+	control:RemoveEventListener ("Removed", "Gooey.DragDropController." .. self:GetHashCode ())
 end
 
 -- Event handlers

@@ -155,10 +155,10 @@ function PANEL:AddTab (...)
 	if text     then tab:SetText (text)         end
 	if contents then tab:SetContents (contents) end
 	
-	tab:AddEventListener ("CloseRequested",  self:GetHashCode (), self.CloseRequested)
-	tab:AddEventListener ("ContentsChanged", self:GetHashCode (), self.ContentsChanged)
-	tab:AddEventListener ("TextChanged",     self:GetHashCode (), self.TextChanged)
-	tab:AddEventListener ("VisibleChanged",  self:GetHashCode (), self.VisibleChanged)
+	tab:AddEventListener ("CloseRequested",  "Gooey.TabControl." .. self:GetHashCode (), self.CloseRequested)
+	tab:AddEventListener ("ContentsChanged", "Gooey.TabControl." .. self:GetHashCode (), self.ContentsChanged)
+	tab:AddEventListener ("TextChanged",     "Gooey.TabControl." .. self:GetHashCode (), self.TextChanged)
+	tab:AddEventListener ("VisibleChanged",  "Gooey.TabControl." .. self:GetHashCode (), self.VisibleChanged)
 	
 	if not self:GetSelectedTab () then
 		self:SetSelectedTab (tab)
@@ -376,10 +376,10 @@ function PANEL:RemoveTab (tab, delete)
 	self.TabSet [tab] = nil
 	
 	-- Unhook tab
-	tab:RemoveEventListener ("CloseRequested",  self:GetHashCode ())
-	tab:RemoveEventListener ("ContentsChanged", self:GetHashCode ())
-	tab:RemoveEventListener ("TextChanged",     self:GetHashCode ())
-	tab:RemoveEventListener ("VisibleChanged",  self:GetHashCode ())
+	tab:RemoveEventListener ("CloseRequested",  "Gooey.TabControl." .. self:GetHashCode ())
+	tab:RemoveEventListener ("ContentsChanged", "Gooey.TabControl." .. self:GetHashCode ())
+	tab:RemoveEventListener ("TextChanged",     "Gooey.TabControl." .. self:GetHashCode ())
+	tab:RemoveEventListener ("VisibleChanged",  "Gooey.TabControl." .. self:GetHashCode ())
 	
 	-- Update selected tab
 	if self:GetSelectedTab () == tab then

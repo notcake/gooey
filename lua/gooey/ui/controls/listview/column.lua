@@ -222,12 +222,12 @@ end
 function self:HookHeader (header)
 	if not header then return end
 	
-	header:AddEventListener ("Removed", self:GetHashCode (),
+	header:AddEventListener ("Removed", "Gooey.ListView.Column." .. self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end
 	)
-	header:AddEventListener ("WidthChanged", self:GetHashCode (),
+	header:AddEventListener ("WidthChanged", "Gooey.ListView.Column." .. self:GetHashCode (),
 		function (_, width)
 			self:SetWidth (width)
 		end
@@ -237,6 +237,6 @@ end
 function self:UnhookHeader (header)
 	if not header then return end
 	
-	header:RemoveEventListener ("Removed", self:GetHashCode ())
-	header:RemoveEventListener ("WidthChanged", self:GetHashCode ())
+	header:RemoveEventListener ("Removed",      "Gooey.ListView.Column." .. self:GetHashCode ())
+	header:RemoveEventListener ("WidthChanged", "Gooey.ListView.Column." .. self:GetHashCode ())
 end

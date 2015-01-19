@@ -109,7 +109,7 @@ end
 function PANEL:HookMenu (menu)
 	if not menu then return end
 	
-	menu:AddEventListener ("MenuClosed",
+	menu:AddEventListener ("MenuClosed", "Gooey.MenuStripItem." .. self:GetHashCode (),
 		function (_)
 			menu.CloseTime = CurTime ()
 		end
@@ -119,7 +119,7 @@ end
 function PANEL:UnhookMenu (menu)
 	if not menu then return end
 	
-	menu:RemoveEventListener ("MenuClosed",     self:GetHashCode ())
+	menu:RemoveEventListener ("MenuClosed", "Gooey.MenuStripItem." .. self:GetHashCode ())
 end
 
 Gooey.Register ("GMenuStripItem", PANEL, "GPanel")
