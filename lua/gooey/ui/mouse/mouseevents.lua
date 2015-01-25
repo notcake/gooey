@@ -21,6 +21,9 @@ function Gooey.CreateMouseEvents (panel)
 	function panel:OnCursorExited ()
 		self:DispatchEvent ("MouseLeave")
 		if self.OnMouseLeave then self:OnMouseLeave () end
+		
+		self.Depressed = false
+		self.Pressed   = false
 	end
 
 	function panel:OnMousePressed (mouseCode)
