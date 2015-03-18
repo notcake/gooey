@@ -684,10 +684,11 @@ end
 function PANEL:OnMouseWheel (delta)
 	if self.VScroll:IsVisible () then
 		self.VScroll:OnMouseWheeled (delta)
-	else
+		return true
+	elseif self.HScroll:IsVisible () then
 		self.HScroll:OnMouseWheeled (delta)
+		return true
 	end
-	return true
 end
 
 function PANEL:OnRemoved ()

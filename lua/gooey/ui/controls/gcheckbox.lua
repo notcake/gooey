@@ -19,27 +19,29 @@ function PANEL:IsChecked ()
 end
 
 function PANEL:Paint (w, h)
-	local w = 15
-	local h = 15
+	local checkWidth  = 15
+	local checkHeight = 15
+	local x = 0
+	local y = 0.5 * (h - checkHeight)
 	
 	if self:IsChecked () then
 		if self:IsEnabled () then
-			self:GetSkin ().tex.Checkbox_Checked (0, 0, w, h)
+			self:GetSkin ().tex.Checkbox_Checked (x, y, checkWidth, checkHeight)
 		else
-			self:GetSkin ().tex.CheckboxD_Checked (0, 0, w, h)
+			self:GetSkin ().tex.CheckboxD_Checked (x, y, checkWidth, checkHeight)
 		end
 	else
 		if self:IsEnabled () then
-			self:GetSkin ().tex.Checkbox (0, 0, w, h)
+			self:GetSkin ().tex.Checkbox (x, y, checkWidth, checkHeight)
 		else
-			self:GetSkin ().tex.CheckboxD (0, 0, w, h)
+			self:GetSkin ().tex.CheckboxD (x, y, checkWidth, checkHeight)
 		end
 	end
 	return false
 end
 
-function PANEL:PerformLayout ()
-	self:SetTextInset (self:GetTall () + 4, 0)
+function PANEL:PerformLayout (w, h)
+	self:SetTextInset (h + 4, 0)
 end
 
 function PANEL:SetChecked (checked)

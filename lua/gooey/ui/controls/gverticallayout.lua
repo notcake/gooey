@@ -4,6 +4,10 @@ function PANEL:Init ()
 	-- Items
 	self.Items = Gooey.Containers.OrderedSet ()
 	
+	-- Item IDs
+	self.ItemIds   = {}
+	self.ItemsById = {}
+	
 	-- Item layout
 	self.ItemSpacing = 0
 	
@@ -145,11 +149,21 @@ function PANEL:LayoutItemWidths (w, h)
 end
 
 -- Items
-function PANEL:AddItem (control)
+function PANEL:AddItem (control, id)
 	if self.Items:Contains (control) then return end
 	
 	self.Items:Add (control)
 	control:SetParent (self.ItemCanvas)
+	
+	if id then
+		if self.ItemsById [id] then
+			self.ItemIds [self.ItemsById [id]] = nil
+			self.ItemsById [id] = nil
+		end
+		
+		self.ItemsById [id] = control
+		self.ItemIds [control] = id
+	end
 	
 	self:HookControl (control)
 	
@@ -164,6 +178,9 @@ function PANEL:Clear ()
 	
 	self.Items:Clear ()
 	
+	self.ItemIds   = {}
+	self.ItemsById = {}
+	
 	self:InvalidateVerticalItemLayout ()
 end
 
@@ -173,6 +190,10 @@ end
 
 function PANEL:GetItem (index)
 	return self.Items:Get (index)
+end
+
+function PANEL:GetItemById (id)
+	return self.ItemsById [id]
 end
 
 function PANEL:GetItemCount ()
@@ -191,6 +212,11 @@ function PANEL:RemoveItem (control)
 	if not self.Items:Contains (control) then return end
 	
 	self.Items:Remove (control)
+	
+	if self.ItemIds [control] then
+		self.ItemsById [self.ItemIds [control]] = nil
+		self.ItemIds [control] = nil
+	end
 	
 	self:UnhookControl (control)
 	
