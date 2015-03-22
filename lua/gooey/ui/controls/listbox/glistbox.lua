@@ -201,10 +201,6 @@ function PANEL:PaintOver ()
 end
 
 function PANEL:PerformLayout (w, h)
-	local x1, y1, x2, y2 = self:GetContentBounds ()
-	self.ItemView:SetPos (x1, y1)
-	self.ItemView:SetSize (x2 - x1, y2 - y1)
-	
 	self:LayoutScrollbars (w, h)
 	
 	if not self.VerticalItemLayoutValid then
@@ -214,6 +210,13 @@ function PANEL:PerformLayout (w, h)
 	if not self.ItemWidthsValid then
 		self:LayoutItemWidths (w, h)
 	end
+	
+	-- Do this last, since item layout can change the content height
+	-- which can change scrollbar visibility,
+	-- which changes view size
+	local x1, y1, x2, y2 = self:GetContentBounds ()
+	self.ItemView:SetPos (x1, y1)
+	self.ItemView:SetSize (x2 - x1, y2 - y1)
 end
 
 function PANEL:LayoutScrollbars (w, h)
