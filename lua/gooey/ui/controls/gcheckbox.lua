@@ -41,7 +41,7 @@ function PANEL:Paint (w, h)
 end
 
 function PANEL:PerformLayout (w, h)
-	self:SetTextInset (h + 4, 0)
+	self:SetTextInset (20, 0)
 end
 
 function PANEL:SetChecked (checked)

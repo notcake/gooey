@@ -12,7 +12,7 @@ function self:ctor (imageCache, image)
 	end
 	
 	if string.find (self.Material:GetShader (), "VertexLitGeneric") or
-		string.find (self.Material:GetShader (), "Cable") then
+	   string.find (self.Material:GetShader (), "Cable") then
 		local baseTexture = self.Material:GetString ("$basetexture")
 		if baseTexture then
 			self.Material = CreateMaterial (image .. "_DImage", "UnlitGeneric",

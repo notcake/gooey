@@ -10,6 +10,8 @@ local self = {}
 			Fired when this text entry's help text has changed.
 		HelpTextColorChanged (helpTextColor)
 			Fired when this text entry's help text color has changed.
+		HelpTextFontChanged (helpTextFont)
+			Fired when this text entry's help text font has changed.
 ]]
 
 function self:Init ()
@@ -17,7 +19,8 @@ function self:Init ()
 	
 	self.BorderColor = nil
 	
-	self.HelpText = nil
+	self.HelpText     = nil
+	self.HelpTextFont = "DermaDefaultItalic"
 	
 	self:AddEventListener ("MouseDown", "Gooey.TextEntry." .. self:GetHashCode (),
 		function (_)
@@ -59,6 +62,10 @@ function self:GetHelpTextColor ()
 	return self.HelpTextColor
 end
 
+function self:GetHelpTextFont ()
+	return self.HelpTextFont
+end
+
 function self:SetHelpText (helpText)
 	if self.HelpText == helpText then return self end
 	
@@ -75,6 +82,16 @@ function self:SetHelpTextColor (helpTextColor)
 	self.HelpTextColor = helpTextColor
 	
 	self:DispatchEvent ("HelpTextColorChanged", self.HelpTextColor)
+	
+	return self
+end
+
+function self:SetHelpTextFont (helpTextFont)
+	if self.HelpTextFont == helpTextFont then return self end
+	
+	self.HelpTextFont = helpTextFont
+	
+	self:DispatchEvent ("HelpTextFontChanged", self.HelpTextFont)
 	
 	return self
 end
@@ -123,7 +140,7 @@ end
 function self:PaintHelpText (w, h)
 	if not self:GetHelpText () then return end
 	
-	surface.SetFont ("DermaDefaultItalic")
+	surface.SetFont (self:GetHelpTextFont ())
 	local textWidth, textHeight = surface.GetTextSize (self:GetHelpText ())
 	surface.SetTextPos (3, self:IsMultiline () and 1 or (0.5 * (h - textHeight) + 1))
 	surface.SetTextColor (self:GetHelpTextColor () or GLib.Colors.Silver)

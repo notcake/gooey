@@ -63,6 +63,12 @@ function PANEL:Init ()
 		end
 	)
 	
+	self:AddEventListener ("WidthChanged",
+		function (_)
+			self:UpdateTooltip ()
+		end
+	)
+	
 	self:AddEventListener ("TextChanged",
 		function (_)
 			self:UpdateTooltip ()
@@ -134,7 +140,8 @@ function PANEL:IsMenuOpen ()
 end
 
 function PANEL:SetSelectedItem (comboBoxItem)
-	if type (comboBoxItem) == "string" then
+	if isnumber (comboBoxItem) or
+	   isstring (comboBoxItem) then
 		comboBoxItem = self:GetItemById (comboBoxItem)
 	end
 	

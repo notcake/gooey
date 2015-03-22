@@ -21,7 +21,7 @@ function self:GetPlaceholderImage ()
 end
 
 function self:GetImage (image)
-	image = image:lower ()
+	image = string.lower (image)
 	if self.Images [image] then
 		return self.Images [image]
 	end
@@ -39,7 +39,7 @@ function self:GetImage (image)
 end
 
 function self:LoadImage (image)
-	image = image:lower ()
+	image = string.lower (image)
 	if self.Images [image] then
 		return self.Images [image]
 	end
