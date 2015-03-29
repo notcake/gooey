@@ -45,7 +45,7 @@ function PANEL:Paint (w, h)
 		end
 		surface.SetDrawColor (col.r, col.g, col.b, col.a)
 		self:DrawFilledRect ()
-	elseif self:IsHovered () then
+	elseif self:IsHoveredRecursive () then
 		local col = self:GetSkin ().listview_selected
 		surface.SetDrawColor (col.r, col.g, col.b, col.a * 0.25)
 		self:DrawFilledRect ()
@@ -142,14 +142,6 @@ end
 -- Selection
 function PANEL:CanSelect ()
 	return self.Selectable
-end
-
-function PANEL:IsHovered ()
-	if not self.Hovered then return false end
-	
-	local mouseX, mouseY = self:CursorPos ()
-	return mouseX >= 0 and mouseX < self:GetWide () and
-	       mouseY >= 0 and mouseY < self:GetTall ()
 end
 
 function PANEL:IsSelected ()

@@ -109,7 +109,7 @@ function PANEL:Paint (w, h)
 		end
 		surface.SetDrawColor (col)
 		self:DrawFilledRect ()
-	elseif self:IsHovered () then
+	elseif self:IsHoveredRecursive () then
 		surface.SetDrawColor (col.r, col.g, col.b, col.a * 0.25)
 		self:DrawFilledRect ()
 	end

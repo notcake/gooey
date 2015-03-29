@@ -99,14 +99,16 @@ end
 
 -- Control
 function self:Contains (control)
-	if not control then return false end
+	if not control            then return false end
 	if not control:IsValid () then return false end
 	
 	local parent = control:GetParent ()
 	while parent and parent:IsValid () do
 		if parent == self then return true end
+		
 		parent = parent:GetParent ()
 	end
+	
 	return false
 end
 
@@ -132,6 +134,18 @@ function self:IsHovered ()
 	return vgui.GetHoveredPanel () == self
 end
 
+function self:IsHoveredRecursive ()
+	if vgui.GetHoveredPanel () == self then return true end
+	
+	if vgui.GetHoveredPanel () == nil then
+		local mouseX, mouseY = self:CursorPos ()
+		return mouseX >= 0 and mouseX < self:GetWidth () and
+		       mouseY >= 0 and mouseY < self:GetHeight ()
+	end
+	
+	return self:Contains (vgui.GetHoveredPanel ())
+end
+
 function self:IsPressed ()
 	return self.Pressed
 end
@@ -144,6 +158,28 @@ function self:LocalToScreen (x, y)
 	local parentX, parentY = self:LocalToParent (x, y)
 	if not self:GetParent () then return parentX, parentY end
 	return self:GetParent ():LocalToScreen (parentX, parentY)
+end
+
+function self:Owns (control)
+	if not control            then return false end
+	if not control:IsValid () then return false end
+	
+	local owner = control.GetOwner and control:GetOwner ()
+	if not owner or not owner:IsValid () then
+		owner = control:GetParent ()
+	end
+	
+	while owner and owner:IsValid () do
+		if owner == self then return true end
+		
+		control = owner
+		owner = control.GetOwner and control:GetOwner ()
+		if not owner or not owner:IsValid () then
+			owner = control:GetParent ()
+		end
+	end
+	
+	return false
 end
 
 function self:Remove ()

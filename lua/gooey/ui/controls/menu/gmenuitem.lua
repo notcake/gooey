@@ -112,7 +112,7 @@ function PANEL:Paint (w, h)
 	
 	local subMenu = self:GetItem ():GetSubMenu ()
 	local activeMenu = self:GetContainingMenu ():GetActiveSubMenu ()
-	if not self.Hovered and
+	if not self:IsHovered () and
 	   self:GetContainingMenu ():GetHoveredItem () == nil and
 	   activeMenu and activeMenu:GetMenu () == subMenu then
 		self:GetSkin ().tex.MenuBG_Hover (0, 0, w, h)

@@ -121,10 +121,6 @@ function PANEL:IsCloseButtonVisible ()
 	return self.CloseButton:IsVisible ()
 end
 
-function PANEL:IsHovered ()
-	return self.Hovered
-end
-
 function PANEL:IsSelected ()
 	return self.Tab:IsSelected ()
 end
