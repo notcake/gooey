@@ -276,6 +276,7 @@ function self:SetToolTipText (toolTipText)
 	if self.ToolTipText == toolTipText then return self end
 	
 	self.ToolTipText = toolTipText
+	
 	self:DispatchEvent ("ToolTipTextChanged", self.ToolTipText)
 	
 	return self

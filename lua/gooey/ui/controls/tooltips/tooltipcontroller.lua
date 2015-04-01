@@ -30,9 +30,14 @@ function self:ctor (control)
 				if self.Manual then return end
 				if not self.Control:IsEnabled () then return end
 				if not self:GetToolTipText () then return end
-				if self:IsToolTipVisible () then return end
-				if SysTime () - self.MouseEnterTime > 0.5 then
-					self:ShowToolTip ()
+				if self:IsToolTipVisible () then
+					if not self.Control:IsHoveredRecursive () then
+						self:HideToolTip ()
+					end
+				else
+					if SysTime () - self.MouseEnterTime > 0.5 then
+						self:ShowToolTip ()
+					end
 				end
 			end
 		)
