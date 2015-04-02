@@ -149,8 +149,10 @@ function PANEL:Init ()
 		end
 	)
 	
-	self:AddEventListener ("WidthChanged",
+	self:AddEventListener ("SizeChanged",
 		function (_, w)
+			-- Need to update when height changes too, since vertical scrollbar visibility can change,
+			-- affecting view width
 			self.ItemCanvas:SetWidth (self:GetContentWidth ())
 		end
 	)
