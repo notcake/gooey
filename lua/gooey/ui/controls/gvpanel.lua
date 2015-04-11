@@ -118,6 +118,20 @@ function PANEL:CaptureMouse (capture, control)
 	self.MouseCaptured = capture
 end
 
+function PANEL:Contains (control)
+	if not control            then return false end
+	if not control:IsValid () then return false end
+	
+	local parent = control:GetParent ()
+	while parent and parent:IsValid () do
+		if parent == self then return true end
+		
+		parent = parent:GetParent ()
+	end
+	
+	return false
+end
+
 function PANEL:ContainsPoint (x, y)
 	return x >= 0 and x < self:GetWidth () and
 	       y >= 0 and y < self:GetHeight ()
@@ -244,6 +258,22 @@ end
 
 function PANEL:IsHovered ()
 	return self.Hovered
+end
+
+function PANEL:IsHoveredRecursive ()
+	if self.Hovered then return true end
+	
+	local parent = self:GetParent ()
+	while parent and parent:IsValid () do
+		if parent.GetHoveredControl then
+			local hoveredControl = parent:GetHoveredControl ()
+			return self:Contains (hoveredControl)
+		end
+		
+		parent = parent:GetParent ()
+	end
+	
+	return false
 end
 
 function PANEL:IsLayoutValid ()
