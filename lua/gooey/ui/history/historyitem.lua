@@ -12,26 +12,20 @@ function self:ChainItem (historyItem)
 	
 	if self.ChainedItem then
 		self.ChainedItem:ChainItem (historyItem)
-		return
 	else
-		self.MoveForwardFunction = self.MoveForward
-		self.MoveBackFunction    = self.MoveBack
-		
-		self.MoveForward = self.MoveForwardChain
-		self.MoveBack    = self.MoveBackChain
+		self.ChainedItem = historyItem
 	end
-	self.ChainedItem = historyItem
 end
 
 function self:GetDescription ()
 	return self.Description
 end
 
-function self:MoveForward ()
-end
-
 function self:SetDescription (description)
 	self.Description = description or "<action>"
+end
+
+function self:MoveForward ()
 end
 
 function self:MoveBack ()
@@ -39,15 +33,15 @@ end
 
 -- Internal, do not call
 function self:MoveForwardChain ()
-	self:MoveForwardFunction ()
+	self:MoveForward ()
 	if self.ChainedItem then
-		self.ChainedItem:MoveForward ()
+		self.ChainedItem:MoveForwardChain ()
 	end
 end
 
 function self:MoveBackChain ()
 	if self.ChainedItem then
-		self.ChainedItem:MoveBack ()
+		self.ChainedItem:MoveBackChain ()
 	end
-	self:MoveBackFunction ()
+	self:MoveBack ()
 end
