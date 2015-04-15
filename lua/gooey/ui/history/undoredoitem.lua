@@ -19,3 +19,11 @@ end
 
 function self:Undo ()
 end
+
+function self:RedoChain ()
+	self:MoveForwardChain ()
+end
+
+function self:UndoChain ()
+	self:MoveBackChain ()
+end

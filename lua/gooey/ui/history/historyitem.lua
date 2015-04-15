@@ -47,7 +47,7 @@ end
 
 function self:MoveBackChain ()
 	if self.ChainedItem then
-		self.ChainedItem:MpveBack ()
+		self.ChainedItem:MoveBack ()
 	end
 	self:MoveBackFunction ()
 end

@@ -43,7 +43,7 @@ function self:MoveForward (count)
 	for i = 1, count do
 		if self.NextStack.Count == 0 then return end
 		
-		self.NextStack.Top:Redo ()
+		self.NextStack.Top:RedoChain ()
 		self.PreviousStack:Push (self.NextStack:Pop ())
 		
 		self:DispatchEvent ("ItemRedone", self.PreviousStack.Top)
@@ -57,7 +57,7 @@ function self:MoveBack (count)
 	for i = 1, count do
 		if self.PreviousStack.Count == 0 then return end
 		
-		self.PreviousStack.Top:Undo ()
+		self.PreviousStack.Top:UndoChain ()
 		self.NextStack:Push (self.PreviousStack:Pop ())
 		
 		self:DispatchEvent ("ItemUndone", self.NextStack.Top)
