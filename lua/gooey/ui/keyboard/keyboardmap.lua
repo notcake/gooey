@@ -5,14 +5,22 @@ function self:ctor ()
 	self.Keys = {}
 end
 
-function self:Clone (keyboardMap)
-	keyboardMap = keyboardMap or Gooey.KeyboardMap ()
-	for key, handlers in pairs (self.Keys) do
+function self:Clone (clone)
+	clone = clone or self.__ictor ()
+	
+	clone:Copy (self)
+	
+	return clone
+end
+
+function self:Copy (source)
+	for key, handlers in pairs (source.Keys) do
 		for _, handler in ipairs (handlers) do
-			keyboardMap:Register (key, handler)
+			self:Register (key, handler)
 		end
 	end
-	return keyboardMap
+	
+	return self
 end
 
 local lastEscapeFrame = nil

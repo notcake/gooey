@@ -37,6 +37,28 @@ function self:dtor ()
 	end
 end
 
+function self:Clone (clone)
+	clone = clone or self.__ictor ()
+	
+	clone:Copy (self)
+	
+	return clone
+end
+
+function self:Copy (source)
+	-- Items
+	for menuItem in source:GetEnumerator () do
+		self:AddBaseMenuItem (menuItem:Clone ())
+	end
+	
+	self:SetWidth (source:GetWidth ())
+	
+	-- Events
+	self:GetEventProvider ():Copy (source)
+	
+	return self
+end
+
 function self:AddBaseMenuItem (baseMenuItem)
 	baseMenuItem:SetParent (self)
 	
@@ -87,22 +109,6 @@ function self:Clear ()
 	self.ItemsById = {}
 	
 	self:DispatchEvent ("Cleared")
-end
-
-function self:Clone (menu)
-	menu = menu or Gooey.Menu ()
-	
-	-- Items
-	for menuItem in self:GetEnumerator () do
-		menu:AddBaseMenuItem (menuItem:Clone ())
-	end
-	
-	menu:SetWidth (self:GetWidth ())
-	
-	-- Events
-	self:GetEventProvider ():Clone (menu)
-	
-	return menu
 end
 
 function self:GetEnumerator ()

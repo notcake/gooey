@@ -7,18 +7,24 @@ end
 function self:dtor ()
 end
 
-function self:Clone (menuItem)
-	menuItem = menuItem or Gooey.MenuSeparator ()
+function self:Clone (clone)
+	clone = clone or self.__ictor ()
 	
+	clone:Copy (self)
+	
+	return clone
+end
+
+function self:Copy (source)
 	-- BaseMenuItem
-	menuItem:SetId (self:GetId ())
-	menuItem:SetEnabled (self:IsEnabled ())
-	menuItem:SetVisible (self:IsVisible ())
+	self:SetId      (source:GetId     ())
+	self:SetEnabled (source:IsEnabled ())
+	self:SetVisible (source:IsVisible ())
 	
 	-- Events
-	self:GetEventProvider ():Clone (menuItem)
+	self:GetEventProvider ():Copy (source)
 	
-	return menuItem
+	return self
 end
 
 function self:GetText ()
