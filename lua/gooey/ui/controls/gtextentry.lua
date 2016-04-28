@@ -134,7 +134,7 @@ function self:Paint (w, h)
 	end
 	
 	-- Text
-	self:DrawTextEntryText (self:GetTextColor (), self.m_colHighlight, self.m_colCursor)
+	self:DrawTextEntryText (self:GetTextColor (), self:GetHighlightColor (), self:GetCursorColor ())
 end
 
 function self:PaintHelpText (w, h)
@@ -183,4 +183,4 @@ function self:OnTextChanged ()
 	self:DispatchEvent ("TextChanged", self:GetText ())
 end
 
-Gooey.Register ("GTextEntry", self, "DTextEntry") 
+Gooey.Register ("GTextEntry", self, "DTextEntry")
